@@ -23,7 +23,32 @@ const router = createRouter({
     {
       path: "/login",
       name: "LogIn",
-      component: () => import(/* webpackChunkName: "one" */ "../pages/login.vue"),
+      component: () => import(/* webpackChunkName: "one" */ "../pages/Login.vue"),
+    },
+     {
+      path: "/exam",
+      name: "ExamAns",
+      component: () => import(/* webpackChunkName: "home" */ "../pages/ExamAns.vue"),
+    },
+     {
+      path: "/comments",
+      name: "comments",
+      component: () => import(/* webpackChunkName: "home" */ "../pages/Comments.vue"),
+    },
+     {
+      path: "/lessons",
+      name: "Lessons",
+      component: () => import(/* webpackChunkName: "home" */ "../pages/Lessons.vue"),
+    },
+     {
+      path: "/ratings",
+      name: "Ratings",
+      component: () => import(/* webpackChunkName: "home" */ "../pages/Ratings.vue"),
+    },
+    {
+      path: "/languages",
+      name: "Languages",
+      component: () => import(/* webpackChunkName: "home" */ "../pages/Language.vue"),
     },
   ]
 })

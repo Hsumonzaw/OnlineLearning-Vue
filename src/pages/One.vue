@@ -274,6 +274,7 @@ export default {
       userService
         .getUserList()
         .then((response) => {
+
           this.userList.splice(0);
           this.userList.push(...response);
         })

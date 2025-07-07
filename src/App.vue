@@ -1,7 +1,7 @@
 <template>
   <v-app>
     <div>
-      <v-navigation-drawer
+      <!-- <v-navigation-drawer
         expand-on-hover
         rail
         v-show="showNavigation"
@@ -27,7 +27,7 @@
           <v-list-item prepend-icon="mdi-account-multiple" title="UserAccounts" value="shared" @click="clickRouter('/one')"></v-list-item>
           <v-list-item prepend-icon="mdi-star" title="Starred" value="starred"></v-list-item>
         </v-list>
-      </v-navigation-drawer>
+      </v-navigation-drawer> -->
   <div class="pl-12 hidden-print-only"> 
       </div>
       <v-container fluid class="pl-12 pa-0">
@@ -43,11 +43,13 @@ export default {
   data: () => ({
     showNavigation:true,
     userData:{},
+  
   }),
    props: {},
   mounted: function() {
     this.userData = JSON.parse(localStorage.getItem("user"));
     this.getLoginMethod();
+
   },
   methods: {
     srcMethod:function(){
@@ -55,7 +57,7 @@ export default {
     },
     getLoginMethod:function(){
       
-    if(this.userData.password=="" || this.userData.password==undefined){
+    if(this.userData?.password=="" || this.userData?.password==undefined){
       this.$router
           .push({
             path: "/login",
