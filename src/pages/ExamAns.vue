@@ -5,8 +5,8 @@
     <template v-slot:default>
           <thead>
             <tr>
-              <th class="text-center white--text bg-primary">ExamId</th>
-              <th class="text-center white--text bg-primary">UserAccountId</th>
+              <th class="text-center white--text bg-primary">No</th>
+
               <th class="text-center white--text bg-primary">CourseId</th>
               <th class="text-center white--text bg-primary">pdf</th>
               <th class="text-center white--text bg-primary">Exam Mark</th>
@@ -16,7 +16,7 @@
 
             </tr>
           </thead>
-          <tbody>
+          <!-- <tbody>
             <tr
               v-for="(item, index) in examList"
               :key="index"
@@ -29,8 +29,7 @@
               }"
             >
               <td class="text-center">{{ index + 1 }}</td>
-              <td class="text-center">{{ item.userAccountId }}</td>
-              <td class="text-center">{{ item.coursesId }}</td>
+              <td class="text-center">{{ item.CoursesDto.coursesId }}</td>
               
               <td class="text-center">{{ item.pdf }}</td>
 
@@ -48,28 +47,27 @@
                   <v-icon size="small" @click="deleteUserMethod(item)">mdi-delete</v-icon></v-btn>
               </td>
             </tr>
-          </tbody>
+          </tbody> -->
         </template>
       </v-table>
-       <v-col cols="12" md="12">
-        <v-text-field
-          label="UserAccount Id"
-          v-model="exam.userAccountId"
-          :rules="[(v) => !!v || 'required']" >
-        </v-text-field>
-        </v-col>
+      <v-col>
         <v-col cols="12" md="12">
         <v-text-field
           label="Courses Id"
           v-model="exam.coursesId"
-          :rules="[(v) => !!v || 'required']" >
+          :items="coursesList"
+          :rules="[(v) => !!v || 'required']" 
+          density="compact"
+          variant="outlined">
         </v-text-field>
         </v-col>
          <v-col cols="12" md="12">
         <v-text-field
           label="Exam Question"
           v-model="exam.pdf"
-          :rules="[(v) => !!v || 'required']" >
+          :rules="[(v) => !!v || 'required']"
+          density="compact"
+          variant="outlined" >
         </v-text-field>
         </v-col>
         <v-col cols="12" md="12">
@@ -135,6 +133,7 @@
         </v-col>
       </v-row>
     </v-col>
+    </v-col>
      <!-- <v-col>
       <v-dialog v-model="dialogDelete" width="500">
         <v-card>
@@ -151,6 +150,7 @@
         </v-card>
       </v-dialog>
     </v-col> -->
+
     </v-col>
     </v-row>
 
@@ -158,37 +158,40 @@
 <script>
 import { format } from "date-fns";
 import ExamAnsService from "../service/ExamAnsService.js";
+// import CoursesService from "../service/CoursesService.js";
+import Swal from 'sweetalert2';
+
 export default {
   data: () => ({
     selectedOne :{},
     exam :{},
     examList :[],
     statusTypeList: ["PENDING", "DONE"],
-     startPicker: new Date(),
+    startPicker: new Date(),
     startMenu: false,
-    saveOrupdate: "SAVE",
-
-
-
-    
+    dialogDelete:false,
+    saveOrupdate : "SAVE",
+    coursesList:[], 
   }),
-   props: {hideToolbar: Function},
+   props: {},
   mounted: function() {
     this.exam.startDate = format(this.startPicker, "dd-MM-yyyy");
     this.examListMethod();
+    this.coursesListMethod();
   },
   methods: {
      examListMethod() {
       ExamAnsService.getExamList().then((res) => {
               // console.log("examList =>", res);
-        this.examList = res;
+         this.examList = res;
       });
     },
     saveData: function () {
       if (this.saveOrupdate == "SAVE") {
         ExamAnsService
-        .addExam(this.exam)
+        .addExamList(this.exam)
           .then((response) => {
+            // console.log(response);
             this.exam = {};
             this.examListMethod();
             this.$swal({
@@ -222,6 +225,10 @@ export default {
           });
       }
     },
+    formatDate(datePicker) {
+      const [year, month, day] = datePicker.split("-");
+      return $`{day}-${month}-${year}`;
+    },
   },
   watch: {
      startPicker() {
@@ -233,5 +240,19 @@ export default {
 };
 </script>
 <style scoped>
+table,
+th,
+td {
+  border: 1px solid rgb(215, 215, 215);
+  border-collapse: collapse;
+  padding: 0 1px !important;
+}
 
-</style>
+.login-full {
+  height: 100vh;
+}
+.information-window-v-sheet {
+  height: 100vh !important;
+  overflow-x: scroll;
+}
+</style>s

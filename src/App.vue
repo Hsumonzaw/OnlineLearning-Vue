@@ -28,9 +28,9 @@
           <v-list-item prepend-icon="mdi-star" title="Starred" value="starred"></v-list-item>
         </v-list>
       </v-navigation-drawer> -->
-  <div class="pl-12 hidden-print-only"> 
+  <div class="hidden-print-only"> 
       </div>
-      <v-container fluid class="pl-12 pa-0">
+      <v-container fluid class="pa-0">
         <router-view :hideToolbar="hideToolbar"/>
         </v-container>
               
@@ -67,6 +67,7 @@ export default {
     }else{
       axios.defaults.headers.common["Authorization"] = `${this.userData.password}`;
       this.showNavigation = true;
+
     }
     },
     clickRouter:function(path){

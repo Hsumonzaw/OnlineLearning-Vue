@@ -12,7 +12,7 @@ getExamList() {
   }
 
 
-  addExam(exam) {
+addExamList(exam) {
     let url = `/examans`;
     return this.axios.post(url, exam).then((request) => request.data);
   }

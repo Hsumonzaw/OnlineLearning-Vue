@@ -16,14 +16,14 @@ const router = createRouter({
       component: () => import(/* webpackChunkName: "home" */ "../pages/index.vue"),
     },
     {
-      path: "/one",
-      name: "one",
-      component: () => import(/* webpackChunkName: "one" */ "../pages/One.vue"),
+      path: "/useraccount",
+      name: "useraccount",
+      component: () => import(/* webpackChunkName: "useraccount" */ "../pages/Useraccount.vue"),
     },
     {
       path: "/login",
       name: "LogIn",
-      component: () => import(/* webpackChunkName: "one" */ "../pages/Login.vue"),
+      component: () => import(/* webpackChunkName: "login" */ "../pages/Login.vue"),
     },
      {
       path: "/exam",
@@ -49,6 +49,11 @@ const router = createRouter({
       path: "/languages",
       name: "Languages",
       component: () => import(/* webpackChunkName: "home" */ "../pages/Language.vue"),
+    },
+    {
+      path: "/courses",
+      name: "Courses",
+      component: () => import(/* webpackChunkName: "home" */ "../pages/Courses.vue"),
     },
   ]
 })

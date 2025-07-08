@@ -11,6 +11,7 @@
               <th class="text-center white--text bg-primary">youtube</th>
               <th class="text-center white--text bg-primary">pdf</th>
               <th class="text-center white--text bg-primary">Video Type</th>
+              <th class="text-center white--text bg-primary">Amount</th>
 
               <th class="text-center white--text bg-primary">Date</th>
               <th class="text-center white--text bg-primary">ModifiedDate</th>
@@ -37,6 +38,7 @@
               <td class="text-center">{{ item.youtube }}</td>
               <td class="text-center">{{ item.pdf }}</td>
               <td class="text-center">{{ item.freeVideo || '-' }}</td>
+              <td class="text-center">{{ item.amount || '-' }}</td>
 
               <td class="text-start">{{ item.date }}</td>
               <td class="text-start">{{ item.modifiedDate }}</td>
@@ -157,6 +159,22 @@
                 ></v-autocomplete>
 
               </v-col>
+                <v-col cols="12" md="12">
+           <v-autocomplete
+            v-model="lesson.languagesDto"
+            :items="languageList"
+            item-text="amount"
+            item-title="amount"
+            item-value="language"
+            label="Amount"
+            return-object
+            dense
+            outlined
+           :rules="[(v) => !!v || ' required']"
+          />
+
+            </v-col>
+
               <v-col cols="12" md="12" class="text-right mb-2">
                 <v-btn color="primary " @click="saveLesson()">{{
                   saveOrupdate

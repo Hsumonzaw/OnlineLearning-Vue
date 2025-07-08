@@ -76,9 +76,19 @@ export default {
       // } else {
       //   axios.defaults.headers.common["Authorization"] = ``;
       // }
-      this.$router.push({
-              name: "one"
-            });
+            if(response.userType=="ADMIN"){
+        this.$router
+          .push({
+            path: "/useraccounts",
+          })
+          .catch(() => {});
+      }else{
+        this.$router
+          .push({
+            path: "/",
+          })
+          .catch(() => {});
+      }
         })
         .catch((error) => {
 
