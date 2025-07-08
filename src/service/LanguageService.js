@@ -7,7 +7,7 @@ class LanguageService {
   }
 
   getLanguageList() {
-    let url =`/languages`;
+    let url = `/languages`;
     return this.axios.get(url).then((request) => request.data);
   }
   addLanguageList(language) {
@@ -15,15 +15,14 @@ class LanguageService {
     return this.axios.post(url, language).then((request) => request.data);
   }
 
-  // updateLesson(lessons) {
-  //   let url = /lessons/${lessons.lessonsId};
-  //   return this.axios.put(url, lessons).then((request) => request.data);
-  // }
-  // deleteLesson(lessons) {
-  //   let url = /lessons/${lessons.lessonsId};
-  //   return this.axios.delete(url).then((request) => request.data);
-  // }
-
+  updateLanguage(language) {
+    let url = `/languages/${language.languagesId}`;
+    return this.axios.put(url, language).then((request) => request.data);
+  }
+  deleteLanguage(language) {
+    let url = `/languages/${language.languagesId}`;
+    return this.axios.delete(url).then((request) => request.data);
+  }
 }
 
 const service = new LanguageService();

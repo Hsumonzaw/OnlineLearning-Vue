@@ -6,9 +6,15 @@ class UserAccountService {
     this.axios = axios;
   }
 
-  getUserList() {
+  getUserList(userType) {
     let url = `/useraccounts`;
-    return this.axios.get(url).then((request) => request.data);
+    return this.axios
+      .get(url, {
+        params: {
+          userType,
+        },
+      })
+      .then((request) => request.data);
   }
 
   addUser(user) {
@@ -24,7 +30,7 @@ class UserAccountService {
     let url = `/useraccounts/${userAccount.userAccountId}`;
     return this.axios.delete(url).then((request) => request.data);
   }
-    updatePhoto(formData, userAccountId) {
+  updatePhoto(formData, userAccountId) {
     let url = `useraccounts/${userAccountId}/photo`;
     return axios
       .put(url, formData, {
@@ -34,7 +40,6 @@ class UserAccountService {
       })
       .then((request) => request.data);
   }
-
 }
 
 const service = new UserAccountService();
