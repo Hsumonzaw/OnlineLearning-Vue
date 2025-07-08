@@ -69,7 +69,7 @@
                 <v-text-field
                   type="number"
                   label="Amount"
-                  v-model="language.amount"
+                  v-model.number="language.amount"
                   :rules="[(v) => !!v || 'required']"
                   density="compact"
                   variant="outlined"
@@ -88,7 +88,7 @@
                 <v-text-field
                   type="number"
                   label="Exam Fee"
-                  v-model="language.examFee"
+                  v-model.number="language.examFee"
                   density="compact"
                   variant="outlined"
                 ></v-text-field>
@@ -147,7 +147,10 @@ import languageService from "../service/LanguageService.js";
 export default {
   data: () => ({
     selectedOne: {},
-    language: {},
+    language: {
+      amount: 0,
+      examFee: 0,
+    },
     saveOrupdate: "SAVE",
     languageList: [],
     dialogDelete: false,
@@ -168,7 +171,10 @@ export default {
               showConfirmButton: false,
               timer: 1000,
             });
-            this.language = {};
+            this.language = {
+              amount: 0,
+              examFee: 0,
+            };
             this.languageListMethod();
           })
           .catch((error) => {
@@ -184,7 +190,10 @@ export default {
               showConfirmButton: false,
               timer: 1000,
             });
-            this.language = {};
+            this.language = {
+              amount: 0,
+              examFee: 0,
+            };
             this.languageListMethod();
           })
           .catch((error) => {
