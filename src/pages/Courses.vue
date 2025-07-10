@@ -109,6 +109,7 @@
                   density="compact"
                   variant="outlined"
                   :rules="[(v) => !!v || 'Language is required']"
+                  @update:model-value="changePrice()"
                 />
               </v-col>
               <v-col cols="12" md="12">
@@ -123,6 +124,7 @@
                   density="compact"
                   variant="outlined"
                   :rules="[(v) => !!v || 'Language is required']"
+                  @update:model-value="changePrice()"
                 />
               </v-col>
 
@@ -212,6 +214,13 @@ export default {
     this.courses.type = this.courseList[0];
   },
   methods: {
+  changePrice(){
+    if(this.courses.type=="COURSES"){
+        this.courses.amount = this.courses.languagesDto.amount;
+    }else{
+this.courses.amount = this.courses.languagesDto.examFee;
+    }
+  },
     studentListMethod() {
       userAccountService
         .getUserList(this.userType)

@@ -1,6 +1,33 @@
 <template>
   <v-app>
     <div>
+      <v-toolbar flat :elevation="isDark ? 0 : 4" :class="isDark ? 'dark-bar' : 'light-bar'" height="50">
+    <v-toolbar-title>Online Courses Management</v-toolbar-title>
+
+    <v-spacer></v-spacer>
+     <v-btn icon @click="toggleTheme" :title="isDark ? 'Light Mode' : 'Dark Mode'">
+      <v-icon>{{ isDark ? 'mdi-white-balance-sunny' : 'mdi-weather-night' }}</v-icon>
+    </v-btn>
+      <v-menu offset-y>
+    <template v-slot:activator="{ props }">
+          <v-btn icon v-bind="props">
+            <v-avatar size="30">
+              <img src="@/assets/user-profile.png" alt="" class="profile-img">
+            </v-avatar>
+          </v-btn>
+        </template>
+        <v-card min-width="180">
+          <v-list>
+          <!-- <v-list-item @click="" ><v-list-item-title>Setting</v-list-item-title></v-list-item> -->
+          <v-list-item @click="clickRouter('/login')"><v-list-item-title>Log In</v-list-item-title></v-list-item>
+        </v-list>
+        </v-card>
+      </v-menu>
+   </v-toolbar>
+    </div>
+    <div>
+   
+   
       <!-- <v-navigation-drawer
         expand-on-hover
         rail
@@ -43,12 +70,18 @@ export default {
   data: () => ({
     showNavigation:true,
     userData:{},
+    isDark: false,
+    isLoggedIn:false,
+    
   
   }),
    props: {},
   mounted: function() {
     this.userData = JSON.parse(localStorage.getItem("user"));
     this.getLoginMethod();
+    this.isLoggedIn = !!this.userData ?.password;
+     
+   
 
   },
   methods: {
@@ -80,11 +113,33 @@ export default {
      hideToolbar: function (hide) {
       this.getLoginMethod();
     },
+    toggleTheme(){
+      this.isDark = !this.isDark;
+    },
+    // logout(){
+    //   this.$router.push("/login").catch(() => {});
+    // }
   },
-  watch: {},
+  watch: {
+     isDark(val) {
+      this.$vuetify.theme.global.name = val ? 'dark' : 'light';
+    }
+  },
   components: {}
 };
 </script>
 <style scoped>
-
+.v-toolbar.light-bar {
+  background-color: #558cdf;
+  color: white;
+}
+.v-toolbar.dark-bar {
+  background-color: #4ecddbf6;
+  color: white;
+}
+.profile-img {
+  object-fit: cover;
+  width: 100%;
+  height: 100%;
+}
 </style>

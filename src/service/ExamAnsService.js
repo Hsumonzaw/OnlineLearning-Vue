@@ -16,6 +16,14 @@ addExamList(exam) {
     let url = `/examans`;
     return this.axios.post(url, exam).then((request) => request.data);
   }
+   updateLanguage(exam) {
+    let url = `/examans/${exam.examansId}`;
+    return this.axios.put(url, exam).then((request) => request.data);
+  }
+  deleteLanguage(exam) {
+    let url = `/examans/${exam.examansId}`;
+    return this.axios.delete(url).then((request) => request.data);
+  }
 }
 
 const service = new ExamAnsService();
