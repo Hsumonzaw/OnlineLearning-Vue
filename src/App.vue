@@ -57,26 +57,26 @@ export default {
     },
     getLoginMethod:function(){
       
-    if(this.userData?.password=="" || this.userData?.password==undefined){
-      this.$router
-          .push({
-            path: "/login",
-          })
-          .catch(() => {});
-          this.showNavigation = false;
-    }else{
-      axios.defaults.headers.common["Authorization"] = `${this.userData.password}`;
-      this.showNavigation = true;
+    // if(this.userData?.password=="" || this.userData?.password==undefined){
+    //   this.$router
+    //       .push({
+    //         path: "/login",
+    //       })
+    //       .catch(() => {});
+    //       this.showNavigation = false;
+    // }else{
+    //   axios.defaults.headers.common["Authorization"] = `${this.userData.password}`;
+    //   this.showNavigation = true;
 
-    }
-    },
-    clickRouter:function(path){
-       this.$router
-          .push({
-            path: path,
-          })
-          .catch(() => {});
-    },
+    // }
+    // },
+    // clickRouter:function(path){
+    //    this.$router
+    //       .push({
+    //         path: path,
+    //       })
+    //       .catch(() => {});
+     },
      hideToolbar: function (hide) {
       this.getLoginMethod();
     },
