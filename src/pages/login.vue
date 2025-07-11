@@ -37,10 +37,8 @@
  <v-app my-5>
   <div class="background-image d-flex align-center justify-center">
    <v-card class="pa-8  bg-light-blue-lighten-4  " elevation="16" style="width: 400px; min-width: 300px;">
-
     
-    
-    <v-card-title class="text-h5 text-center"><img src="@/assets/user-profile.png" alt="" class="login-img"><br>Log In</v-card-title>
+    <v-card-title class="text-h5 text-center"><img src="@/assets/user-profile.png" alt="" class="login"><br>Log In</v-card-title>
     <v-col cols="12" md="12">
       <v-text-field label="UserName" v-model="user.userName" prepend-icon="mdi-account" variant="outlined" :rules="nameRules"
 ></v-text-field>
@@ -85,6 +83,7 @@ export default {
         .then((response) => {
           localStorage.setItem("user",JSON.stringify(response));
           this.hideToolbar(true);
+          localStorage.setItem("isLoggedIn","true");
       // if (response.password != undefined) {
       //   axios.defaults.headers.common["Authorization"] = `${response.password}`;
       // } else {
@@ -127,7 +126,7 @@ export default {
 .title{
   font-size: large ;
 }
-.login-img {
+.login{
   width: 100px;
   height: 100px;
   object-fit: cover;

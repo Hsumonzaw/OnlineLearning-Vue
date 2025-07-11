@@ -1,8 +1,28 @@
 <template>
-  <v-row no-gutters>
-    <v-col cols="8" md="8">
-      <v-table fixed-header height="92vh" density="compact">
-        <template v-slot:default>
+  <div>
+    <!-- Table Section -->
+    <v-row v-show="!showForm" no-gutters>
+      <v-col cols="12" >
+        <h2 style="background-color:rgb(136, 210, 230);text-align: center;">User Informations</h2>
+        <v-col cols="12" md="2" class="mb-2">
+          <v-btn
+            style="background-color: rgb(136, 199, 245);"
+            prepend-icon="mdi-plus-circle"
+            rounded="xl"
+            size="50"
+
+            block
+            @click="showForm = true"
+          >
+            <template v-slot:prepend>
+              <v-icon color="success"></v-icon>
+            </template>
+            Add User
+          </v-btn>
+        </v-col>
+
+        <!-- Table Full Width -->
+        <v-table fixed-header height="92vh" >
           <thead>
             <tr>
               <th class="text-center white--text bg-primary">No.</th>
@@ -28,7 +48,8 @@
                     : 'transparent',
               }"
             >
-              <td class="text-center">{{ index + 1 }}</td>
+            
+               <td class="text-center">{{ index + 1 }}</td>
               <td class="text-center">{{ item.startDate }}</td>
               <td class="text-center">{{ item.name }}</td>
               
@@ -54,16 +75,22 @@
             </tr>
             <v-divider />
           </tbody>
-        </template>
-      </v-table>
-    </v-col>
+        </v-table>
+      </v-col>
+    </v-row>
+
+    <!-- Form Section (centered) -->
+    <v-row v-show="showForm" justify="center" class="mt-4">
     <v-col cols="4" md="4" class="pl-2">
-      <v-row class="align-center login-full" no-gutters>
-        <v-col>
-          <v-card variant="outlined" class="mr-2 pl-2 pr-2">
-            <v-row no-gutters class="pa-2">
+        <v-card class="form pa-4" elevation="4">
+          <v-row>
+            <v-col cols="12" class="text-right">
+              <h1 style="text-align: center;">Add User
+              <v-btn icon @click="showForm = false" style="background-color: red;margin-left: 100px;"><v-icon >mdi-close</v-icon></v-btn></h1>
+            </v-col>
+            <v-row no-gutters class=" pa-2">
               <v-col cols="12" md="12">
-                <v-menu
+<v-menu
                   v-model="startMenu"
                   full-width
                   max-width="290px"
@@ -142,27 +169,27 @@
                 }}</v-btn>
               </v-col>
             </v-row>
-          </v-card>
-        </v-col>
-      </v-row>
-    </v-col>
-    <v-col>
-      <v-dialog v-model="dialogDelete" width="500">
-        <v-card>
-          <v-card-title class="text-h5 white--text bg-red"> Delete </v-card-title>
-
-          <v-card-text class="text-h6">
-            Are you sure to delete({{ selectedOne.name }})?
-          </v-card-text>
-          <v-card-actions>
-            <v-spacer></v-spacer>
-            <v-btn class="black" text @click="dialogDelete = false"> CANCEL </v-btn>
-            <v-btn dark class="bg-red" text @click="clickDeleteDialog()"> DELETE </v-btn>
-          </v-card-actions>
+          </v-row>
         </v-card>
-      </v-dialog>
-    </v-col>
-    <v-col>
+      </v-col>
+    </v-row>
+
+    <!-- Delete Dialog -->
+    <v-dialog v-model="dialogDelete" width="500">
+      <v-card>
+        <v-card-title class="text-h5 white--text bg-red">Delete</v-card-title>
+        <v-card-text class="text-h6">
+          Are you sure to delete({{ selectedOne.name }})?
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn class="black" text @click="dialogDelete = false">CANCEL</v-btn>
+          <v-btn dark class="bg-red" text @click="clickDeleteDialog()">DELETE</v-btn>
+        </v-card-actions>
+      </v-card>
+          
+    </v-dialog>
+  <v-col>
           <v-bottom-sheet v-model="userPhotoDialog" fullscreen scrollable>
         <v-sheet class="information-window-v-sheet">
           <PhotoUser
@@ -173,7 +200,8 @@
         </v-sheet>
       </v-bottom-sheet>
     </v-col>
-  </v-row>
+    
+  </div>
 </template>
 <script>
 import { format } from "date-fns";
@@ -189,6 +217,7 @@ export default {
     startMenu: false,
     dialogDelete:false,
     userPhotoDialog:false,
+    showForm: false,
   }),
   props: { hideToolbar: Function },
   mounted: function () {
@@ -227,6 +256,7 @@ export default {
         this.dialogDelete = true;
     },
     editUser:function(item){
+      this.showForm = true;
       this.saveOrupdate = "UPDATE";
       this.user = Object.assign({},item);
     },
@@ -241,6 +271,8 @@ export default {
           .then((response) => {
             this.user = {};
             this.userListMethod();
+            this.showForm = false;
+            this.saveOrupdate = "SAVE";
             this.$swal({
               icon: "success",
               title: "Your work has been saved",
@@ -258,6 +290,7 @@ export default {
             this.saveOrupdate="SAVE";
             this.user = {};
             this.userListMethod();
+            this.showForm = false;
             this.$swal({
               icon: "success",
               title: "Your work has been updated",

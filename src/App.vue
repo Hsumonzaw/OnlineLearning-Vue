@@ -12,14 +12,16 @@
     <template v-slot:activator="{ props }">
           <v-btn icon v-bind="props">
             <v-avatar size="30">
-              <img src="@/assets/user-profile.png" alt="" class="profile-img">
+              <img src="@/assets/loginProfile.png" alt="" class="profile-img">
             </v-avatar>
           </v-btn>
         </template>
         <v-card min-width="180">
           <v-list>
           <!-- <v-list-item @click="" ><v-list-item-title>Setting</v-list-item-title></v-list-item> -->
-          <v-list-item @click="clickRouter('/login')"><v-list-item-title>Log In</v-list-item-title></v-list-item>
+          <v-list-item v-if="!isLoggedIn" @click="clickRouter('/login')"><v-list-item-title>Log In</v-list-item-title></v-list-item>
+          <v-list-item v-else @click="logout"><v-list-item-title>Log Out</v-list-item-title></v-list-item>
+
         </v-list>
         </v-card>
       </v-menu>
@@ -71,15 +73,15 @@ export default {
     showNavigation:true,
     userData:{},
     isDark: false,
-    isLoggedIn:false,
     
   
   }),
    props: {},
   mounted: function() {
     this.userData = JSON.parse(localStorage.getItem("user"));
+    this.isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
     this.getLoginMethod();
-    this.isLoggedIn = !!this.userData ?.password;
+
      
    
 
@@ -88,7 +90,7 @@ export default {
     srcMethod:function(){
         return `${axios.defaults.baseURL}/userphoto/${this.userData?.profilePhoto}.png`;
     },
-    getLoginMethod:function(){
+   getLoginMethod:function(){
       
     if(this.userData?.password=="" || this.userData?.password==undefined){
       this.$router
@@ -103,6 +105,19 @@ export default {
 
     }
     },
+
+    logout(){
+      localStorage.removeItem("user");
+      localStorage.removeItem("isLoggedIn");
+      this.userData = {};
+      this.isLoggedIn = false;
+      this.showNavigation = false;
+    this.$router
+    .push({
+      path: "/"
+    })
+    .catch(() => {});
+    },
     clickRouter:function(path){
        this.$router
           .push({
@@ -110,18 +125,21 @@ export default {
           })
           .catch(() => {});
     },
-     hideToolbar: function (hide) {
+    hideToolbar:function(hide){
       this.getLoginMethod();
     },
     toggleTheme(){
       this.isDark = !this.isDark;
     },
+
+
+    
     // logout(){
-    //   this.$router.push("/login").catch(() => {});
+    //   th// $router.push("// gin").catch(() => {});
     // }
   },
   watch: {
-     isDark(val) {
+   isDark(val) {
       this.$vuetify.theme.global.name = val ? 'dark' : 'light';
     }
   },
