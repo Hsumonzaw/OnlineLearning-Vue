@@ -1,24 +1,23 @@
 <template>
   <div>
     <!-- Table Section -->
-    <v-row v-show="!showForm" no-gutters>
+   <v-row>
       <v-col cols="12">
         <h2 style="background-color:rgb(136, 210, 230); text-align: center;" >Courses</h2>
-        <v-col cols="12" md="2" class="mb-2">
-          <v-btn
-            style="background-color: rgb(136, 199, 245);"
-            prepend-icon="mdi-plus-circle"
-            rounded="xl"
-            size="50"
-            block
-            @click="showForm = true"
-          >
-            <template v-slot:prepend>
-              <v-icon color="success"></v-icon>
-            </template>
-            Add Course
-          </v-btn>
-        </v-col>
+        <v-tooltip location="top">
+  <template v-slot:activator="{ props }">
+    <v-btn
+      v-bind="props"
+      icon
+      color="blue"
+      class="fab-button"
+      @click="showForm = true"
+    >
+      <v-icon size="36" color="white">mdi-plus</v-icon>
+    </v-btn>
+  </template>
+  <span>Add Course</span>
+</v-tooltip>
 
         <!-- Table Full Width -->
         <v-table fixed-header height="92vh" >
@@ -30,6 +29,7 @@
               <th class="text-center white--text bg-primary">Language Name</th>
               <th class="text-center white--text bg-primary">Type</th>
               <th class="text-center white--text bg-primary">Amount</th>
+              <th class="text-center white--text bg-primary">Courses Photo</th>
               <th class="text-center white--text bg-primary">Action</th>
             </tr>
           </thead>
@@ -53,7 +53,13 @@
               <td class="text-center">{{ item.languagesDto?.name }}</td>
               <td class="text-center">{{ item?.type }}</td>
               <td class="text-start">{{ item?.amount }}</td>
+              <td class="text-start">{{ item?.cphoto }}</td>
+              
               <td class="text-center">
+
+                 <v-btn class="ml-1" small icon color="black" density="compact">
+                  <v-icon size="small" @click="photoMethod(item)">mdi-image</v-icon></v-btn
+                >
                 <v-btn class="ml-1" small icon color="green" density="compact">
                   <v-icon size="small" @click="clickEdit(item)"
                     >mdi-pencil</v-icon
@@ -73,16 +79,16 @@
     </v-row>
 
     <!-- Form Section (centered) -->
-    <v-row v-show="showForm" justify="center" class="mt-4">
-    <v-col cols="4" md="4" class="pl-2">
+<v-dialog v-model="showForm" max-width="500">
         <v-card class="form pa-4" elevation="4">
-          <v-row>
-            <v-col cols="12" class="text-right">
-              <h1 style="text-align: center;">Add Course
-              <v-btn icon @click="showForm = false" style="background-color: red;margin-left: 100px;"><v-icon >mdi-close</v-icon></v-btn></h1>
-            </v-col>
-            <v-row no-gutters class=" pa-2">
-             <v-col cols="12" md="12" class="pt-2">
+          
+      <v-card-title class="d-flex justify-space-between align-center">
+      <span class="text-h4">Add Course</span>
+      <v-btn icon color="red" @click="showForm = false">
+        <v-icon>mdi-close</v-icon>
+      </v-btn>
+    </v-card-title>
+    <v-card-text>
                 <v-menu
                   v-model="receivedMenu"
                   full-width
@@ -107,8 +113,7 @@
                     :max="new Date()"
                   ></v-date-picker>
                 </v-menu>
-              </v-col>
-              <v-col cols="12" md="12">
+
                 <v-autocomplete
                   v-model="courses.studentDto"
                   :items="studentList"
@@ -121,8 +126,7 @@
                   variant="outlined"
                   :rules="[(v) => !!v || 'Student is required']"
                 />
-              </v-col>
-              <v-col cols="12" md="12">
+
                 <v-autocomplete
                   v-model="courses.languagesDto"
                   :items="languageList"
@@ -134,9 +138,9 @@
                   density="compact"
                   variant="outlined"
                   :rules="[(v) => !!v || 'Language is required']"
+                   @update:model-value="changeType()"
                 />
-              </v-col>
-              <v-col cols="12" md="12">
+
                 <v-autocomplete
                   v-model="courses.type"
                   :items="courseList"
@@ -148,10 +152,9 @@
                   density="compact"
                   variant="outlined"
                   :rules="[(v) => !!v || 'Language is required']"
+                  @update:model-value="changeType()"
                 />
-              </v-col>
 
-              <v-col cols="12" md="12">
                 <v-text-field
                   type="number"
                   label="Amount"
@@ -160,19 +163,20 @@
                   density="compact"
                   variant="outlined"
                 ></v-text-field>
-              </v-col>
 
-              <v-col cols="12" md="12" class="text-right mb-2">
-                <v-btn color="primary " @click="saveCourse()">{{
+                           </v-card-text>
+               <v-card-actions class="justify-end pr-5">  
+                <v-btn  class="text-black"
+                style="background-color: #2196f3;" 
+                 @click="saveCourse()">{{
                   saveOrupdate
                 }}</v-btn>
-              </v-col>
-            </v-row>
-          </v-row>
-        </v-card>
-      </v-col>
-    </v-row>
+              </v-card-actions>
 
+            
+        
+        </v-card>
+</v-dialog>
     <!-- Delete Dialog -->
     <v-dialog v-model="dialogDelete" width="500">
       <v-card>
@@ -188,6 +192,18 @@
       </v-card>
           
     </v-dialog>
+
+      <v-col>
+          <v-bottom-sheet v-model="coursePhotoDialog" fullscreen scrollable>
+        <v-sheet class="information-window-v-sheet">
+          <CoursePhoto
+          @closeDialog="coursePhotoDialog=false"
+          :courses="selectedOne"
+          @loadUserList="loadUserList"
+          />
+        </v-sheet>
+      </v-bottom-sheet>
+    </v-col>
     </div>
 </template>
 <script>
@@ -206,11 +222,11 @@ export default {
     receivedPicker: new Date(),
     receivedMenu: false,
     userType: "STUDENT",
-    languageList: [],
-    courseList: ["COURSES", "EXAM"],
+    languageList: [],courseList: ["COURSES", "EXAM"],
     coursesList: [],
     dialogDelete: false,
     showForm:false,
+    coursePhotoDialog: false,
   }),
   props: {},
   mounted: function () {
@@ -219,8 +235,24 @@ export default {
     this.languageListMethod();
     this.coursesListMethod();
     this.courses.type = this.courseList[0];
+    this.showForm = false;
   },
   methods: {
+
+       loadUserList:function(){
+      this.coursePhotoDialog = false;
+      this.coursesListMethod();
+    },  
+    photoMethod:function(item){
+        this.coursePhotoDialog = true;
+    },
+    changeType(){
+      if(this.courses.type=="COURSES"){
+        this.courses.amount = this.courses.languagesDto.amount;
+      }else{
+          this.courses.amount = this.courses.languagesDto.examFee;
+      }
+    },
     studentListMethod() {
       userAccountService
         .getUserList(this.userType)
@@ -266,22 +298,22 @@ export default {
               amount: 0,
             };
             this.showForm =false;
-            this.$swal({
-              icon: "success",
-              title: "Your work has been saved",
-              showConfirmButton: false,
-              timer: 1000,
-            });
+          this.$swal({
+          icon: "success",
+          title: "Your work saved successfully!",
+          showConfirmButton: false,
+          timer: 1000,
+        }).then(() => {
+          this.showForm = false;
+        });
             this.coursesListMethod();
           })
-          .catch((error) => {
-            this.$swal("Fail!", error.response.data.message, "error");
-          });
+        
       } else {
         coursesService
           .updateCourse(this.courses)
           .then((response) => {
-            
+            this.saveOrupdate = "SAVE";
             this.courses = {
               receivedDate: format(this.receivedPicker, "dd-MM-yyyy"),
               studentDto: this.studentList[0],
@@ -289,21 +321,19 @@ export default {
               type: this.courseList[0],
               amount: 0,
             };
-            this.saveOrupdate = "SAVE";
+            this.coursesListMethod();
             this.showForm =false;
             this.$swal({
-              icon: "success",
-              title: "Your work has been updated",
-              showConfirmButton: false,
-              timer: 1000,
-            });
-            this.coursesListMethod();
+          icon: "success",
+          title: "Your work updated successfully!",
+          showConfirmButton: false,
+          timer: 1000,
+        }).then(() => {
+          this.showForm = false;
+        });
 
-            this.saveOrupdate = "SAVE";
           })
-          .catch((error) => {
-            this.$swal("Fail!", error.response.data.message, "error");
-          });
+         
       }
     },
     clickEdit(item) {
@@ -341,6 +371,13 @@ export default {
       this.receivedMenu = false;
       this.courses.receivedDate = format(this.receivedPicker, "dd-MM-yyyy");
     },
+        showForm(newVal) {
+    if (!newVal) {
+      // Dialog closed → reset the form
+      this.courses = {};
+      this.saveOrupdate = "SAVE";
+    }
+  },
   },
   components: {},
 };
@@ -353,6 +390,13 @@ td {
   border-collapse: collapse;
   padding: 0 1px !important;
 }
+tbody{
+  background-color: rgb(153, 207, 238);
+}
+tr:hover {
+  background-color: rgb(78, 136, 243) !important;
+  cursor: pointer;
+}
 
 .login-full {
   height: 100vh;
@@ -360,5 +404,19 @@ td {
 .information-window-v-sheet {
   height: 100vh !important;
   overflow-x: scroll;
+}
+.form{
+  background-color: rgb(155, 207, 255);
+
+}
+.fab-button {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  z-index: 999;
 }
 </style>

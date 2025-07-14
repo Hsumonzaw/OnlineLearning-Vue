@@ -1,24 +1,24 @@
 <template>
   <div>
     <!-- Table Section -->
-    <v-row v-show="!showForm" no-gutters>
+    <v-row>
       <v-col cols="12">
         <h1 style="background-color:rgb(136, 210, 230);text-align: center;">Lessons</h1>
-        <v-col cols="12" md="2" class="mb-2">
-          <v-btn
-            style="background-color: rgb(136, 199, 245);"
-            prepend-icon="mdi-plus-circle"
-            rounded="xl"
-            size="50"
-            block
-            @click="showForm = true"
-          >
-            <template v-slot:prepend>
-              <v-icon color="success"></v-icon>
-            </template>
-            Add Lesson
-          </v-btn>
-        </v-col>
+ <v-tooltip location="top">
+  <template v-slot:activator="{ props }">
+    <v-btn
+      v-bind="props"
+      icon
+      color="blue"
+      class="fab-button"
+      @click="showForm = true"
+    >
+      <v-icon size="36" color="white">mdi-plus</v-icon>
+    </v-btn>
+  </template>
+  <span>Add Lesson</span>
+</v-tooltip>
+
 
         <!-- Table Full Width -->
         <v-table fixed-header height="92vh" >
@@ -30,7 +30,7 @@
               <th class="text-center white--text bg-primary">Youtube</th>
               <th class="text-center white--text bg-primary">PDF</th>
               <th class="text-center white--text bg-primary">Video Type</th>
-              <th class="text-center white--text bg-primary">Amount</th>
+              <th class="text-center white--text bg-primary" v-if="showTeacher">Amount</th>
               <th class="text-center white--text bg-primary">Date</th>
               <th class="text-center white--text bg-primary">ModifiedDate</th>
               <th class="text-center white--text bg-primary">Action</th>
@@ -54,15 +54,15 @@
               <td class="text-center">{{ item.youtube }}</td>
               <td class="text-center">{{ item.pdf }}</td>
               <td class="text-center">{{ item.freeVideo || '-' }}</td>
-              <td class="text-center">{{ item.languagesDto.amount || '-' }}</td>
+              <td class="text-center" v-if="showTeacher">{{ item.languagesDto.amount || '-' }}</td>
               <td class="text-start">{{ item.date }}</td>
               <td class="text-start">{{ item.modifiedDate }}</td>
               <td class="text-center">
                 <v-btn class="ml-1" small icon color="black" density="compact">
                   <v-icon size="small" @click="FileMethod(item)">mdi-file</v-icon></v-btn
                 >
-                <v-btn class="ml-1" small icon color="green" density="compact">
-                  <v-icon size="small" @click.stop="clickEdit(item)">mdi-pencil</v-icon>
+                <v-btn class="ml-1" small icon color="green" density="compact" @click="clickEdit(item)" >
+                  <v-icon size="small" >mdi-pencil</v-icon>
                 </v-btn>
                 <v-btn class="ml-1" small icon color="red" density="compact">
                   <v-icon size="small" @click.stop="clickDelete(item)">mdi-delete</v-icon>
@@ -76,16 +76,18 @@
     </v-row>
 
     <!-- Form Section (centered) -->
-    <v-row v-show="showForm" justify="center" class="mt-4">
-    <v-col cols="4" md="4" class="pl-2">
+    <v-dialog v-model="showForm" max-width="500">
+
         <v-card class="form pa-4" elevation="4">
-          <v-row>
-            <v-col cols="12" class="text-right">
-              <h1 style="text-align: center;">Add Lessons
-              <v-btn icon @click="showForm = false" style="background-color: red;margin-left: 100px;"><v-icon >mdi-close</v-icon></v-btn></h1>
-            </v-col>
-            <v-row no-gutters class=" pa-2">
-              <v-col cols="12" md="12">
+          
+              <v-card-title class="d-flex justify-space-between align-center">
+      <span class="text-h4">Add Lessons</span>
+      <v-btn icon color="red" @click="showForm = false">
+        <v-icon>mdi-close</v-icon>
+      </v-btn>
+    </v-card-title>
+    
+              <v-card-text>
                 <v-menu
                   v-model="startMenu"
                   full-width
@@ -109,25 +111,8 @@
                     hide-header
                   ></v-date-picker>
                 </v-menu>
-              </v-col>
-              <!-- <v-col cols="12" md="12">
-                <v-autocomplete
-                  v-model="lesson.userAccountDto"
-                  :items="userList"
-                  item-text="userName"
-                  item-title="userName"
-                  item-value="userName"
-                  label="Student Name"
-                  return-object
-                  density="compact"
-                  variant="outlined"
-                  :rules="[(v) => !!v || 'Name is required']"
-                />
-              </v-col> -->
-      
-            <v-col cols="12" md="12">
+              
            <v-autocomplete
-
             v-model="lesson.languagesDto"
             :items="languageList"
             item-text="name"
@@ -138,20 +123,16 @@
             dense
             outlined
            :rules="[(v) => !!v ||  'language is required']"
+           
           />
 
-            </v-col>
-
-              <v-col cols="12" md="12">
                 <v-text-field
+               
                   label="Youtube Link"
                   v-model="lesson.youtube"
                   :rules="[(v) => !!v ||  'required']"
                 ></v-text-field>
-              </v-col>
 
-              <v-col cols="12" md="12">
-                
                 <v-autocomplete
                   v-model="lesson.freeVideo"
                   :items="VideoList"
@@ -162,30 +143,24 @@
                   filled
                 ></v-autocomplete>
 
-              </v-col>
-                <v-col cols="12" md="12">
-           <v-text-field
-  label="Amount"
-  :value="lesson.languagesDto?.amount || 0"
-  readonly
-  dense
-  outlined
-></v-text-field>
-
-          
-
-            </v-col>
-
-              <v-col cols="12" md="12" class="text-right mb-2">
-                <v-btn color="primary " @click="saveLesson()">{{
+              <v-text-field
+               v-if="showTeacher"
+                  label="Amount"
+                  :value="lesson.languagesDto?.amount || 0"
+                  readonly
+                  dense
+                  outlined
+                ></v-text-field>
+                </v-card-text>
+                <v-card-actions class="justify-end pr-5">  
+                <v-btn  class="text-black"
+                style="background-color: #2196f3;" 
+                 @click="saveLesson()">{{
                   saveOrupdate
                 }}</v-btn>
-              </v-col>
-            </v-row>
-          </v-row>
+              </v-card-actions>
         </v-card>
-      </v-col>
-    </v-row>
+    </v-dialog>
 
     <!-- Delete Dialog -->
     <v-dialog v-model="dialogDelete" width="500">
@@ -241,10 +216,17 @@ export default {
     languageList:[],
     showForm: false,
     lessonFileDialog:false,
-
+userData:{},
+    showTeacher:false,
   }),
    props: {},
   mounted: function() {
+    this.userData = JSON.parse(localStorage.getItem("user"));
+    if(this.userData.role=="TEACHER"){
+      this.showTeacher = false;
+    }else{
+      this.showTeacher = true;
+    }
     this.lesson.startDate = format(this.startPicker, "dd-MM-yyyy");
     this.languageListMethod();
     this.lessonListMethod();
@@ -255,6 +237,7 @@ export default {
      loadLessonList:function(){
       this.lessonFileDialog = false;
        this.lessonListMethod();
+       this.showForm = false;
      }, 
      FileMethod:function(item){
         this.selectedOne = item;
@@ -289,11 +272,18 @@ export default {
     
     saveLesson: function () {
   if (!this.lesson.languagesDto || !this.lesson.languagesDto.languagesId) {
-    Swal.fire("Error", "Please select a language.", "error");
+    this.showForm = false;
+    Swal.fire("Error", "Please select a language.", "error").then(() => {
+      this.showForm = true;
+    });
     return;
   }
   if (!this.lesson.youtube || !this.lesson.freeVideo) {
-    Swal.fire("Error", "Please fill all required fields.", "error");
+      this.showForm = false;
+    Swal.fire("Error", "Please fill all required fields.",
+     "error").then(() => {
+      this.showForm = true;
+    });
     return;
   }
   
@@ -319,55 +309,64 @@ export default {
     lessonService
       .addLesson(this.lesson)
       .then((response) => {
+        
+        this.lesson.languagesDto = this.languageList[0];
+        this.lesson.freeVideo = this.VideoList[0];
+        this.startPicker = new Date();
+        this.lesson.startDate = format(this.startPicker, "dd-MM-yyyy");
+
+        //this.saveOrupdate = "SAVE";
+        this.showForm = false;
+       Swal.fire({
+  icon: "success",
+  title: "Lesson saved successfully!",
+  showConfirmButton: false,
+  timer: 1000,
+}).then(() => {
+  this.showForm = false;
+});
         this.lesson = {}; // Reset form
         this.lessonListMethod(); // Reload list
-this.lesson.languagesDto = this.languageList[0];
-this.lesson.freeVideo = this.VideoList[0];
-this.startPicker = new Date();
-this.lesson.startDate = format(this.startPicker, "dd-MM-yyyy");
-
-        this.saveOrupdate = "SAVE";
-        Swal.fire({
-          icon: "success",
-          title: "Lesson saved successfully!",
-          showConfirmButton: false,
-          timer: 1000,
-        });
       })
-      .catch((error) => {
-        Swal.fire("Fail!", error.response?.data?.message || "Save error", "error");
-      });
   } else {
     lessonService
       .updateLesson(this.lesson)
       .then((response) => {
+        
+        this.saveOrupdate = "SAVE";
+        this.showForm = false;
+       Swal.fire({
+  icon: "success",
+  title: "Lesson updated successfully!",
+  showConfirmButton: false,
+  timer: 1000,
+}).then(() => {
+  this.showForm = false;
+});
         this.lesson = {};
         this.lessonListMethod();
-        this.saveOrupdate = "SAVE";
-        Swal.fire({
-          icon: "success",
-          title: "Lesson updated successfully!",
-          showConfirmButton: false,
-          timer: 1000,
-        });
+        
       })
-      .catch((error) => {
-        Swal.fire("Fail!", error.response?.data?.message || "Update error", "error");
-      });
+
   }
 },
 
-    clickEdit(item) {
-      this.lesson = {
-        ...item,
-      };
-      if (item.date) {
-    this.startPicker = new Date(item.date);
-    this.lesson.startDate = format(this.startPicker, "dd-MM-yyyy");
-  }
-      this.saveOrupdate = "UPDATE";
-        this.showForm = true;
-    },
+ clickEdit:function(item) {
+    
+    this.lesson = { ...item };
+
+    if (item.date && !isNaN(Date.parse(item.date))) {
+  this.startPicker = new Date(item.date);
+  this.lesson.startDate = format(this.startPicker, "dd-MM-yyyy");
+} else {
+  this.startPicker = new Date(); // fallback
+  this.lesson.startDate = format(this.startPicker, "dd-MM-yyyy");
+}
+
+    this.saveOrupdate = "UPDATE";
+    this.showForm = true;
+ 
+},
     lessonListMethod() {
       lessonService
         .getLessonList()
@@ -412,10 +411,21 @@ this.lesson.startDate = format(this.startPicker, "dd-MM-yyyy");
 
   watch: {
     startPicker() {
-      this.startMenu = false;
+    this.startMenu = false;
+    try {
       this.lesson.startDate = format(this.startPicker, "dd-MM-yyyy");
+    } catch (e) {
+      console.warn("Invalid startPicker format:", this.startPicker);
+    }
     },
+    showForm(newVal) {
+    if (!newVal) {
+      // Dialog closed → reset the form
+      this.lesson = {};
+      this.saveOrupdate = "SAVE";
+    }
   },
+},
   components: {}
 };
 </script>
@@ -428,9 +438,17 @@ td {
   padding: 0 1px !important;
   
 }
-td{
-  background-color: rgb(174, 205, 223);
+tbody{
+  background-color: rgb(153, 207, 238);
+
 }
+tr:hover {
+  background-color: rgb(78, 136, 243) !important;
+  cursor: pointer;
+}
+
+
+
 thead{
   background-color: rgb(25, 130, 216);
 }
@@ -443,7 +461,19 @@ thead{
 }
 
 .form{
-  background-color: rgb(192, 217, 238);
+  background-color: rgb(155, 207, 255);
+
 }
+.fab-button {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  z-index: 999;
+}
+
 
 </style>

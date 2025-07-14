@@ -1,10 +1,55 @@
 <template>
   <v-app>
-    <div>
+    <div >
       <v-toolbar flat :elevation="isDark ? 0 : 4" :class="isDark ? 'dark-bar' : 'light-bar'" height="50">
-    <v-toolbar-title>Online Courses Management</v-toolbar-title>
+    <v-toolbar-title style="font-weight: bolder; font-size: x-large;">
+<link rel="icon" href="/unilogo.png" type="image/png" />
+      Online Courses Management</v-toolbar-title>
 
     <v-spacer></v-spacer>
+    <v-menu offset-y open-on-hover close-on-content-click v-if="showNavigation && userData.role!='STUDENT' " >
+      <!--  -->
+        <template v-slot:activator="{props}">
+          <v-btn text v-bind="props" v-on="on"
+            class="hover-style">
+            <v-icon start>mdi-cog</v-icon>
+            Setting
+            <v-icon end>mdi-menu-down</v-icon > 
+            </v-btn>
+        </template>
+        <v-list>
+    <v-list-item @click="clickRouter('/')">
+    <v-list-item-title>
+      <v-icon>mdi-home</v-icon>
+      Home</v-list-item-title>
+    </v-list-item>
+    <v-list-item @click="clickRouter('/useraccount')">
+      <v-list-item-title>
+      <v-icon>mdi-account-multiple-plus</v-icon> 
+        User Account</v-list-item-title>
+    </v-list-item>
+    <v-list-item @click="clickRouter('/courses')">
+      <v-list-item-title>
+        <v-icon>mdi-folder-open</v-icon>
+        Courses</v-list-item-title>
+      </v-list-item>
+ 
+    <v-list-item @click="clickRouter('/languages')">
+      <v-list-item-title>
+      <v-icon>mdi-web</v-icon> 
+        Languages</v-list-item-title>
+    </v-list-item>
+
+    <v-list-item @click="clickRouter('/lessons')">
+      <v-list-item-title>
+      <v-icon>mdi-lightbulb-on-outline</v-icon>  
+        Lessons</v-list-item-title>
+    </v-list-item>
+
+    
+    </v-list>
+
+      </v-menu>
      <v-btn icon @click="toggleTheme" :title="isDark ? 'Light Mode' : 'Dark Mode'">
       <v-icon>{{ isDark ? 'mdi-white-balance-sunny' : 'mdi-weather-night' }}</v-icon>
     </v-btn>
@@ -16,7 +61,7 @@
             </v-avatar>
           </v-btn>
         </template>
-        <v-card min-width="180">
+        <v-card min-width="120" style="">
           <v-list>
           <!-- <v-list-item @click="" ><v-list-item-title>Setting</v-list-item-title></v-list-item> -->
           <v-list-item v-if="!isLoggedIn" @click="clickRouter('/login')"><v-list-item-title>Log In</v-list-item-title></v-list-item>
@@ -25,6 +70,7 @@
         </v-list>
         </v-card>
       </v-menu>
+      
    </v-toolbar>
     </div>
     <div>
@@ -73,26 +119,41 @@ export default {
     showNavigation:true,
     userData:{},
     isDark: false,
+   
+    isLoggedIn: localStorage.getItem("isLoggedIn") === "true", 
+
     
   
   }),
    props: {},
   mounted: function() {
-    this.userData = JSON.parse(localStorage.getItem("user"));
-    this.isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+    //dark mode store in local storage
     this.getLoginMethod();
+  const savedTheme = localStorage.getItem("theme");
+  this.isDark = savedTheme === "dark"; 
+  this.$vuetify.theme.global.name = this.isDark ? 'dark' : 'light';
+  //  console.log("USER TYPE:", this.userData?.userTypeList); 
+    this.isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+    
 
      
    
 
   },
+  // computed: {
+  // isAdminOrStaff() {
+  //   const role = this.userData?.role;
+  //   return role === 'Admin' || role === 'Staff';
+  // }
+// },
   methods: {
     srcMethod:function(){
         return `${axios.defaults.baseURL}/userphoto/${this.userData?.profilePhoto}.png`;
     },
    getLoginMethod:function(){
-      
+      this.userData = JSON.parse(localStorage.getItem("user"));
     if(this.userData?.password=="" || this.userData?.password==undefined){
+        this.isLoggedIn = false;
       this.$router
           .push({
             path: "/login",
@@ -105,13 +166,20 @@ export default {
 
     }
     },
-
+    // clickRouter:function(path){
+    //    this.$router
+    //       .push({
+    //         path: path,
+    //       })
+    //       .catch(() => {});
+    //  },
     logout(){
       localStorage.removeItem("user");
       localStorage.removeItem("isLoggedIn");
       this.userData = {};
       this.isLoggedIn = false;
       this.showNavigation = false;
+
     this.$router
     .push({
       path: "/"
@@ -130,6 +198,8 @@ export default {
     },
     toggleTheme(){
       this.isDark = !this.isDark;
+      localStorage.setItem("theme", this.isDark ? "dark" : "light");
+      
     },
 
 
@@ -159,5 +229,11 @@ export default {
   object-fit: cover;
   width: 100%;
   height: 100%;
+}
+.hover-style:hover{
+  background-color:  #61cfd6;
+    color: #0a3e8b; 
+    text-decoration: underline;
+  text-decoration-color: #0d47a1; 
 }
 </style>

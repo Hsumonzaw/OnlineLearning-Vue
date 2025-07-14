@@ -1,25 +1,23 @@
 <template>
   <div>
     <!-- Table Section -->
-    <v-row v-show="!showForm" no-gutters>
+    <v-row>
       <v-col cols="12" >
         <h2 style="background-color:rgb(136, 210, 230);text-align: center;">User Informations</h2>
-        <v-col cols="12" md="2" class="mb-2">
-          <v-btn
-            style="background-color: rgb(136, 199, 245);"
-            prepend-icon="mdi-plus-circle"
-            rounded="xl"
-            size="50"
-
-            block
-            @click="showForm = true"
-          >
-            <template v-slot:prepend>
-              <v-icon color="success"></v-icon>
-            </template>
-            Add User
-          </v-btn>
-        </v-col>
+  <v-tooltip location="top">
+  <template v-slot:activator="{ props }">
+    <v-btn
+      v-bind="props"
+      icon
+      color="blue"
+      class="fab-button"
+      @click="showForm = true"
+    >
+      <v-icon size="36" color="white">mdi-plus</v-icon>
+    </v-btn>
+  </template>
+  <span>Add User</span>
+</v-tooltip>
 
         <!-- Table Full Width -->
         <v-table fixed-header height="92vh" >
@@ -80,20 +78,20 @@
     </v-row>
 
     <!-- Form Section (centered) -->
-    <v-row v-show="showForm" justify="center" class="mt-4">
-    <v-col cols="4" md="4" class="pl-2">
-        <v-card class="form pa-4" elevation="4">
-          <v-row>
-            <v-col cols="12" class="text-right">
-              <h1 style="text-align: center;">Add User
-              <v-btn icon @click="showForm = false" style="background-color: red;margin-left: 100px;"><v-icon >mdi-close</v-icon></v-btn></h1>
-            </v-col>
-            <v-row no-gutters class=" pa-2">
-              <v-col cols="12" md="12">
+    <v-dialog v-model="showForm" max-width="600" style="height: 730px;">
+      
+        <v-card class="form pa-1" elevation="4"mb-0  >
+        <v-card-title class="d-flex justify-space-between align-center">
+      <span class="text-h4">Add User</span>
+      <v-btn icon color="red" @click="showForm = false">
+        <v-icon>mdi-close</v-icon>
+      </v-btn>
+    </v-card-title>
+            <v-card-text>
 <v-menu
                   v-model="startMenu"
                   full-width
-                  max-width="290px"
+                  max-width="200px"
                   min-width="290px"
                   v-bind:close-on-content-click="false"
                 >
@@ -113,41 +111,35 @@
                     hide-header
                   ></v-date-picker>
                 </v-menu>
-              </v-col>
-              <v-col cols="12" md="12">
+            
                 <v-text-field
                   label="Name"
                   v-model="user.name"
                   :rules="[(v) => !!v || 'required']"
                 ></v-text-field>
-              </v-col>
-              <v-col cols="12" md="12">
+
                 <v-text-field
                   label="User Name"
                   v-model="user.userName"
                   :rules="[(v) => !!v || 'required']"
                 ></v-text-field>
-              </v-col>
-              <v-col cols="12" md="12">
+
                 <v-text-field
                   label="Password"
                   v-model="user.password"
                   :rules="[(v) => !!v || 'required']"
                 ></v-text-field>
-              </v-col>
-              <v-col cols="12" md="12">
+              
                 <v-text-field
                   label="Phone"
                   v-model="user.phonenum"
                 ></v-text-field>
-              </v-col>
-              <v-col cols="12" md="12">
+
                 <v-text-field
                   label="Address"
                   v-model="user.address"
                 ></v-text-field>
-              </v-col>
-              <v-col cols="12" md="12">
+
                 <v-autocomplete
                   v-model="user.userType"
                   item-text="userType"
@@ -162,17 +154,17 @@
                   filled
                 >
                 </v-autocomplete>
-              </v-col>
-              <v-col cols="12" md="12" class="text-right mb-2">
-                <v-btn color="primary " @click="saveUser()">{{
+                </v-card-text>
+               <v-card-actions class="justify-end pr-5 ">  
+                <v-btn  class="text-black"
+                style="background-color: #2196f3;" 
+                 @click="saveUser()">{{
                   saveOrupdate
                 }}</v-btn>
-              </v-col>
-            </v-row>
-          </v-row>
+              </v-card-actions>
+      
         </v-card>
-      </v-col>
-    </v-row>
+</v-dialog>
 
     <!-- Delete Dialog -->
     <v-dialog v-model="dialogDelete" width="500">
@@ -208,8 +200,7 @@ import { format } from "date-fns";
 import userService from "../service/UserAccountService.js";
 export default {
   data: () => ({
-    selectedOne: {},
-    user: {},
+    selectedOne: {},user: {},
     userList: [],
     userTypeList: ["STAFF", "STUDENT", "TEACHER", "ADMIN"],
     saveOrupdate: "SAVE",
@@ -224,6 +215,7 @@ export default {
     this.user.startDate = format(this.startPicker, "dd-MM-yyyy");
     this.user.userType = this.userTypeList[1];
     this.userListMethod();
+    this.showForm = false;
   },
   methods: {
     loadUserList:function(){
@@ -271,18 +263,18 @@ export default {
           .then((response) => {
             this.user = {};
             this.userListMethod();
-            this.showForm = false;
             this.saveOrupdate = "SAVE";
+            this.showForm = false;
             this.$swal({
-              icon: "success",
-              title: "Your work has been saved",
-              showConfirmButton: false,
-              timer: 1000,
-            });
+          icon: "success",
+          title: "Your work saved successfully!",
+          showConfirmButton: false,
+          timer: 1000,
+        }).then(() => {
+          this.showForm = false;
+        });
           })
-          .catch((error) => {
-            this.$swal("Fail!", error.response.data.message, "error");
-          });
+       
       } else {
         userService
           .updateUser(this.user)
@@ -292,15 +284,15 @@ export default {
             this.userListMethod();
             this.showForm = false;
             this.$swal({
-              icon: "success",
-              title: "Your work has been updated",
-              showConfirmButton: false,
-              timer: 1000,
-            });
-          })
-          .catch((error) => {
-            this.$swal("Fail!", error.response.data.message, "error");
+            icon: "success",
+            title: "Your work updated successfully!",
+            showConfirmButton: false,
+            timer: 1000,
+          }).then(() => {
+            this.showForm = false;
           });
+          })
+       
       }
     },
     userListMethod() {
@@ -321,6 +313,13 @@ export default {
       this.startMenu = false;
       this.user.startDate = format(this.startPicker, "dd-MM-yyyy");
     },
+        showForm(newVal) {
+    if (!newVal) {
+      // Dialog closed → reset the form
+      this.user = {};
+      this.saveOrupdate = "SAVE";
+    }
+  },
   },
   components: {},
 };
@@ -333,12 +332,32 @@ td {
   border-collapse: collapse;
   padding: 0 1px !important;
 }
-
+tbody{
+  background-color: rgb(153, 207, 238);
+}
+tr:hover {
+  background-color: rgb(78, 136, 243) !important;
+  cursor: pointer;
+}
 .login-full {
   height: 100vh;
 }
 .information-window-v-sheet {
   height: 100vh !important;
   overflow-x: scroll;
+}
+.form{
+  background-color: rgb(155, 207, 255);
+
+}
+.fab-button {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  z-index: 999;
 }
 </style>

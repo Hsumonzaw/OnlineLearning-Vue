@@ -84,6 +84,7 @@ export default {
           localStorage.setItem("user",JSON.stringify(response));
           this.hideToolbar(true);
           localStorage.setItem("isLoggedIn","true");
+          this.$root.isLoggedIn = true;
       // if (response.password != undefined) {
       //   axios.defaults.headers.common["Authorization"] = `${response.password}`;
       // } else {

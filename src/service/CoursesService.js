@@ -23,6 +23,17 @@ class CoursesService {
     let url = `/courses/${course.coursesId}`;
     return this.axios.delete(url).then((request) => request.data);
   }
+
+  updateCorPhoto(formData, coursesId) {
+    let url = `courses/${coursesId}/cphoto`;
+    return axios
+      .put(url, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      })
+      .then((request) => request.data);
+  }
 }
 
 const service = new CoursesService();

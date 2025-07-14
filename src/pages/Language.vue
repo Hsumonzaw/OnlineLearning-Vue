@@ -1,8 +1,26 @@
 <template>
-  <v-row no-gutters>
-    <v-col cols="8" md="8">
-      <v-table fixed-header height="92vh" density="compact">
-        <template v-slot:default>
+  <div>
+      <!-- Table Section -->
+    <v-row>
+      <v-col cols="12" >
+        <h2 style="background-color:rgb(136, 210, 230);text-align: center;">Languages</h2>
+  <v-tooltip location="top">
+  <template v-slot:activator="{ props }">
+    <v-btn
+      v-bind="props"
+      icon
+      color="blue"
+      class="fab-button"
+      @click="showForm = true"
+    >
+      <v-icon size="36" color="white">mdi-plus</v-icon>
+    </v-btn>
+  </template>
+  <span>Add Language</span>
+</v-tooltip>
+
+
+      <v-table fixed-header height="92vh">
           <thead>
             <tr>
               <th class="text-center white--text bg-primary">No.</th>
@@ -48,15 +66,21 @@
             </tr>
             <v-divider />
           </tbody>
-        </template>
       </v-table>
     </v-col>
-    <v-col cols="4" md="4" class="pl-2">
-      <v-row class="align-center login-full" no-gutters>
-        <v-col>
-          <v-card variant="outlined" class="mr-2 pl-2 pr-2">
-            <v-row no-gutters class="pa-2">
-              <v-col cols="12" md="12">
+    </v-row>  
+
+
+<v-dialog v-model="showForm" max-width="500">
+      
+        <v-card class="form pa-4" elevation="4">
+        <v-card-title class="d-flex justify-space-between align-center">
+      <span class="text-h4">Add Language</span>
+      <v-btn icon color="red" @click="showForm = false">
+        <v-icon>mdi-close</v-icon>
+      </v-btn>
+    </v-card-title>
+            <v-card-text>
                 <v-text-field
                   label="Name"
                   v-model="language.name"
@@ -64,8 +88,7 @@
                   density="compact"
                   variant="outlined"
                 ></v-text-field>
-              </v-col>
-              <v-col cols="12" md="12">
+
                 <v-text-field
                   type="number"
                   label="Amount"
@@ -74,8 +97,7 @@
                   density="compact"
                   variant="outlined"
                 ></v-text-field>
-              </v-col>
-              <v-col cols="12" md="12">
+
                 <v-text-field
                   label="Exam Link"
                   v-model="language.examLink"
@@ -83,8 +105,7 @@
                   density="compact"
                   variant="outlined"
                 ></v-text-field>
-              </v-col>
-              <v-col cols="12" md="12">
+
                 <v-text-field
                   type="number"
                   label="Exam Fee"
@@ -92,21 +113,19 @@
                   density="compact"
                   variant="outlined"
                 ></v-text-field>
-              </v-col>
 
-              <v-col cols="12" md="12" class="text-right mb-2">
-                <v-btn
-                  color="primary "
-                  :disabled="!isFormValid"
-                  @click="saveLanguage()"
-                  >{{ saveOrupdate }}</v-btn
-                >
-              </v-col>
-            </v-row>
+                </v-card-text>
+               <v-card-actions class="justify-end pr-5">  
+                <v-btn  class="text-black"
+                style="background-color: #2196f3;" 
+                 @click="saveLanguage()">{{
+                  saveOrupdate
+                }}</v-btn>
+              </v-card-actions>
           </v-card>
-        </v-col>
-      </v-row>
-    </v-col>
+</v-dialog>
+
+
     <v-col>
       <v-dialog v-model="dialogDelete" width="500">
         <v-card>
@@ -129,18 +148,7 @@
         </v-card>
       </v-dialog>
     </v-col>
-    <v-col>
-      <v-bottom-sheet v-model="userPhotoDialog" fullscreen scrollable>
-        <v-sheet class="information-window-v-sheet">
-          <PhotoUser
-            @closeDialog="userPhotoDialog = false"
-            :user="selectedOne"
-            @loadUserList="loadUserList"
-          />
-        </v-sheet>
-      </v-bottom-sheet>
-    </v-col>
-  </v-row>
+  </div>
 </template>
 <script>
 import languageService from "../service/LanguageService.js";
@@ -154,10 +162,12 @@ export default {
     saveOrupdate: "SAVE",
     languageList: [],
     dialogDelete: false,
+    showForm: false,
   }),
   props: {},
   mounted: function () {
     this.languageListMethod();
+    this.showForm = false;
   },
   methods: {
     saveLanguage: function () {
@@ -165,40 +175,43 @@ export default {
         languageService
           .addLanguageList(this.language)
           .then((response) => {
+            this.showForm = false;
             this.$swal({
-              icon: "success",
-              title: "Your work has been saved",
-              showConfirmButton: false,
-              timer: 1000,
-            });
+          icon: "success",
+          title: "Your work saved successfully!",
+          showConfirmButton: false,
+          timer: 1000,
+        }).then(() => {
+          this.showForm = false;
+        });
             this.language = {
               amount: 0,
               examFee: 0,
             };
             this.languageListMethod();
           })
-          .catch((error) => {
-            this.$swal("Fail!", error.response.data.message, "error");
-          });
+       
       } else {
         languageService
           .updateLanguage(this.language)
           .then((response) => {
+            this.saveOrupdate="SAVE";
+            this.showForm = false;
             this.$swal({
-              icon: "success",
-              title: "Your work has been updated",
-              showConfirmButton: false,
-              timer: 1000,
-            });
+          icon: "success",
+          title: "Your work updated successfully!",
+          showConfirmButton: false,
+          timer: 1000,
+        }).then(() => {
+          this.showForm = false;
+        });
             this.language = {
               amount: 0,
               examFee: 0,
             };
             this.languageListMethod();
           })
-          .catch((error) => {
-            this.$swal("Fail!", error.response.data.message, "error");
-          });
+
       }
     },
     languageListMethod() {
@@ -213,32 +226,43 @@ export default {
         });
     },
     clickEdit(item) {
+      this.showForm = true;
       this.language = { ...item };
       this.saveOrupdate = "UPDATE";
     },
     clickDelete(item) {
       this.selectedOne = { ...item };
-      this.dialogDelete = true;
+      this.dialogDelete= true;
     },
     clickDeleteDialog() {
+      this.dialogDelete = false;
       languageService
         .deleteLanguage(this.selectedOne)
         .then((response) => {
-          this.dialogDelete = false;
+          this.saveOrupdate = "SAVE";
+          this.language = {};
+          this.languageListMethod();
           this.$swal({
             icon: "success",
             title: "Your work has been deleted",
             showConfirmButton: false,
             timer: 1000,
           });
-          this.languageListMethod();
         })
         .catch((error) => {
           this.$swal("Fail!", error.response.data.message, "error");
         });
     },
   },
-  watch: {},
+  watch: {
+      showForm(newVal) {
+    if (!newVal) {
+      // Dialog closed → reset the form
+      this.language = { amount: 0, examFee: 0 };
+      this.saveOrupdate = "SAVE";
+    }
+  }
+  },
   components: {},
   computed: {
     isFormValid() {
@@ -261,11 +285,33 @@ td {
   padding: 0 1px !important;
 }
 
+tbody{
+  background-color: rgb(153, 207, 238);
+}
+tr:hover {
+  background-color: rgb(78, 136, 243) !important;
+  cursor: pointer;
+}
+
 .login-full {
   height: 100vh;
 }
 .information-window-v-sheet {
   height: 100vh !important;
   overflow-x: scroll;
+}
+.form{
+  background-color: rgb(155, 207, 255);
+
+}
+.fab-button {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  z-index: 999;
 }
 </style>
