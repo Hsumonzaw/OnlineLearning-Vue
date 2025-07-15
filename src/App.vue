@@ -3,12 +3,11 @@
     <div >
       <v-toolbar flat :elevation="isDark ? 0 : 4" :class="isDark ? 'dark-bar' : 'light-bar'" height="50">
     <v-toolbar-title style="font-weight: bolder; font-size: x-large;">
-<link rel="icon" href="/unilogo.png" type="image/png" />
+    <link rel="icon" href="/unilogo.png" type="image/png" />
       Online Courses Management</v-toolbar-title>
 
     <v-spacer></v-spacer>
-    <v-menu offset-y open-on-hover close-on-content-click v-if="showNavigation && userData.role!='STUDENT' " >
-      <!--  -->
+    <v-menu offset-y open-on-hover close-on-content-click v-if="showNavigation && userData.role!='STUDENT'">
         <template v-slot:activator="{props}">
           <v-btn text v-bind="props" v-on="on"
             class="hover-style">
@@ -45,8 +44,6 @@
       <v-icon>mdi-lightbulb-on-outline</v-icon>  
         Lessons</v-list-item-title>
     </v-list-item>
-
-    
     </v-list>
 
       </v-menu>

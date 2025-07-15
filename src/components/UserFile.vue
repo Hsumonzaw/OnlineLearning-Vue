@@ -11,9 +11,9 @@
     </v-col>
       <v-col cols="12" md="12">
           <v-row class="ml-2">
-            <v-col cols="12" md="12">
+            <!-- <v-col cols="12" md="12">
             <img :src="file" height="100%" width="700vh" />
-            </v-col>
+            </v-col> -->
             <v-col cols="12" md="12">
               <input type="file" id="file" ref="file" @change="changeFile"/>
             </v-col>
@@ -39,7 +39,7 @@ export default {
   }),
    props: {user:Object},
   mounted: function() {
-    this.file = `${axios.defaults.baseURL}/userfile/${this.user?.file}.pdf`;
+    //this.file = `${axios.defaults.baseURL}/userfile/${this.user?.file}.pdf`;
   },
   methods: {
     saveFile:function(){

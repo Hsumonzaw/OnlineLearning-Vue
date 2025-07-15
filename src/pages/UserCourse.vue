@@ -1,5 +1,6 @@
 <template>
-  <v-container fluid class="py-10">
+  <v-container fluid class="py-10" >
+    
     <v-row no-gutters>
       <v-col cols="12" md="12" class="px-2 mt-6 pt-2 pb-1">
         <v-row no-gutters align="stretch">
@@ -157,7 +158,7 @@ p {
   }
 }
 
-.product-avatar {
+.courses-avatar {
   box-shadow: 0 4px 18px rgba(255, 255, 255, 0.1);
   animation: avatar-pop 1.2s cubic-bezier(0.4, 0, 0.2, 1);
   contain: layout style;
