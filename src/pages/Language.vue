@@ -25,9 +25,9 @@
             <tr>
               <th class="text-center white--text bg-primary">No.</th>
               <th class="text-center white--text bg-primary">Name</th>
-              <th class="text-center white--text bg-primary">Amount</th>
+              <th class="text-center white--text bg-primary" v-if="showTeacher">Amount</th>
               <th class="text-center white--text bg-primary">Exam Link</th>
-              <th class="text-center white--text bg-primary">Exam Fee</th>
+              <th class="text-center white--text bg-primary" v-if="showTeacher">Exam Fee</th>
               <th class="text-center white--text bg-primary">Action</th>
             </tr>
           </thead>
@@ -46,10 +46,10 @@
               <td class="text-center">{{ index + 1 }}</td>
               <td class="text-center">{{ item?.name }}</td>
 
-              <td class="text-start">{{ item?.amount }}</td>
+              <td class="text-start" v-if="showTeacher">{{ item?.amount }}</td>
 
               <td class="text-start">{{ item?.examLink }}</td>
-              <td class="text-start">{{ item?.examFee }}</td>
+              <td class="text-start" v-if="showTeacher">{{ item?.examFee }}</td>
 
               <td class="text-center">
                 <v-btn class="ml-1" small icon color="green" density="compact">
@@ -90,6 +90,7 @@
                 ></v-text-field>
 
                 <v-text-field
+                v-if="showTeacher"
                   type="number"
                   label="Amount"
                   v-model.number="language.amount"
@@ -107,6 +108,7 @@
                 ></v-text-field>
 
                 <v-text-field
+                  v-if="showTeacher"
                   type="number"
                   label="Exam Fee"
                   v-model.number="language.examFee"
@@ -159,13 +161,21 @@ export default {
       amount: 0,
       examFee: 0,
     },
+    userData: {},
     saveOrupdate: "SAVE",
     languageList: [],
     dialogDelete: false,
     showForm: false,
+    showTeacher : false,
   }),
   props: {},
   mounted: function () {
+    this.userData = JSON.parse(localStorage.getItem("user"));
+    if(this.userData.role=="TEACHER"){
+      this.showTeacher = false;
+    }else{
+      this.showTeacher = true;
+    }
     this.languageListMethod();
     this.showForm = false;
   },

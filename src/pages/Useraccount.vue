@@ -27,10 +27,15 @@
               <th class="text-center white--text bg-primary">StartDate</th>
               <th class="text-center white--text bg-primary">Name</th>
               <th class="text-center white--text bg-primary">UserName</th>
+              <th class="text-center white--text bg-primary">Age</th>
+              <th class="text-center white--text bg-primary">NRC</th>
+              <th class="text-center white--text bg-primary">Email</th>
               <th class="text-center white--text bg-primary">Phone</th>
               <th class="text-center white--text bg-primary">Address</th>
               <th class="text-center white--text bg-primary">UserType</th>
               <th class="text-center white--text bg-primary">Photo</th>
+              <th class="text-center white--text bg-primary">Degree</th>
+              <th class="text-center white--text bg-primary">File</th>
               <th class="text-center white--text bg-primary">Action</th>
             </tr>
           </thead>
@@ -50,24 +55,30 @@
                <td class="text-center">{{ index + 1 }}</td>
               <td class="text-center">{{ item.startDate }}</td>
               <td class="text-center">{{ item.name }}</td>
-              
               <td class="text-center">{{ item.userName }}</td>
-
+              <td class="text-center">{{ item.age }}</td>
+              <td class="text-center">{{ item.nrc }}</td>
+              <td class="text-center">{{ item.email }}</td>
+              
               <td class="text-start">{{ item.phonenum }}</td>
               <td class="text-start">{{ item.address }}</td>
-
               <td class="text-start">{{ item.userType }}</td>
               <td class="text-center">{{ item.photo }}</td>
+              <td class="text-center">{{ item.degree }}</td>
+              <td class="text-center">{{ item.file }}</td>
 
               <td class="text-center">
                 <v-btn class="ml-1" small icon color="black" density="compact">
+                  <v-icon size="small" @click="FileMethod(item)">mdi-file</v-icon></v-btn
+                >
+                <v-btn class="ml-1" small icon color="black" density="compact">
                   <v-icon size="small" @click="photoMethod(item)">mdi-image</v-icon></v-btn
                 >
-                <v-btn class="ml-1" small icon color="green" density="compact">
-                  <v-icon size="small" @click="editUser(item)">mdi-pencil</v-icon></v-btn
+                <v-btn class="ml-1" small icon color="green" density="compact"  @click.stop="editUser(item)">
+                  <v-icon size="small">mdi-pencil</v-icon></v-btn
                 >
-                <v-btn class="ml-1" small icon color="red" density="compact">
-                  <v-icon size="small" @click="deleteUserMethod(item)">mdi-delete</v-icon></v-btn
+                <v-btn class="ml-1" small icon color="red" density="compact" @click.stop="deleteUserMethod(item)">
+                  <v-icon size="small" >mdi-delete</v-icon></v-btn
                 >
               </td>
             </tr>
@@ -80,7 +91,7 @@
     <!-- Form Section (centered) -->
     <v-dialog v-model="showForm" max-width="600" style="height: 730px;">
       
-        <v-card class="form pa-1" elevation="4"mb-0  >
+        <v-card class="form pa-1" elevation="4" mb-0  >
         <v-card-title class="d-flex justify-space-between align-center">
       <span class="text-h4">Add User</span>
       <v-btn icon color="red" @click="showForm = false">
@@ -124,6 +135,21 @@
                   :rules="[(v) => !!v || 'required']"
                 ></v-text-field>
 
+                    <v-text-field
+                  label="Age"
+                  v-model="user.age"
+                  :rules="[(v) => !!v || 'required']"
+                ></v-text-field>
+                    <v-text-field
+                  label="NRC"
+                  v-model="user.nrc"
+                  :rules="[(v) => !!v || 'required']"
+                ></v-text-field>
+                    <v-text-field
+                  label="Email"
+                  v-model="user.email"
+                  :rules="[(v) => !!v || 'required']"
+                ></v-text-field>
                 <v-text-field
                   label="Password"
                   v-model="user.password"
@@ -140,7 +166,7 @@
                   v-model="user.address"
                 ></v-text-field>
 
-                <v-autocomplete
+                <!-- <v-autocomplete
                   v-model="user.userType"
                   item-text="userType"
                   item-title="userType"
@@ -152,8 +178,24 @@
                   density="compact"
                   variant="outlined"
                   filled
-                >
-                </v-autocomplete>
+                ></v-autocomplete> -->
+                <v-autocomplete
+  v-model="user.userType"
+  :items="userTypeList"
+  label="UserType"
+  required
+  density="compact"
+  variant="outlined"
+  filled
+></v-autocomplete>
+    <v-text-field
+                  label="Degree"
+                  v-model="user.degree"
+                  :rules="[(v) => !!v || 'required']"
+                ></v-text-field>
+                
+
+                
                 </v-card-text>
                <v-card-actions class="justify-end pr-5 ">  
                 <v-btn  class="text-black"
@@ -192,6 +234,16 @@
         </v-sheet>
       </v-bottom-sheet>
     </v-col>
+     <v-col>
+          <v-bottom-sheet v-model="UserFileDialog" fullscreen scrollable>
+        <v-sheet class="information-window-v-sheet">
+          <UserFile
+          @closeDialog="UserFileDialog=false"
+          :user="selectedOne"
+          @loadUserList="loadUserList"          />
+        </v-sheet>
+      </v-bottom-sheet>
+    </v-col>
     
   </div>
 </template>
@@ -200,7 +252,8 @@ import { format } from "date-fns";
 import userService from "../service/UserAccountService.js";
 export default {
   data: () => ({
-    selectedOne: {},user: {},
+    selectedOne: {},
+    user: {},
     userList: [],
     userTypeList: ["STAFF", "STUDENT", "TEACHER", "ADMIN"],
     saveOrupdate: "SAVE",
@@ -209,26 +262,39 @@ export default {
     dialogDelete:false,
     userPhotoDialog:false,
     showForm: false,
+      loggedInUser: null,
+      UserFileDialog :false,
   }),
   props: { hideToolbar: Function },
   mounted: function () {
+     this.loggedInUser = JSON.parse(localStorage.getItem("user"));
     this.user.startDate = format(this.startPicker, "dd-MM-yyyy");
     this.user.userType = this.userTypeList[1];
     this.userListMethod();
     this.showForm = false;
+    
   },
   methods: {
+    FileMethod:function(item){
+        this.selectedOne = item;
+        this.UserFileDialog = true;
+    },
     loadUserList:function(){
       this.userPhotoDialog = false;
       this.userListMethod();
+      this.userPhotoDialog = false;
+      this.showForm = false;
+
+
     },  
     photoMethod:function(item){
         this.userPhotoDialog = true;
     },
     clickDeleteDialog:function(item){
+        console.log("Deleting user ID:", this.selectedOne.userAccountId);
         this.dialogDelete = false;
         userService
-          .deleteUser(this.selectedOne)
+          .deleteUser(this.selectedOne?.userAccountId)
           .then((response) => {
             this.saveOrupdate = "SAVE";
             this.user = {};
@@ -245,6 +311,7 @@ export default {
           });
     },
     deleteUserMethod:function(item){
+      this.selectedOne = item;
         this.dialogDelete = true;
     },
     editUser:function(item){
@@ -256,57 +323,83 @@ export default {
       const [year, month, day] = datePicker.split("-");
       return `${day}-${month}-${year}`;
     },
-    saveUser: function () {
-      if (this.saveOrupdate == "SAVE") {
-        userService
-          .addUser(this.user)
-          .then((response) => {
-            this.user = {};
-            this.userListMethod();
-            this.saveOrupdate = "SAVE";
-            this.showForm = false;
-            this.$swal({
-          icon: "success",
-          title: "Your work saved successfully!",
-          showConfirmButton: false,
-          timer: 1000,
-        }).then(() => {
-          this.showForm = false;
-        });
-          })
-       
-      } else {
-        userService
-          .updateUser(this.user)
-          .then((response) => {
-            this.saveOrupdate="SAVE";
-            this.user = {};
-            this.userListMethod();
-            this.showForm = false;
-            this.$swal({
-            icon: "success",
-            title: "Your work updated successfully!",
-            showConfirmButton: false,
-            timer: 1000,
-          }).then(() => {
-            this.showForm = false;
-          });
-          })
-       
-      }
-    },
-    userListMethod() {
-      userService
-        .getUserList()
-        .then((response) => {
+ 
+      async saveUser() {
+  try {
+    // Normalize userType
+    let userType = this.user.userType;
+    if (typeof userType === "object") {
+      userType = userType.userType || userType.value || "";
+    }
 
-          this.userList.splice(0);
-          this.userList.push(...response);
-        })
-        .catch((error) => {
-          // this.$swal("Fail!", error.response.data.message, "error");
-        });
-    },
+    // Re-assign normalized value back
+    this.user.userType = userType;
+
+    // Assign teacherId
+    if (this.loggedInUser?.role === "TEACHER" && userType === "STUDENT") {
+      this.user.teacherId = this.loggedInUser.userId;
+    } else {
+      this.user.teacherId = 0;
+    }
+
+    
+
+    // Save or update
+    if (this.saveOrupdate === "SAVE") {
+      await userService.addUser(this.user);
+      this.$swal({
+        icon: "success",
+        title: "User saved successfully!",
+        showConfirmButton: false,
+        timer: 1000,
+      });
+    } else {
+      await userService.updateUser(this.user);
+      this.$swal({
+        icon: "success",
+        title: "User updated successfully!",
+        showConfirmButton: false,
+        timer: 1000,
+      });
+    }
+
+    this.user = {};
+    this.saveOrupdate = "SAVE";
+    this.showForm = false;
+    this.userListMethod();
+
+  } catch (error) {
+    console.error("User save failed", error);
+    this.$swal("Error", error.response?.data?.message || "Failed to save user", "error");
+  }
+},
+
+
+
+
+userListMethod() {
+  userService.getUserList().then((response) => {
+    const allUsers = response.data || response;
+    this.loggedInUser = JSON.parse(localStorage.getItem("user"));
+
+
+
+    if (this.loggedInUser?.role === "TEACHER") {  // <-- change here
+      this.userList = allUsers.filter(
+        user =>
+          user.userType === "STUDENT" &&
+          user.teacherId === this.loggedInUser.userId  // <-- also change here
+      );
+    } else {
+      this.userList = allUsers;
+    }
+  });
+  
+}
+
+
+
+
   },
   watch: {
     startPicker() {

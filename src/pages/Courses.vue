@@ -28,7 +28,7 @@
               <th class="text-center white--text bg-primary">Student Name</th>
               <th class="text-center white--text bg-primary">Language Name</th>
               <th class="text-center white--text bg-primary">Type</th>
-              <th class="text-center white--text bg-primary">Amount</th>
+              <th class="text-center white--text bg-primary" v-if="showTeacher">Amount</th>
               <th class="text-center white--text bg-primary">Courses Photo</th>
               <th class="text-center white--text bg-primary">Action</th>
             </tr>
@@ -52,7 +52,7 @@
 
               <td class="text-center">{{ item.languagesDto?.name }}</td>
               <td class="text-center">{{ item?.type }}</td>
-              <td class="text-start">{{ item?.amount }}</td>
+              <td class="text-start" v-if="showTeacher">{{ item?.amount }}</td>
               <td class="text-start">{{ item?.cphoto }}</td>
               
               <td class="text-center">
@@ -156,6 +156,7 @@
                 />
 
                 <v-text-field
+                v-if="showTeacher"
                   type="number"
                   label="Amount"
                   v-model.number="courses.amount"
@@ -227,9 +228,17 @@ export default {
     dialogDelete: false,
     showForm:false,
     coursePhotoDialog: false,
+    showTeacher: false,
+    userData : {},
   }),
   props: {},
   mounted: function () {
+       this.userData = JSON.parse(localStorage.getItem("user"));
+    if(this.userData.role=="TEACHER"){
+      this.showTeacher = false;
+    }else{
+      this.showTeacher = true;
+    }
     this.courses.receivedDate = format(this.receivedPicker, "dd-MM-yyyy");
     this.studentListMethod();
     this.languageListMethod();

@@ -26,12 +26,22 @@ class UserAccountService {
     let url = `/useraccounts/${useraccounts.userAccountId}`;
     return this.axios.put(url, useraccounts).then((request) => request.data);
   }
-  deleteUser(userAccount) {
-    let url = `/useraccounts/${userAccount.userAccountId}`;
+  deleteUser(userAccountId) {
+    let url = `/useraccounts/${userAccountId}`;
     return this.axios.delete(url).then((request) => request.data);
   }
   updatePhoto(formData, userAccountId) {
     let url = `useraccounts/${userAccountId}/photo`;
+    return axios
+      .put(url, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      })
+      .then((request) => request.data);
+  }
+    updateFile(formData, userAccountId) {
+    let url = `useraccounts/${userAccountId}/file`;
     return axios
       .put(url, formData, {
         headers: {

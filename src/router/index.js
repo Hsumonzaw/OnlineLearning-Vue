@@ -67,7 +67,7 @@ const router = createRouter({
       name: "usercourses",
       component: () =>
         import(/* webpackChunkName: "home" */ "../pages/UserCourse.vue"),
-    },
+    }
   ],
 });
 export default router;
