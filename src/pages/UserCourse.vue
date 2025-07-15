@@ -101,7 +101,7 @@ export default {
 </script>
 <style scoped>
 .v-container {
-  background: linear-gradient(135deg, #1976d2 0%, #1976d2 60%, #42a5f5 100%);
+  background: linear-gradient(135deg, #79d4eb 0%, #5c83aa 60%, #42a5f5 100%);
 }
 
 p {

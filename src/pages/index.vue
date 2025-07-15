@@ -10,7 +10,6 @@
     cover
   />
 </v-avatar>
-This gives it:
       CodeLingo
   </v-toolbar-title>
     <v-spacer></v-spacer>
@@ -98,9 +97,8 @@ This gives it:
 
         <!-- description -->
         <p class="text-subtitle-2 mt-1" style="color: #546e7a;">
-       Learn the fundamentals of web development with our HTML course, taught by an experienced Burmese instructor. 
-       This course focuses on HTML as the primary language and is perfect for beginners looking to build websites from scratch.
-        You can learn this lecture in the Myanmar language, making it easier to understand for local learners. </p>
+          {{ courses?.description }}
+       </p>
         </div>
         <v-chip
       color="green lighten-2"
@@ -179,25 +177,7 @@ export default {
       ],
        photos: [],
       latestUserCourses: [],
-        teachers: [
-        {
-          name: "Mrs. Hannah",
-          img: "@/src/teacher1.jpg",
-          description:
-            "Experienced web developer teaching HTML in Burmese. Great for beginners looking to learn the basics of web development.",
-        },
-        {
-          name: "Ms. Sakura",
-          img: "img/teacher2.jpg",
-          description:
-            "Native Japanese instructor focusing on grammar, vocabulary, and cultural context. Learn with clarity and confidence.",
-        },
-        {
-          name: "Mr. Aung Ko",
-          img: "img/teacher3.jpg",
-          description:
-            "Professional Java developer with years of training experience. Learn object-oriented programming from scratch.",
-        },
+       
       ]
     //   isLoggedIn: false,
     //  showHero: false,

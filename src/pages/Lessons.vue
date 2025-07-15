@@ -30,7 +30,7 @@
               <th class="text-center white--text bg-primary">Youtube</th>
               <th class="text-center white--text bg-primary">PDF</th>
               <th class="text-center white--text bg-primary">Video Type</th>
-              <th class="text-center white--text bg-primary" v-if="showTeacher">Amount</th>
+              <!-- <th class="text-center white--text bg-primary" v-if="showTeacher">Amount</th> -->
               <th class="text-center white--text bg-primary">Date</th>
               <th class="text-center white--text bg-primary">ModifiedDate</th>
               <th class="text-center white--text bg-primary">Action</th>
@@ -54,7 +54,7 @@
               <td class="text-center">{{ item.youtube }}</td>
               <td class="text-center">{{ item.pdf }}</td>
               <td class="text-center">{{ item.freeVideo || '-' }}</td>
-              <td class="text-center" v-if="showTeacher">{{ item.languagesDto.amount || '-' }}</td>
+              <!-- <td class="text-center" v-if="showTeacher">{{ item.languagesDto.amount || '-' }}</td> -->
               <td class="text-start">{{ item.date }}</td>
               <td class="text-start">{{ item.modifiedDate }}</td>
               <td class="text-center">
@@ -143,14 +143,14 @@
                   filled
                 ></v-autocomplete>
 
-              <v-text-field
+              <!-- <v-text-field
                v-if="showTeacher"
                   label="Amount"
                   :value="lesson.languagesDto?.amount || 0"
                   readonly
                   dense
                   outlined
-                ></v-text-field>
+                ></v-text-field> -->
                 </v-card-text>
                 <v-card-actions class="justify-end pr-5">  
                 <v-btn  class="text-black"

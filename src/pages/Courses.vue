@@ -30,6 +30,8 @@
               <th class="text-center white--text bg-primary">Type</th>
               <th class="text-center white--text bg-primary" v-if="showTeacher">Amount</th>
               <th class="text-center white--text bg-primary">Courses Photo</th>
+              <th class="text-center white--text bg-primary">Descriptions</th>
+              
               <th class="text-center white--text bg-primary">Action</th>
             </tr>
           </thead>
@@ -54,6 +56,7 @@
               <td class="text-center">{{ item?.type }}</td>
               <td class="text-start" v-if="showTeacher">{{ item?.amount }}</td>
               <td class="text-start">{{ item?.cphoto }}</td>
+              <td class="text-start">{{ item?.description }}</td>
               
               <td class="text-center">
 
@@ -160,6 +163,15 @@
                   type="number"
                   label="Amount"
                   v-model.number="courses.amount"
+                  :rules="[(v) => !!v || 'required']"
+                  density="compact"
+                  variant="outlined"
+                ></v-text-field>
+
+                 <v-text-field
+                  
+                  label="Descriptions"
+                  v-model.number="courses.description"
                   :rules="[(v) => !!v || 'required']"
                   density="compact"
                   variant="outlined"
