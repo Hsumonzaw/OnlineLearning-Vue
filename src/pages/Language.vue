@@ -228,8 +228,18 @@ export default {
       languageService
         .getLanguageList()
         .then((response) => {
-          this.languageList.splice(0);
-          this.languageList.push(...response);
+         if (this.userData.role === "TEACHER") {
+        const filteredLessons = response.filter(language => {
+console.log(language.userAccount?.userAccountId);
+
+          return language.userAccount?.userAccountId == this.userData.userId; // using == to allow string/number match
+        });
+        this.languageList.splice(0);
+        this.languageList.push(...filteredLessons);
+      } else {
+        this.languageList.splice(0);
+        this.languageList.push(...response);
+      }
         })
         .catch((error) => {
           this.$swal("Fail!", error.response.data.message, "error");

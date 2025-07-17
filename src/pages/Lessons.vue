@@ -25,10 +25,9 @@
           <thead>
             <tr>
               <th class="text-center white--text bg-primary">No.</th>
-              <th class="text-center white--text bg-primary">UserName</th>
+              <th class="text-center white--text bg-primary">Teacher Name</th>
               <th class="text-center white--text bg-primary">Languages Name</th>
               <th class="text-center white--text bg-primary">Youtube</th>
-              <th class="text-center white--text bg-primary">PDF</th>
               <th class="text-center white--text bg-primary">Video Type</th>
               <!-- <th class="text-center white--text bg-primary" v-if="showTeacher">Amount</th> -->
               <th class="text-center white--text bg-primary">Date</th>
@@ -52,7 +51,6 @@
               <td class="text-center">{{ item.userAccount?.userName }}</td>
               <td class="text-center">{{ item.languagesDto?.name }}</td>
               <td class="text-center">{{ item.youtube }}</td>
-              <td class="text-center">{{ item.pdf }}</td>
               <td class="text-center">{{ item.freeVideo || '-' }}</td>
               <!-- <td class="text-center" v-if="showTeacher">{{ item.languagesDto.amount || '-' }}</td> -->
               <td class="text-start">{{ item.date }}</td>
@@ -125,6 +123,7 @@
            :rules="[(v) => !!v ||  'language is required']"
            
           />
+         
 
                 <v-text-field
                
@@ -143,14 +142,7 @@
                   filled
                 ></v-autocomplete>
 
-              <!-- <v-text-field
-               v-if="showTeacher"
-                  label="Amount"
-                  :value="lesson.languagesDto?.amount || 0"
-                  readonly
-                  dense
-                  outlined
-                ></v-text-field> -->
+             
                 </v-card-text>
                 <v-card-actions class="justify-end pr-5">  
                 <v-btn  class="text-black"
@@ -216,8 +208,8 @@ export default {
     languageList:[],
     showForm: false,
     lessonFileDialog:false,
+    showTeacher : false,
 userData:{},
-    showTeacher:false,
   }),
    props: {},
   mounted: function() {
@@ -262,8 +254,10 @@ userData:{},
           this.lessonListMethod();
         })
         .catch((error) => {
-          this.$swal("Fail!", error.response.data.message, "error");
-        });
+  const message = error?.response?.data?.message || error.message || "Unknown error";
+  this.$swal("Fail!", message, "error");
+});
+
     },
     formatDate(datePicker) {
       const [year, month, day] = datePicker.split("-");
@@ -367,20 +361,30 @@ userData:{},
     this.showForm = true;
  
 },
-    lessonListMethod() {
-      lessonService
-        .getLessonList()
-        .then((response) => {
-          console.log("Lesson list response:", response);
-            //  console.log("Rating Data:", response);
-          this.lessonList.splice(0);
-          this.lessonList.push(...response);
-        })
-        // .catch((err) => console.error("Fetch error:", err));
-        // .catch((error) => {
-        //   // this.$swal("Fail!", error.response.data.message, "error");
-        // });
-      },
+lessonListMethod() {
+  lessonService
+    .getLessonList()
+    .then((response) => {
+
+      if (this.userData.role === "TEACHER") {
+        const filteredLessons = response.filter(lesson => {
+
+
+          return lesson.userAccount?.userAccountId == this.userData.userId; // using == to allow string/number match
+        });
+        this.lessonList.splice(0);
+        this.lessonList.push(...filteredLessons);
+      } else {
+        this.lessonList.splice(0);
+        this.lessonList.push(...response);
+      }
+    })
+    .catch((error) => {
+      console.error("Failed to load lessons:", error);
+    });
+},
+
+
        languageListMethod() {
       languageService
         .getLanguageList()
@@ -404,8 +408,10 @@ userData:{},
           this.lesson.userAccountDto = this.userList[0];
         })
         .catch((error) => {
-          this.$swal("Fail!", error.response.data.message, "error");
-        });
+  const message = error?.response?.data?.message || error.message || "Unknown error";
+  this.$swal("Fail!", message, "error");
+});
+
     }
     },
 

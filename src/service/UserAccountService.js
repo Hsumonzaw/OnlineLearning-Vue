@@ -50,6 +50,15 @@ class UserAccountService {
       })
       .then((request) => request.data);
   }
+getStudentsForTeacher() {
+  return axios
+    .get(`/useraccounts`, { params: { userType: "TEACHER" } })
+    .then((res) => res.data);
+}
+
+   
+
+  
 }
 
 const service = new UserAccountService();

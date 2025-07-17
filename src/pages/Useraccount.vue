@@ -4,6 +4,22 @@
     <v-row>
       <v-col cols="12" >
         <h2 style="background-color:rgb(136, 210, 230);text-align: center;">User Informations</h2>
+           <v-col cols="2" class="pl-1 pt-2">
+      <v-autocomplete
+        v-model="userType"
+        item-text="userTypeName"
+        :items="userTypeList"
+        name="userType"
+        label="User Type"
+        return-object
+        density="compact"
+        variant="outlined"
+        required
+        small
+        filled
+        @update:modelValue="userListMethodByType"
+      ></v-autocomplete>
+    </v-col>
   <v-tooltip location="top">
   <template v-slot:activator="{ props }">
     <v-btn
@@ -56,12 +72,12 @@
               <td class="text-center">{{ item.startDate }}</td>
               <td class="text-center">{{ item.name }}</td>
               <td class="text-center">{{ item.userName }}</td>
-              <td class="text-center">{{ item.age }}</td>
-              <td class="text-center">{{ item.nrc }}</td>
-              <td class="text-center">{{ item.email }}</td>
+              <td class="text-center">{{ item.age || '-'}}</td>
+              <td class="text-center">{{ item.nrc || '-'}}</td>
+              <td class="text-center">{{ item.email || '-'}}</td>
               
-              <td class="text-start">{{ item.phonenum }}</td>
-              <td class="text-start">{{ item.address }}</td>
+              <td class="text-start">{{ item.phonenum || '-'}}</td>
+              <td class="text-start">{{ item.address || '-'}}</td>
               <td class="text-start">{{ item.userType }}</td>
               <td class="text-center">{{ item.photo }}</td>
               <td class="text-center">{{ item.degree }}</td>
@@ -255,7 +271,7 @@ export default {
     selectedOne: {},
     user: {},
     userList: [],
-    userTypeList: ["STAFF", "STUDENT", "TEACHER", "ADMIN"],
+    userTypeList: ["ALL","STAFF", "STUDENT", "TEACHER", "ADMIN"],
     saveOrupdate: "SAVE",
     startPicker: new Date(),
     startMenu: false,
@@ -264,25 +280,46 @@ export default {
     showForm: false,
       loggedInUser: null,
       UserFileDialog :false,
+      userType:"ALL"
   }),
   props: { hideToolbar: Function },
   mounted: function () {
-     this.loggedInUser = JSON.parse(localStorage.getItem("user"));
+    
+    this.loggedInUser = JSON.parse(localStorage.getItem("user"));
     this.user.startDate = format(this.startPicker, "dd-MM-yyyy");
-    this.user.userType = this.userTypeList[1];
+    this.user.userType = this.userTypeList[0];
+    // this.userType = this.userTypeList[0];
     this.userListMethod();
     this.showForm = false;
+    this.userListMethodByType();
     
   },
   methods: {
+        userListMethodByType() {
+          // console.log(this.userType);
+          
+      userService
+        .getUserList(this.userType)
+        .then((response) => {
+          // console.log(response);
+
+          this.userList.splice(0, this.userList.length);
+          this.userList.push(...response);
+          this.saveOrupdate = "SAVE";
+        })
+        .catch((error) => {
+          this.$swal("Fail!", error.response.data.message, "error");
+        });
+    },
     FileMethod:function(item){
         this.selectedOne = item;
+        this.showForm = false;
         this.UserFileDialog = true;
     },
     loadUserList:function(){
       this.userPhotoDialog = false;
       this.userListMethod();
-      this.userPhotoDialog = false;
+      this.userFileDialog = false;
       this.showForm = false;
 
 
@@ -291,7 +328,7 @@ export default {
         this.userPhotoDialog = true;
     },
     clickDeleteDialog:function(item){
-        console.log("Deleting user ID:", this.selectedOne.userAccountId);
+        // console.log("Deleting user ID:", this.selectedOne.userAccountId);
         this.dialogDelete = false;
         userService
           .deleteUser(this.selectedOne?.userAccountId)
@@ -299,6 +336,7 @@ export default {
             this.saveOrupdate = "SAVE";
             this.user = {};
             this.userListMethod();
+            this.userListMethodByType();
             this.$swal({
               icon: "success",
               title: "Your work has been deleted",
@@ -324,7 +362,7 @@ export default {
       return `${day}-${month}-${year}`;
     },
  
-      async saveUser() {
+    async saveUser() {
   try {
     // Normalize userType
     let userType = this.user.userType;
@@ -346,7 +384,9 @@ export default {
 
     // Save or update
     if (this.saveOrupdate === "SAVE") {
-      await userService.addUser(this.user);
+      this.userListMethodByType();
+      await userService
+      .addUser(this.user);
       this.$swal({
         icon: "success",
         title: "User saved successfully!",
@@ -354,7 +394,11 @@ export default {
         timer: 1000,
       });
     } else {
-      await userService.updateUser(this.user);
+
+      await userService
+      .updateUser(this.user);
+      this.userListMethodByType();
+
       this.$swal({
         icon: "success",
         title: "User updated successfully!",
@@ -376,9 +420,9 @@ export default {
 
 
 
-
 userListMethod() {
-  userService.getUserList().then((response) => {
+  userService
+  .getUserList().then((response) => {
     const allUsers = response.data || response;
     this.loggedInUser = JSON.parse(localStorage.getItem("user"));
 
@@ -396,9 +440,6 @@ userListMethod() {
   });
   
 }
-
-
-
 
   },
   watch: {
