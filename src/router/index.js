@@ -67,7 +67,13 @@ const router = createRouter({
       name: "usercourses",
       component: () =>
         import(/* webpackChunkName: "home" */ "../pages/UserCourse.vue"),
-    }
+    },
+    {
+      path: "/userlessons",
+      name: "userlessons",
+      component: () =>
+        import(/* webpackChunkName: "home" */ "../pages/UserLesson.vue"),
+    },
   ],
 });
 export default router;

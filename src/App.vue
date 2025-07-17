@@ -1,12 +1,25 @@
 <template>
   <v-app>
     <div >
-      <v-toolbar flat :elevation="isDark ? 0 : 4" :class="isDark ? 'dark-bar' : 'light-bar'" height="50">
-    <v-toolbar-title style="font-weight: bolder; font-size: x-large;">
-    <link rel="icon" href="/unilogo.png" type="image/png" />
-      Online Courses Management</v-toolbar-title>
-
+      <v-app-bar flat height="70" color="#2196f3"  class="px-8">
+       <v-toolbar-title class="d-flex align-center font-weight-bold white--text " style="font-size: 2rem;color: antiquewhite;">
+    <v-avatar size="60" class="mr-2" color="white">
+  <v-img
+    src="@/assets/unilogo.png"
+    alt="Logo"
+    cover
+  />
+</v-avatar>
+      CodeLingo
+  </v-toolbar-title>
     <v-spacer></v-spacer>
+    <div class="centered-nav ">
+    <v-btn text  to="/">Home</v-btn>
+    <v-btn text to="/usercourses">Courses</v-btn>
+    <v-btn text to="/userlessons"> Lessons</v-btn>
+    <v-btn text to="">Teachers</v-btn>
+    <v-btn text to="">Exam</v-btn>
+    </div>
     <v-menu offset-y open-on-hover close-on-content-click v-if="showNavigation && userData.role!='STUDENT'">
         <template v-slot:activator="{props}">
           <v-btn text v-bind="props" v-on="on"
@@ -50,6 +63,8 @@
      <v-btn icon @click="toggleTheme" :title="isDark ? 'Light Mode' : 'Dark Mode'">
       <v-icon>{{ isDark ? 'mdi-white-balance-sunny' : 'mdi-weather-night' }}</v-icon>
     </v-btn>
+
+    <!-- profile -->
       <v-menu offset-y>
     <template v-slot:activator="{ props }">
           <v-btn icon v-bind="props">
@@ -68,7 +83,7 @@
         </v-card>
       </v-menu>
       
-   </v-toolbar>
+ </v-app-bar>
     </div>
     <div>
    
@@ -230,7 +245,13 @@ export default {
 .hover-style:hover{
   background-color:  #61cfd6;
     color: #0a3e8b; 
-    text-decoration: underline;
-  text-decoration-color: #0d47a1; 
+    
+}
+.centered-nav {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 16px;
 }
 </style>

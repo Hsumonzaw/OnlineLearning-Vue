@@ -57,8 +57,7 @@ import axios from "@/config";
 export default {
   data: () => ({
    coursesList: [
-        {id:1},
-        {id:2}
+        
     ],
     lessonsId: 0,
   }),

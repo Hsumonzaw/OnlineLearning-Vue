@@ -384,11 +384,11 @@ userListMethod() {
 
 
 
-    if (this.loggedInUser?.role === "TEACHER") {  // <-- change here
+    if (this.loggedInUser?.role === "TEACHER") {  
       this.userList = allUsers.filter(
         user =>
           user.userType === "STUDENT" &&
-          user.teacherId === this.loggedInUser.userId  // <-- also change here
+          user.teacherId === this.loggedInUser.userId  
       );
     } else {
       this.userList = allUsers;
