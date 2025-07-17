@@ -178,7 +178,7 @@ export default {
        photos: [],
       latestUserCourses: [],
        
-      ]
+      
     //   isLoggedIn: false,
     //  showHero: false,
     //   courses:[

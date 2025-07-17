@@ -36,6 +36,7 @@ import userService from "../service/UserAccountService.js";
 export default {
   data: () => ({
     file:"",
+    showForm : false,
   }),
    props: {user:Object},
   mounted: function() {
