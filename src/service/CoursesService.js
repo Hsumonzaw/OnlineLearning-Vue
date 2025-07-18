@@ -34,6 +34,13 @@ class CoursesService {
       })
       .then((request) => request.data);
   }
+  courseListMethodByType() {
+  coursesService.getCourseListByType(this.type)
+    .then((response) => {
+      this.coursesList = response;
+    })
+    .catch((err) => console.error("Fetch error:", err));
+}
 }
 
 const service = new CoursesService();

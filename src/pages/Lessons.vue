@@ -1,7 +1,7 @@
 <template>
   <div>
     <!-- Table Section -->
-    <v-row>
+    <v-row class="title">
       <v-col cols="12">
         <h1 style="background-color:rgb(136, 210, 230);text-align: center;">Lessons</h1>
  <v-tooltip location="top">
@@ -479,6 +479,9 @@ thead{
   height: 60px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
   z-index: 999;
+}
+.title{
+  padding-top: 70px;
 }
 
 

@@ -1,7 +1,7 @@
 <template>
   <div>
     <!-- Table Section -->
-    <v-row>
+    <v-row class="title"> 
       <v-col cols="12" >
         <h2 style="background-color:rgb(136, 210, 230);text-align: center;">User Informations</h2>
            <v-col cols="2" class="pl-1 pt-2">
@@ -493,5 +493,8 @@ tr:hover {
   height: 60px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
   z-index: 999;
+}
+.title{
+  padding-top: 70px;
 }
 </style>

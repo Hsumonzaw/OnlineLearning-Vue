@@ -1,7 +1,7 @@
 <template>
   <div>
       <!-- Table Section -->
-    <v-row>
+    <v-row class="title">
       <v-col cols="12" >
         <h2 style="background-color:rgb(136, 210, 230);text-align: center;">Languages</h2>
   <v-tooltip location="top">
@@ -181,49 +181,40 @@ export default {
   },
   methods: {
     saveLanguage: function () {
-      if (this.saveOrupdate == "SAVE") {
-        languageService
-          .addLanguageList(this.language)
-          .then((response) => {
-            this.showForm = false;
-            this.$swal({
-          icon: "success",
-          title: "Your work saved successfully!",
-          showConfirmButton: false,
-          timer: 1000,
-        }).then(() => {
-          this.showForm = false;
-        });
-            this.language = {
-              amount: 0,
-              examFee: 0,
-            };
-            this.languageListMethod();
-          })
-       
-      } else {
-        languageService
-          .updateLanguage(this.language)
-          .then((response) => {
-            this.saveOrupdate="SAVE";
-            this.showForm = false;
-            this.$swal({
-          icon: "success",
-          title: "Your work updated successfully!",
-          showConfirmButton: false,
-          timer: 1000,
-        }).then(() => {
-          this.showForm = false;
-        });
-            this.language = {
-              amount: 0,
-              examFee: 0,
-            };
-            this.languageListMethod();
-          })
+  if (this.saveOrupdate == "SAVE") {
+    this.language.userAccount = {
+      userAccountId: this.userData.userId
+    };
+    languageService.addLanguageList(this.language).then((response) => {
+      this.showForm = false;
+      this.$swal({
+        icon: "success",
+        title: "Your work saved successfully!",
+        showConfirmButton: false,
+        timer: 1000,
+      });
+      this.language = { amount: 0, examFee: 0 };
+      this.languageListMethod();
+    });
+  } else {
+    this.language.userAccount = {
+      userAccountId: this.userData.userId
+    };
+    languageService.updateLanguage(this.language).then((response) => {
+      this.saveOrupdate = "SAVE";
+      this.showForm = false;
+      this.$swal({
+        icon: "success",
+        title: "Your work updated successfully!",
+        showConfirmButton: false,
+        timer: 1000,
+      });
+      this.language = { amount: 0, examFee: 0 };
+      this.languageListMethod();
+    });
+  }
+},
 
-      }
-    },
     languageListMethod() {
       languageService
         .getLanguageList()
@@ -231,6 +222,9 @@ export default {
          if (this.userData.role === "TEACHER") {
         const filteredLessons = response.filter(language => {
 console.log(language.userAccount?.userAccountId);
+console.log("userId from localStorage:", this.userData.userId);
+console.log("Sending language object:", this.language);
+
 
           return language.userAccount?.userAccountId == this.userData.userId; // using == to allow string/number match
         });
@@ -333,5 +327,8 @@ tr:hover {
   height: 60px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
   z-index: 999;
+}
+.title{
+  padding-top: 70px;
 }
 </style>

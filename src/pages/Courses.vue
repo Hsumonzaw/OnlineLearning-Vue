@@ -1,9 +1,25 @@
 <template>
   <div>
     <!-- Table Section -->
-   <v-row>
+   <v-row class="title">
       <v-col cols="12">
         <h2 style="background-color:rgb(136, 210, 230); text-align: center;" >Courses</h2>
+        <v-col cols="2" class="pl-1 pt-2">
+      <v-autocomplete
+        v-model="type"
+        item-text="typeName"
+        :items="courseList"
+        name="type"
+        label="Course Or Exam"
+        return-object
+        density="compact"
+        variant="outlined"
+        required
+        small
+        filled
+        @update:modelValue="courseListMethodByType"
+      ></v-autocomplete>
+    </v-col>
         <v-tooltip location="top">
   <template v-slot:activator="{ props }">
     <v-btn
@@ -25,12 +41,14 @@
 <tr>
               <th class="text-center white--text bg-primary">No.</th>
               <th class="text-center white--text bg-primary">Received Date</th>
-              <th class="text-center white--text bg-primary">Student Name</th>
+              <th class="text-center white--text bg-primary" v-if="showTeacher">Student Name</th>
               <th class="text-center white--text bg-primary">Language Name</th>
               <th class="text-center white--text bg-primary">Type</th>
               <th class="text-center white--text bg-primary" v-if="showTeacher">Amount</th>
-              <th class="text-center white--text bg-primary">Courses Photo</th>
-              <th class="text-center white--text bg-primary">Descriptions</th>
+              <th class="text-center white--text bg-primary" v-if="showTeacher">Courses Photo</th>
+              <th class="text-center white--text bg-primary">Exam Link</th>
+              <th class="text-center white--text bg-primary">Book Link</th>
+              <th class="text-center white--text bg-primary" v-if="showTeacher">Descriptions</th>
               
               <th class="text-center white--text bg-primary">Action</th>
             </tr>
@@ -50,13 +68,16 @@
               <td class="text-center">{{ index + 1 }}</td>
               <td class="text-center">{{ item?.receivedDate }}</td>
 
-              <td class="text-center">{{ item.studentDto?.userName }}</td>
+              <td class="text-center" v-if="showTeacher">{{ item.studentDto?.userName }}</td>
 
               <td class="text-center">{{ item.languagesDto?.name }}</td>
               <td class="text-center">{{ item?.type }}</td>
               <td class="text-start" v-if="showTeacher">{{ item?.amount }}</td>
-              <td class="text-start">{{ item?.cphoto }}</td>
-              <td class="text-start">{{ item?.description }}</td>
+              <td class="text-start" v-if="showTeacher">{{ item?.cphoto }}</td>
+              <td class="text-start">{{ item?.examLink }}</td>
+              <td class="text-start">{{ item?.pdf }}</td>
+
+              <td class="text-start" v-if="showTeacher">{{ item?.description }}</td>
               
               <td class="text-center">
 
@@ -118,6 +139,7 @@
                 </v-menu>
 
                 <v-autocomplete
+                v-if="showTeacher"
                   v-model="courses.studentDto"
                   :items="studentList"
                   item-text="userName"
@@ -159,6 +181,22 @@
                 />
 
                 <v-text-field
+                  label="Exam Link"
+                  v-model.number="courses.examLink"
+                  :rules="[(v) => !!v || 'required']"
+                  density="compact"
+                  variant="outlined"
+                ></v-text-field>
+
+                <v-text-field
+                  label="Book Link (PDF)"
+                  v-model.number="courses.pdf"
+                  :rules="[(v) => !!v || 'required']"
+                  density="compact"
+                  variant="outlined"
+                ></v-text-field>
+
+                <v-text-field
                 v-if="showTeacher"
                   type="number"
                   label="Amount"
@@ -169,7 +207,7 @@
                 ></v-text-field>
 
                  <v-text-field
-                  
+                  v-if="showTeacher"
                   label="Descriptions"
                   v-model.number="courses.description"
                   :rules="[(v) => !!v || 'required']"
@@ -221,6 +259,7 @@
 </template>
 <script>
 import { format } from "date-fns";
+// import { format, isValid } from "date-fns"; // make sure isValid is imported
 import userAccountService from "../service/UserAccountService.js";
 import languageService from "../service/LanguageService.js";
 import coursesService from "../service/CoursesService.js";
@@ -235,13 +274,15 @@ export default {
     receivedPicker: new Date(),
     receivedMenu: false,
     userType: "STUDENT",
-    languageList: [],courseList: ["COURSES", "EXAM"],
+    languageList: [],
+    courseList: ["ALL","COURSES", "EXAM"],
     coursesList: [],
     dialogDelete: false,
     showForm:false,
     coursePhotoDialog: false,
     showTeacher: false,
     userData : {},
+    type: "ALL",
   }),
   props: {},
   mounted: function () {
@@ -251,14 +292,33 @@ export default {
     }else{
       this.showTeacher = true;
     }
-    this.courses.receivedDate = format(this.receivedPicker, "dd-MM-yyyy");
+    this.courses.receivedDate = format(this.receivedPicker, "dd-MM-yyyy HH:mm:ss");
+    // this.courses.receivedDate = format(this.receivedPicker, "yyyy-MM-dd");
+
     this.studentListMethod();
     this.languageListMethod();
+
+
+
     this.coursesListMethod();
     this.courses.type = this.courseList[0];
     this.showForm = false;
+    this.courseListMethodByType();
+
   },
   methods: {
+    courseListMethodByType() {
+  coursesService.getCourseList()
+    .then((response) => {
+      if (this.type === 'ALL') {
+        this.coursesList = response;
+      } else {
+        this.coursesList = response.filter(item => item.type === this.type);
+      }
+    })
+    .catch((err) => console.error("Fetch error:", err));
+},
+
 
        loadUserList:function(){
       this.coursePhotoDialog = false;
@@ -306,19 +366,43 @@ export default {
         .catch((err) => console.error("Fetch error:", err));
     },
     saveCourse: function () {
+  //       this.courses.receivedDate = format(this.receivedPicker, "yyyy-MM-dd"); // short date
+  // this.courses.date = format(this.courses.date, "yyyy-MM-dd HH:mm:ss"); // full datetime
+  // this.courses.modifiedDate = format(this.courses.modifiedDate, "yyyy-MM-dd HH:mm:ss"); // full datetime
+
+  const received = new Date(this.receivedPicker);
+  const start = new Date(this.courses.date);
+  const modified = new Date(this.courses.modifiedDate);
+
+  if (isValid(this.receivedPicker)) {
+    this.courses.receivedDate = format(this.receivedPicker, "dd-MM-yyyy HH:mm:ss");
+  } else {
+    console.error("Invalid receivedPicker:", this.receivedPicker);
+    return;
+  }
+  
+
+
       if (this.saveOrupdate == "SAVE") {
         coursesService
           .addCourse(this.courses)
           .then((response) => {
+            console.log("this.receivedPicker", this.receivedPicker);
+console.log("this.courses.date", this.courses.date);
+console.log("this.courses.modifiedDate", this.courses.modifiedDate);
             
             this.courses = {
-              receivedDate: format(this.receivedPicker, "dd-MM-yyyy"),
+
+              // receivedDate: format(this.receivedPicker, "yyyy-MM-dd"),
+
+              receivedDate: format(this.receivedPicker, "dd-MM-yyyy HH:mm:ss"),
               studentDto: this.studentList[0],
               languagesDto: this.languageList[0],
               type: this.courseList[0],
               amount: 0,
             };
             this.showForm =false;
+             this.courseListMethodByType();
           this.$swal({
           icon: "success",
           title: "Your work saved successfully!",
@@ -333,9 +417,12 @@ export default {
       } else {
         coursesService
           .updateCourse(this.courses)
+          
           .then((response) => {
             this.saveOrupdate = "SAVE";
             this.courses = {
+              // receivedDate: format(this.receivedPicker, "yyyy-MM-dd"),
+
               receivedDate: format(this.receivedPicker, "dd-MM-yyyy"),
               studentDto: this.studentList[0],
               languagesDto: this.languageList[0],
@@ -344,6 +431,7 @@ export default {
             };
             this.coursesListMethod();
             this.showForm =false;
+             this.courseListMethodByType();
             this.$swal({
           icon: "success",
           title: "Your work updated successfully!",
@@ -373,7 +461,9 @@ export default {
       coursesService
         .deleteCourse(this.selectedOne)
         .then((response) => {
+
           this.dialogDelete = false;
+          this.courseListMethodByType();
           this.$swal({
             icon: "success",
             title: "Your work has been deleted",
@@ -386,10 +476,23 @@ export default {
           this.$swal("Fail!", error.response.data.message, "error");
         });
     },
+    resetForm() {
+  this.courses = {
+    receivedDate: format(new Date(), "dd-MM-yyyy HH:mm:ss"),
+    studentDto: this.studentList[0],
+    languagesDto: this.languageList[0],
+    type: this.courseList[0],
+    amount: 0,
+  };
+  this.showForm = false;
+  this.saveOrupdate = "SAVE";
+}
   },
   watch: {
     receivedPicker() {
       this.receivedMenu = false;
+      // this.courses.receivedDate = format(this.receivedPicker, "yyyy-MM-dd");
+
       this.courses.receivedDate = format(this.receivedPicker, "dd-MM-yyyy");
     },
         showForm(newVal) {
@@ -439,5 +542,8 @@ tr:hover {
   height: 60px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
   z-index: 999;
+}
+.title{
+  padding-top: 70px;
 }
 </style>
