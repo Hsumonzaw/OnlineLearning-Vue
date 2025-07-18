@@ -79,7 +79,14 @@ const router = createRouter({
       name: "teacherforstudent",
       component: () =>
         import(/* webpackChunkName: "home" */ "../pages/TeacherForStudent.vue"),
-    }
+    },
+    {
+      path: "/userteacher",
+      name: "userteacher",
+      component: () =>
+        import(/* webpackChunkName: "home" */ "../pages/UserTeacher.vue"),
+    },
+
   ],
 });
 export default router;
