@@ -1,7 +1,6 @@
 <template>
   
   <v-app>
-  
  <v-container fluid class="modern-contact px-0 py-0"> 
     <section class="hero-section modern-hero">
       <v-row class="align-center justify-center" no-gutters>
@@ -102,7 +101,7 @@
     </v-col>
   </v-row>
   <v-container class="d-flex justify-end" mb-0>
-   <router-link to="/usercourses" class="font-weight-bold  learn-more-btn">
+   <router-link to="/userteacher" class="font-weight-bold  learn-more-btn">
      Learn More
       <v-icon end>mdi-chevron-right</v-icon>
 </router-link>
@@ -114,6 +113,8 @@
   <h1 class="text-center font-weight-bold mb-16" style="color: #1976d2;">
     Meet Our Teachers
   </h1>
+      <Motion preset="slideVisibleRight" :duration="500" :delay="index * 200">
+
   <v-row justify="center">
    <v-hover
   v-for="(teacher, i) in teachers.slice(0, 4)"
@@ -144,10 +145,24 @@
       <p style="color: #607d8b;">📧 {{ teacher.email }}</p>
     </v-card-text>
   </v-card>
-</v-hover>
+   </v-hover>
     </v-row>
-</v-container>
+   </Motion>
 
+
+  
+      <Motion preset="slideVisibleLeft" :duration="500" :delay="index * 200">
+
+    <v-container class="d-flex justify-center" mb-0>
+      
+   <router-link to="/userteacher" class="font-weight-bold  learn-more-btn">
+     See All Teachers
+      <v-icon end>mdi-chevron-right</v-icon>
+</router-link>
+
+</v-container>
+</Motion>
+</v-container>
 
 
 <v-container
@@ -160,6 +175,7 @@
     <h2 class="font-weight-bold" style="color: #0288d1; font-size: 4rem; margin-bottom: 12px;">
     We're  Hiring
     </h2>
+    <v-img src="@/assets/airplane.svg" max-width="200" />
     <p style="color: #455a64; font-size: 2rem;">
       Join our growing team! We're looking for passionate instructors and tech enthusiasts to empower learners worldwide.
     </p>
@@ -180,30 +196,64 @@
     style="border-radius: 16px;  width: 500px; height: 500px;"
   />
 
-  <v-dialog v-model="dialog" max-width="600px">
-      <v-card>
-        <v-card-title class="text-h5 font-weight-bold" style="text-align: center;">Submit Your CV</v-card-title>
-        <v-card-text>
-          <v-form ref="cvForm">
-            <v-text-field label="Full Name" v-model="form.name" required prepend-icon="mdi-account "></v-text-field>
-            <v-text-field label="Email" v-model="form.email" type="email" required prepend-icon="mdi-email-variant"></v-text-field>
-            <v-text-field label="Phone Number" v-model="form.phone" required prepend-icon="mdi-phone-in-talk"></v-text-field>
-            <v-file-input
-              label="Upload CV (PDF/DOC)"
-              v-model="form.cv"
-              accept=".pdf,.doc,.docx"
-              required
-              prepend-icon="mdi-paperclip"
-            ></v-file-input>
-          </v-form>
-        </v-card-text>
-        <v-card-actions>
-          <v-spacer />
-          <v-btn text @click="dialog = false">Cancel</v-btn>
-          <v-btn color="primary" @click="submitCV">Submit</v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
+ <v-dialog v-model="dialog" max-width="600px">
+  <v-card>
+    <v-card-title class="text-h5 font-weight-bold text-center">
+      Submit Your CV
+    </v-card-title>
+
+    <v-card-text>
+      <v-form ref="cvForm" v-model="valid">
+        <v-text-field
+          v-model="form.name"
+          :rules="[v => !!v || 'Name is required']"
+          label="Full Name"
+          prepend-icon="mdi-account"
+          required
+        />
+
+        <v-text-field
+          v-model="form.email"
+          :rules="[
+            v => !!v || 'Email is required',
+            v => /.+@.+/.test(v) || 'Email must be valid'
+          ]"
+          label="Email"
+          prepend-icon="mdi-email"
+          required
+        />
+
+        <v-text-field
+          v-model="form.phone"
+          :rules="[v => !!v || 'Phone is required']"
+          label="Phone Number"
+          prepend-icon="mdi-phone"
+          required
+        />
+
+        <v-file-input
+          v-model="form.cv"
+          :rules="[v => !!v || 'CV file is required']"
+          label="Upload CV (PDF/DOC)"
+          prepend-icon="mdi-file-upload"
+          accept=".pdf,.doc,.docx"
+          required
+        />
+      </v-form>
+    </v-card-text>
+
+    <v-card-actions>
+      <v-spacer />
+      <v-btn text @click="dialog = false">
+        <v-icon start>mdi-close</v-icon> Cancel
+      </v-btn>
+      <v-btn color="primary" @click="submitCV">
+        <v-icon start>mdi-send</v-icon> Submit
+      </v-btn>
+    </v-card-actions>
+  </v-card>
+</v-dialog>
+
 </v-container>
   </v-app>
 </template>
@@ -227,12 +277,14 @@ export default {
       latestUserCourses: [],
       teachers:[],
       dialog:false,
+        valid: false,
       form:{
         name:"",
         email:"",
         phone:"",
-        cv:null,
-      }
+        cv:"",
+      },
+      userAccounts: [],
        
       
     //   isLoggedIn: false,
@@ -287,22 +339,38 @@ export default {
   return `${axios.defaults.baseURL}/userphoto/${photo}.png`;
 },
 submitCV() {
-      if (
-        this.form.name &&
-        this.form.email &&
-        this.form.phone &&
-        this.form.cv
-      ) {
-        // You can upload the CV file to a server here
-        console.log("Submitted:", this.form);
-        alert("CV submitted successfully!");
-        this.dialog = false;
-      } else {
-        alert("Please fill all fields and upload your CV.");
-      }
-    },
+  if (this.$refs.cvForm.validate()) {
+    console.log("Form data:", this.form); // Optional debug
 
+    // Simulate saving CV submission (you could store it in local array)
+    const newUser = {
+      name: this.form.name,
+      email: this.form.email,
+      phone: this.form.phone,
+      cv: this.form.cv?.name || "No file", // show file name if any
+    };
 
+    // Store it in userAccounts list (optional)
+    this.userAccounts.push(newUser);
+
+    // Reset form
+    this.form = {
+      name: "",
+      email: "",
+      phone: "",
+      cv: "",
+    };
+    this.dialog = false;
+
+    this.$nextTick(() => {
+      this.$refs.cvForm.resetValidation(); // clear validation states
+    });
+
+    alert("Your CV has been submitted successfully!");
+  } else {
+    alert("Please fill all fields correctly.");
+  }
+}
 
 
   

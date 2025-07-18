@@ -1,3 +1,4 @@
+
 <template>
 <!-- Video Card Section -->
 <v-container v-if="lessonList && lessonList.length">
