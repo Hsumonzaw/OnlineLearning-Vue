@@ -328,7 +328,7 @@ export default {
         .filter(user => user.userType === "TEACHER")
         .sort((a, b) => b.id - a.id); // Or use createdAt if available
 
-      this.teachers = sorted.slice(0, 4); // Only latest 4
+      this.teachers = sorted.slice(0, 4); //
     })
     .catch((error) => {
       console.error("Failed to fetch teachers:", error);
@@ -340,9 +340,9 @@ export default {
 },
 submitCV() {
   if (this.$refs.cvForm.validate()) {
-    console.log("Form data:", this.form); // Optional debug
+    console.log("Form data:", this.form); 
 
-    // Simulate saving CV submission (you could store it in local array)
+    
     const newUser = {
       name: this.form.name,
       email: this.form.email,
@@ -350,7 +350,7 @@ submitCV() {
       cv: this.form.cv?.name || "No file", // show file name if any
     };
 
-    // Store it in userAccounts list (optional)
+    
     this.userAccounts.push(newUser);
 
     // Reset form

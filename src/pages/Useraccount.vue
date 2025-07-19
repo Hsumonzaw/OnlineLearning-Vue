@@ -305,6 +305,7 @@ export default {
 
           this.userList.splice(0, this.userList.length);
           this.userList.push(...response);
+          console.log(this.userList);
           this.saveOrupdate = "SAVE";
         })
         .catch((error) => {

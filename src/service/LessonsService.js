@@ -6,11 +6,22 @@ class LessonService {
     this.axios = axios;
   }
 
-  getLessonList() {
+  getLessonList(freeVideo,languageId) {
     let url =`/lessons`;
-    return this.axios.get(url).then((request) => request.data);
+    return this.axios.get(url,{
+      params:{
+        freeVideo,languageId
+      }
+    }).then((request) => request.data);
   }
-
+ getLessonListFree(freeVideo,languageId) {
+    let url =`/free/lessons`;
+    return this.axios.get(url,{
+      params:{
+               freeVideo,languageId
+      }
+    }).then((request) => request.data);
+  }
 //   getLessonList(freeVideo = null) {
 //   let url = "/lessons";
 //   if (freeVideo) {

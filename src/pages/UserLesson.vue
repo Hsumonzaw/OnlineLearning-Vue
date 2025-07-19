@@ -86,13 +86,25 @@ export default {
   }),
    props: {},  
   mounted: function() {
+
+
+
     this.userData = JSON.parse(localStorage.getItem("user"));
-    // console.log(this.userData.role);
+    if (this.userData?.password) {
+        this.loadLessons();
+      } else {
+        this.loadLessonsFree();
+      }
     
     
-     this.loadLessons();
+     
   },
   methods: {
+     loadLessonsFree() {
+    lessonService.getLessonListFree().then((res) => {
+      this.lessonList = res; // ✅ update lessonList
+    });
+  },
     loadLessons() {
     lessonService.getLessonList().then((res) => {
       this.lessonList = res; // ✅ update lessonList

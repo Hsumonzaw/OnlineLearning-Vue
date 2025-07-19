@@ -292,7 +292,7 @@ export default {
     }else{
       this.showTeacher = true;
     }
-    this.courses.receivedDate = format(this.receivedPicker, "dd-MM-yyyy HH:mm:ss");
+    this.courses.receivedDate = format(this.receivedPicker, "dd-MM-yyyy");
     // this.courses.receivedDate = format(this.receivedPicker, "yyyy-MM-dd");
 
     this.studentListMethod();
@@ -374,12 +374,12 @@ export default {
   const start = new Date(this.courses.date);
   const modified = new Date(this.courses.modifiedDate);
 
-  if (isValid(this.receivedPicker)) {
-    this.courses.receivedDate = format(this.receivedPicker, "dd-MM-yyyy HH:mm:ss");
-  } else {
-    console.error("Invalid receivedPicker:", this.receivedPicker);
-    return;
-  }
+  // if (isValid(this.receivedPicker)) {
+  //   this.courses.receivedDate = format(this.receivedPicker, "dd-MM-yyyy HH:mm:ss");
+  // } else {
+  //   console.error("Invalid receivedPicker:", this.receivedPicker);
+  //   return;
+  // }
   
 
 
@@ -395,7 +395,7 @@ console.log("this.courses.modifiedDate", this.courses.modifiedDate);
 
               // receivedDate: format(this.receivedPicker, "yyyy-MM-dd"),
 
-              receivedDate: format(this.receivedPicker, "dd-MM-yyyy HH:mm:ss"),
+              receivedDate: format(this.receivedPicker, "dd-MM-yyyy"),
               studentDto: this.studentList[0],
               languagesDto: this.languageList[0],
               type: this.courseList[0],
@@ -478,7 +478,7 @@ console.log("this.courses.modifiedDate", this.courses.modifiedDate);
     },
     resetForm() {
   this.courses = {
-    receivedDate: format(new Date(), "dd-MM-yyyy HH:mm:ss"),
+    receivedDate: format(new Date(), "dd-MM-yyyy"),
     studentDto: this.studentList[0],
     languagesDto: this.languageList[0],
     type: this.courseList[0],

@@ -72,7 +72,7 @@ const router = createRouter({
       path: "/userlessons",
       name: "userlessons",
       component: () =>
-        import(/* webpackChunkName: "home" */ "../pages/UserLesson.vue"),
+        import(/* webpackChunkName: "home" */ "../pages/Test.vue"),
     },
     {
       path: "/teacherforstudent",
