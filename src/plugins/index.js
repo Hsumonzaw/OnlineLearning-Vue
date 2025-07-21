@@ -11,7 +11,7 @@ import router from '@/router'
 import VueSweetAlert from 'vue-sweetalert2'
 import 'sweetalert2/dist/sweetalert2.min.css'
 import { MotionPlugin } from '@vueuse/motion'
-import { VTreeview, VTreeviewItem } from 'vuetify/labs/VTreeview'
+
 
 
 export function registerPlugins (app) {
@@ -21,6 +21,5 @@ export function registerPlugins (app) {
     .use(pinia)
     .use(VueSweetAlert)
     .use(MotionPlugin)
-    .use(VTreeview)
-    .use(VTreeviewItem)
+   
 }

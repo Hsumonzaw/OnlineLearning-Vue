@@ -55,6 +55,12 @@ getStudentsForTeacher() {
     .get(`/useraccounts`, { params: { userType: "TEACHER" } })
     .then((res) => res.data);
 }
+register(student) {
+  return this.addUser(student);
+}
+  login(data) {
+    return this.axios.post("/useraccounts/login", data).then(res => res.data);
+  }
 
    
 
