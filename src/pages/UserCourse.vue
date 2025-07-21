@@ -92,7 +92,7 @@ export default {
           this.coursesList.push(...response);
         })
         .catch((error) => {
-          // this.$swal("Fail!", error.response.data.message, "error");
+           this.$swal("Fail!", error.response.data.message, "error");
         });
     },
   },

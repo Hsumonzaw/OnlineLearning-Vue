@@ -400,9 +400,6 @@ export default {
           .addCourse(this.courses)
           .then((response) => {
             console.log("this.receivedPicker", this.receivedPicker);
-console.log("this.courses.date", this.courses.date);
-console.log("this.courses.modifiedDate", this.courses.modifiedDate);
-            
             this.courses = {
 
               // receivedDate: format(this.receivedPicker, "yyyy-MM-dd"),

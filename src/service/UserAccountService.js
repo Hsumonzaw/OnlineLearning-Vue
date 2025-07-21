@@ -21,7 +21,10 @@ class UserAccountService {
     let url = `/useraccounts`;
     return this.axios.post(url, user).then((request) => request.data);
   }
-
+ saveFreeUserAccounts(user) {
+    let url = `/free/useraccounts`;
+    return this.axios.post(url, user).then((request) => request.data);
+  }
   updateUser(useraccounts) {
     let url = `/useraccounts/${useraccounts.userAccountId}`;
     return this.axios.put(url, useraccounts).then((request) => request.data);
