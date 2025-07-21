@@ -79,7 +79,15 @@
               <td class="text-start">{{ item.phonenum || '-'}}</td>
               <td class="text-start">{{ item.address || '-'}}</td>
               <td class="text-start">{{ item.userType }}</td>
-              <td class="text-center">{{ item.photo }}</td>
+              <td class="text-center"><v-img
+  :src="getUserPhotoUrl(item.photo)"
+  alt="People Photo"
+  max-width="80"
+  max-height="80"
+  contain
+  loading="lazy"
+/>
+</td>
               <td class="text-center">{{ item.degree }}</td>
               <td class="text-center">{{ item.file }}</td>
 
@@ -151,31 +159,38 @@
                   :rules="[(v) => !!v || 'required']"
                 ></v-text-field>
 
-                    <v-text-field
+                <v-text-field
                   label="Age"
                   v-model="user.age"
                   :rules="[(v) => !!v || 'required']"
                 ></v-text-field>
-                    <v-text-field
-                  label="NRC"
-                  v-model="user.nrc"
-                  :rules="[(v) => !!v || 'required']"
-                ></v-text-field>
-                    <v-text-field
-                  label="Email"
+
+                     <v-text-field
+                    v-model="user.nrc"
+                    label="NRC"
+                    :rules="[rules.required, rules.nrc]"
+                    required
+                  ></v-text-field>
+
+               <v-text-field
                   v-model="user.email"
-                  :rules="[(v) => !!v || 'required']"
+                  label="Email"
+                  :rules="[rules.required, rules.email]"
+                  required
                 ></v-text-field>
+
                 <v-text-field
                   label="Password"
                   v-model="user.password"
                   :rules="[(v) => !!v || 'required']"
                 ></v-text-field>
               
-                <v-text-field
-                  label="Phone"
-                  v-model="user.phonenum"
-                ></v-text-field>
+                 <v-text-field
+                v-model="user.phonenum"
+                label="Phone Number"
+                :rules="[rules.required, rules.phone]"
+                required
+              ></v-text-field>
 
                 <v-text-field
                   label="Address"
@@ -196,21 +211,20 @@
                   filled
                 ></v-autocomplete> -->
                 <v-autocomplete
-  v-model="user.userType"
-  :items="userTypeList"
-  label="UserType"
-  required
-  density="compact"
-  variant="outlined"
-  filled
-></v-autocomplete>
-    <v-text-field
+                v-model="user.userType"
+                :items="userTypeList"
+                label="UserType"
+                required
+                density="compact"
+                variant="outlined"
+                filled
+              ></v-autocomplete>
+              
+              <v-text-field
                   label="Degree"
                   v-model="user.degree"
                   :rules="[(v) => !!v || 'required']"
                 ></v-text-field>
-                
-
                 
                 </v-card-text>
                <v-card-actions class="justify-end pr-5 ">  
@@ -265,6 +279,7 @@
 </template>
 <script>
 import { format } from "date-fns";
+import axios from "../config";
 import userService from "../service/UserAccountService.js";
 export default {
   data: () => ({
@@ -280,7 +295,21 @@ export default {
     showForm: false,
       loggedInUser: null,
       UserFileDialog :false,
-      userType:"ALL"
+      userType:"ALL",
+      valid: false,
+      email: "",
+      phone: "",
+      nrc: "",
+      rules: {
+        required: (v) => !!v || "This field is required",
+        email: (v) =>
+          /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) || "Invalid email format",
+        phone: (v) =>
+          /^(?:\+?95|0)(?:9\d{7,9})$/.test(v) || "Invalid Myanmar phone number",
+        nrc: (v) =>
+          /^\d{1,2}\/[A-Z]{3}\([A-Z]\)\d{6}$/.test(v) || "Invalid NRC format",
+      },
+      
   }),
   props: { hideToolbar: Function },
   mounted: function () {
@@ -295,6 +324,11 @@ export default {
     
   },
   methods: {
+    getUserPhotoUrl(photo) {
+  if (!photo) return "path/to/default-image.png"; // fallback image path
+  return `${axios.defaults.baseURL}/userphoto/${photo}.png`;
+},
+
         userListMethodByType() {
           // console.log(this.userType);
           

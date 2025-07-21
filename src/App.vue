@@ -58,9 +58,27 @@
             <v-list-item v-if="!isLoggedIn" @click="clickRouter('/login')">
               <v-list-item-title>Log In</v-list-item-title>
             </v-list-item>
+<<<<<<< HEAD
             <v-list-item v-else @click="logout">
               <v-list-item-title>Log Out</v-list-item-title>
+=======
+            <v-list-item @click="clickRouter('/useraccount')" v-if="showTeacher">
+              <v-list-item-title><v-icon>mdi-account-multiple-plus</v-icon> User Account</v-list-item-title>
             </v-list-item>
+            <v-list-item @click="clickRouter('/teacherforstudent')" v-else>
+              <v-list-item-title><v-icon>mdi-account-multiple</v-icon> My Students</v-list-item-title>
+            </v-list-item>
+            <v-list-item @click="clickRouter('/courses')" v-if="showTeacher">
+              <v-list-item-title><v-icon>mdi-folder-open</v-icon> Courses</v-list-item-title>
+            </v-list-item>
+            <v-list-item @click="clickRouter('/languages')">
+              <v-list-item-title><v-icon>mdi-web</v-icon> Languages</v-list-item-title>
+            </v-list-item>
+            <v-list-item @click="clickRouter('/lessons')">
+              <v-list-item-title><v-icon>mdi-lightbulb-on-outline</v-icon> Lessons</v-list-item-title>
+>>>>>>> fe38ae2465c837f849e9463d971de292e7c4f209
+            </v-list-item>
+            
           </v-list>
         </v-card>
       </v-menu>
@@ -135,11 +153,23 @@ export default {
     showNavigation: true,
     userData: {},
     isDark: false,
+<<<<<<< HEAD
     isLoggedIn: localStorage.getItem("isLoggedIn") === "true",
     socialIcons: ['mdi-facebook', 'mdi-mail', 'mdi-telegram'],
+=======
+    showTeacher : false,
+    isLoggedIn: localStorage.getItem("isLoggedIn") === "true"
+>>>>>>> fe38ae2465c837f849e9463d971de292e7c4f209
   }),
 
   mounted() {
+    this.userData = JSON.parse(localStorage.getItem("user"));
+    
+    if(this.userData.role=="TEACHER"){
+      this.showTeacher = false;
+    }else{
+      this.showTeacher = true;
+    }
     this.getLoginMethod();
     this.setTheme();
     this.setUserPhoto();
