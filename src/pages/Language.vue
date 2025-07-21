@@ -154,6 +154,8 @@
 </template>
 <script>
 import languageService from "../service/LanguageService.js";
+import lessonService from "../service/LessonsService.js";
+
 export default {
   data: () => ({
     selectedOne: {},
@@ -167,25 +169,43 @@ export default {
     dialogDelete: false,
     showForm: false,
     showTeacher : false,
+    lessonList : [],
   }),
   props: {},
   mounted: function () {
     this.userData = JSON.parse(localStorage.getItem("user"));
+    
     if(this.userData.role=="TEACHER"){
       this.showTeacher = false;
     }else{
       this.showTeacher = true;
     }
+  //   this.lessonListMethod().then(() => {
+  //   // Now lessonsDto is set
+  //   this.languageListMethod();
+  // });
+    this.lessonListMethod();
     this.languageListMethod();
     this.showForm = false;
   },
   methods: {
+
     saveLanguage: function () {
+      const languageDto = {
+    languagesId: this.language.languagesId || 0,
+    name: this.language.name,
+    amount: this.language.amount,
+    examLink: this.language.examLink,
+    examFee: this.language.examFee,
+    userAccountId: this.userData.userId
+  };
   if (this.saveOrupdate == "SAVE") {
-    this.language.userAccount = {
-      userAccountId: this.userData.userId
-    };
-    languageService.addLanguageList(this.language).then((response) => {
+    // this.language.userAccount = {
+    //   userAccountId: this.userData.userId
+    // };
+      this.language.userAccountId = this.userData.userId;
+      languageService
+      .addLanguageList(this.language).then((response) => {
       this.showForm = false;
       this.$swal({
         icon: "success",
@@ -193,14 +213,14 @@ export default {
         showConfirmButton: false,
         timer: 1000,
       });
-      this.language = { amount: 0, examFee: 0 };
+      this.language = { languagesId: 0, amount: 0, examFee: 0 };
       this.languageListMethod();
     });
   } else {
-    this.language.userAccount = {
-      userAccountId: this.userData.userId
-    };
-    languageService.updateLanguage(this.language).then((response) => {
+   
+      this.language.userAccountId = this.userData.userId;
+    languageService
+    .updateLanguage(this.language).then((response) => {
       this.saveOrupdate = "SAVE";
       this.showForm = false;
       this.$swal({
@@ -209,7 +229,7 @@ export default {
         showConfirmButton: false,
         timer: 1000,
       });
-      this.language = { amount: 0, examFee: 0 };
+      this.language = { languagesId: 0, amount: 0, examFee: 0 };
       this.languageListMethod();
     });
   }
@@ -219,15 +239,21 @@ export default {
       languageService
         .getLanguageList()
         .then((response) => {
+
          if (this.userData.role === "TEACHER") {
-        const filteredLessons = response.filter(language => {
-console.log(language.userAccount?.userAccountId);
-console.log("userId from localStorage:", this.userData.userId);
-console.log("Sending language object:", this.language);
+       const filteredLessons = response.filter(language => {
+  const creatorId = 
+    language.userAccount?.userAccountId || 
+    language.userAccountId || 
+    language.lessonsDto?.userAccount?.userAccountId;
 
+  console.log("Language creator userAccountId:", creatorId);
+  console.log("Logged-in userId:", this.userData.userId);
+  console.log("Language item:", language);
 
-          return language.userAccount?.userAccountId == this.userData.userId; // using == to allow string/number match
-        });
+  return creatorId == this.userData.userId;
+});
+
         this.languageList.splice(0);
         this.languageList.push(...filteredLessons);
       } else {
@@ -239,6 +265,29 @@ console.log("Sending language object:", this.language);
           this.$swal("Fail!", error.response.data.message, "error");
         });
     },
+    lessonListMethod() {
+    return lessonService
+    .getLessonList()
+    .then((response) => {
+
+   
+        this.lessonList.splice(0);
+        this.lessonList.push(...response);
+        if (this.lessonList.length > 0) {
+  this.language.lessonsDto = this.lessonList[0];
+} else {
+  this.language.lessonsDto = null;
+}
+
+        this.languageListMethod();
+        this.language.lessonsDto = this.lessonList[0];
+        console.log("LessonsDto now set:", this.language.lessonsDto?.userAccountId);
+
+    })
+    .catch((error) => {
+      console.error("Failed to load lessons:", error);
+    });
+},
     clickEdit(item) {
       this.showForm = true;
       this.language = { ...item };
@@ -272,8 +321,8 @@ console.log("Sending language object:", this.language);
       showForm(newVal) {
     if (!newVal) {
       // Dialog closed → reset the form
-      this.language = { amount: 0, examFee: 0 };
-      this.saveOrupdate = "SAVE";
+      this.language = { languagesId: 0, amount: 0, examFee: 0 };
+            this.saveOrupdate = "SAVE";
     }
   }
   },

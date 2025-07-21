@@ -46,7 +46,7 @@
               <th class="text-center white--text bg-primary">Type</th>
               <th class="text-center white--text bg-primary" v-if="showTeacher">Amount</th>
               <th class="text-center white--text bg-primary" v-if="showTeacher">Courses Photo</th>
-              <th class="text-center white--text bg-primary">Exam Link</th>
+              <!-- <th class="text-center white--text bg-primary">Exam Link</th> -->
               <th class="text-center white--text bg-primary">Book Link</th>
               <th class="text-center white--text bg-primary" v-if="showTeacher">Descriptions</th>
               
@@ -73,8 +73,15 @@
               <td class="text-center">{{ item.languagesDto?.name }}</td>
               <td class="text-center">{{ item?.type }}</td>
               <td class="text-start" v-if="showTeacher">{{ item?.amount }}</td>
-              <td class="text-start" v-if="showTeacher">{{ item?.cphoto }}</td>
-              <td class="text-start">{{ item?.examLink }}</td>
+              <td class="text-start" v-if="showTeacher"><v-img
+  :src="getCoursePhotoUrl(item.cphoto)"
+  alt="Course Photo"
+  max-width="80"
+  max-height="80"
+  contain
+  loading="lazy"
+/></td>
+              <!-- <td class="text-start">{{ item?.examLink }}</td> -->
               <td class="text-start">{{ item?.pdf }}</td>
 
               <td class="text-start" v-if="showTeacher">{{ item?.description }}</td>
@@ -180,13 +187,13 @@
                   @update:model-value="changeType()"
                 />
 
-                <v-text-field
+                <!-- <v-text-field
                   label="Exam Link"
                   v-model.number="courses.examLink"
                   :rules="[(v) => !!v || 'required']"
                   density="compact"
                   variant="outlined"
-                ></v-text-field>
+                ></v-text-field> -->
 
                 <v-text-field
                   label="Book Link (PDF)"
@@ -259,6 +266,7 @@
 </template>
 <script>
 import { format } from "date-fns";
+import axios from "../config";
 // import { format, isValid } from "date-fns"; // make sure isValid is imported
 import userAccountService from "../service/UserAccountService.js";
 import languageService from "../service/LanguageService.js";
@@ -307,6 +315,10 @@ export default {
 
   },
   methods: {
+    getCoursePhotoUrl(cphoto) {
+  if (!cphoto) return "path/to/default-image.png"; // fallback image path
+  return `${axios.defaults.baseURL}/coursephoto/${cphoto}.png`;
+},
     courseListMethodByType() {
   coursesService.getCourseList()
     .then((response) => {
