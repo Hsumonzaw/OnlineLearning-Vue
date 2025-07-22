@@ -41,20 +41,21 @@
             lg="4"
             class="mb-6"
           >
-            <v-card elevation="5" class="rounded-xl" style="height: 100%">
+     <v-card elevation="5" class="rounded-xl bg-light-purple" style="height: 100%;">
               <v-card-title
-                class="font-weight-bold text-primary"
+                class="font-weight-bold text-primary "
                 style="min-height: 64px"
               >
                 {{ lesson.languagesDto?.name || "Untitled Lesson" }}
               </v-card-title>
 
-              <v-responsive aspect-ratio="1/1">
+              <v-responsive aspect-ratio="16/9">
                 <iframe
                   :src="getYouTubeEmbedUrl(lesson?.youtube)"
                   frameborder="0"
                   allow="autoplay; encrypted-media"
                   allowfullscreen
+                   style="width: 100%; height: 100%;"
                 ></iframe>
               </v-responsive>
 
@@ -229,7 +230,7 @@ export default {
     selectedOne: {},
     userData: {},
     lessonList: [],
-    showEnrollButton: false,
+    showEnrollButton: true,
     showForm: false,
     user: { userType: "STUDENT" },
     saveOrupdate: "SAVE",
@@ -433,17 +434,43 @@ export default {
 .login-full {
   flex-grow: 1;
   min-height: 100%;
+  background: linear-gradient(to right, #e1f5fe, #ede7f6);
+
 }
 .selected-language {
-  background-color: #c0c0c0 !important;
-  border-radius: 8px;
+ background-color: #c5cae9 !important;
+  border-radius: 10px;
+  font-weight: bold;
+  color: #1a237e;
+}
+.v-card {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.v-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+}
+.v-card-title {
+  font-size: 18px;
+  background-color: #ede7f6; /* light purple */
+  border-bottom: 1px solid #d1c4e9;
 }
 
 .v-list-item {
-  border-radius: 8px;
+  border-radius: 10px;
   transition: background-color 0.3s ease;
 }
 .v-list-item:hover {
   background-color: #e3f2fd;
+}
+.v-btn {
+  border-radius: 12px;
+  font-weight: bold;
+  font-size: 16px;
+  letter-spacing: 0.5px;
+}
+.bg-light-purple {
+  background-color: #f3e5f5;
 }
 </style>

@@ -1,6 +1,5 @@
 <template>
   <v-container class="pa-4 pt-16" fluid>
-    <!-- Page Header -->
     <v-row>
       <v-col cols="12" class="text-center mb-8">
         <h1 class="display-1 font-weight-bold" style="color:#1565c0;">
@@ -13,8 +12,8 @@
       </v-col>
     </v-row>
 
-    <!-- Hero Card with Carousel -->
-    <v-card elevation="5" class="rounded-xl pa-6 mb-10" width="100%" color="#fff7b5">
+
+    <v-card elevation="5" class="rounded-xl pa-6 mb-10" width="100%" color="#F4ECA3">
       <v-row class="align-center">
         <!-- Carousel -->
         <v-col cols="12" md="4" class="d-flex justify-center">
