@@ -229,7 +229,7 @@ export default {
     selectedOne: {},
     userData: {},
     lessonList: [],
-    showEnrollButton: false,
+    showEnrollButton: true,
     showForm: false,
     user: { userType: "STUDENT" },
     saveOrupdate: "SAVE",

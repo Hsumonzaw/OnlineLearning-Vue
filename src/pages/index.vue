@@ -182,7 +182,7 @@
     <v-btn
       color="primary"
       class="mt-4"
-     @click="dialog=true"
+     @click="showForm=true"
     >
       Apply Now
     </v-btn>
@@ -196,63 +196,104 @@
     style="border-radius: 16px;  width: 500px; height: 500px;"
   />
 
- <v-dialog v-model="dialog" max-width="600px">
-  <v-card>
-    <v-card-title class="text-h5 font-weight-bold text-center">
-      Submit Your CV
-    </v-card-title>
+ <v-dialog v-model="showForm" max-width="600" style="height: 730px">
+      <v-card class="form pa-1" elevation="4" mb-0>
+        <v-card-title class="d-flex justify-space-between align-center">
+          <span class="text-h4">Add User</span>
+          <v-btn icon color="red" @click="showForm = false">
+            <v-icon>mdi-close</v-icon>
+          </v-btn>
+        </v-card-title>
+        <v-card-text>
+          <v-menu
+            v-model="startMenu"
+            full-width
+            max-width="200px"
+            min-width="290px"
+            v-bind:close-on-content-click="false"
+          >
+            <template v-slot:activator="{ props }">
+              <v-text-field
+                v-model="user.startDate"
+                density="compact"
+                variant="outlined"
+                label="From Date"
+                readonly
+                v-bind="props"
+              ></v-text-field>
+            </template>
+            <v-date-picker
+              v-model="startPicker"
+              color="primary"
+              hide-header
+            ></v-date-picker>
+          </v-menu>
 
-    <v-card-text>
-      <v-form ref="cvForm" v-model="valid">
-        <v-text-field
-          v-model="form.name"
-          :rules="[v => !!v || 'Name is required']"
-          label="Full Name"
-          prepend-icon="mdi-account"
-          required
-        />
+          <v-text-field
+          
+            label="Name"
+            v-model="user.name"
+            :rules="[(v) => !!v || 'required']"
+          ></v-text-field>
 
-        <v-text-field
-          v-model="form.email"
-          :rules="[
-            v => !!v || 'Email is required',
-            v => /.+@.+/.test(v) || 'Email must be valid'
-          ]"
-          label="Email"
-          prepend-icon="mdi-email"
-          required
-        />
+          <v-text-field
+            label="User Name"
+            v-model="user.userName"
+            :rules="[(v) => !!v || 'required']"
+          ></v-text-field>
 
-        <v-text-field
-          v-model="form.phone"
-          :rules="[v => !!v || 'Phone is required']"
-          label="Phone Number"
-          prepend-icon="mdi-phone"
-          required
-        />
+          <!-- <v-text-field
+            label="Age"
+            v-model="user.age"
+            :rules="[(v) => !!v || 'required']"
+          ></v-text-field> -->
 
-        <v-file-input
-          v-model="form.cv"
-          :rules="[v => !!v || 'CV file is required']"
-          label="Upload CV (PDF/DOC)"
-          prepend-icon="mdi-file-upload"
-          accept=".pdf,.doc,.docx"
-          required
-        />
-      </v-form>
-    </v-card-text>
+          <!-- <v-text-field
+            v-model="user.nrc"
+            label="NRC"
+            :rules="[rules.required, rules.nrc]"
+            required
+          ></v-text-field> -->
 
-    <v-card-actions>
-      <v-spacer />
-      <v-btn text @click="dialog = false">
-        <v-icon start>mdi-close</v-icon> Cancel
-      </v-btn>
-      <v-btn color="primary" @click="submitCV">
-        <v-icon start>mdi-send</v-icon> Submit
-      </v-btn>
-    </v-card-actions>
-  </v-card>
-</v-dialog>
+          <v-text-field
+            v-model="user.email"
+            label="Email"
+            :rules="[rules.required, rules.email]"
+            required
+          ></v-text-field>
+
+          <v-text-field
+            label="Password"
+            v-model="user.password"
+            :rules="[(v) => !!v || 'required']"
+          ></v-text-field>
+
+          <!-- <v-text-field
+            v-model="user.phonenum"
+            label="Phone Number"
+            :rules="[rules.required, rules.phone]"
+            required
+          ></v-text-field> -->
+
+          <!-- <v-text-field label="Address" v-model="user.address"></v-text-field> -->
+         
+
+          <v-text-field
+            label="Degree"
+            v-model="user.degree"
+            :rules="[(v) => !!v || 'required']"
+          ></v-text-field>
+        </v-card-text>
+        <v-card-actions class="justify-end pr-5">
+          <v-btn
+            class="text-black"
+            style="background-color: #2196f3"
+            @click="saveUser()"
+            >{{ saveOrupdate }}</v-btn
+          >
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
 
 </v-container>
   </v-app>
@@ -262,6 +303,8 @@
 <script>
 import coursesService from "@/service/CoursesService";
 import axios from "@/config";
+import { format } from "date-fns";
+
 import userService from "@/service/UserAccountService";
 export default {
   data() {
@@ -276,15 +319,30 @@ export default {
        photos: [],
       latestUserCourses: [],
       teachers:[],
-      dialog:false,
+    
         valid: false,
-      form:{
-        name:"",
-        email:"",
-        phone:"",
-        cv:"",
-      },
+    user:{},
       userAccounts: [],
+      showForm : false,
+      valid: false,
+    email: "",
+    phone: "",
+    nrc: "",
+    rules: {
+      required: (v) => !!v || "This field is required",
+      email: (v) =>
+        /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) || "Invalid email format",
+      phone: (v) =>
+        /^(?:\+?95|0)(?:9\d{7,9})$/.test(v) || "Invalid Myanmar phone number",
+      nrc: (v) =>
+        /^\d{1,2}\/[A-Z]{3}\([A-Z]\)\d{6}$/.test(v) || "Invalid NRC format",
+    },
+    startPicker: new Date(),
+    startMenu: false,
+    userTypeList: ["ALL", "STAFF", "STUDENT", "TEACHER", "ADMIN"],
+    user: { userType: "TEACHER" },
+    saveOrupdate: "SAVE",
+
        
       
     //   isLoggedIn: false,
@@ -301,10 +359,25 @@ export default {
 },
   
   mounted() {
+    this.user.startDate = format(this.startPicker, "dd-MM-yyyy");
+    
     this.getLatestUserCourses();
     this.getTeachers();
+    this.showForm = false;
+    
   },
   methods: {
+      saveUser() {
+          this.showForm = false;
+          userService.addUser(this.user);
+          this.$swal({
+            icon: "success",
+            title: "Rigister successfully!",
+            showConfirmButton: false,
+            timer: 1000,
+          });
+            
+},
      getLatestUserCourses() {
       coursesService.getCourseList() 
         .then((response) => {
@@ -338,45 +411,48 @@ export default {
   if (!photo) return "/default-avatar.png"; // fallback image
   return `${axios.defaults.baseURL}/userphoto/${photo}.png`;
 },
-submitCV() {
-  if (this.$refs.cvForm.validate()) {
-    console.log("Form data:", this.form); 
+// submitCV() {
+//   if (this.$refs.cvForm.validate()) {
+//     console.log("Form data:", this.form); 
 
     
-    const newUser = {
-      name: this.form.name,
-      email: this.form.email,
-      phone: this.form.phone,
-      cv: this.form.cv?.name || "No file", // show file name if any
-    };
+//     const newUser = {
+//       name: this.form.name,
+//       email: this.form.email,
+//       phone: this.form.phone,
+//       cv: this.form.cv?.name || "No file", // show file name if any
+//     };
 
     
-    this.userAccounts.push(newUser);
+//     this.userAccounts.push(newUser);
 
-    // Reset form
-    this.form = {
-      name: "",
-      email: "",
-      phone: "",
-      cv: "",
-    };
-    this.dialog = false;
+//     // Reset form
+//     this.form = {
+//       name: "",
+//       email: "",
+//       phone: "",
+//       cv: "",
+//     };
+//     this.dialog = false;
 
-    this.$nextTick(() => {
-      this.$refs.cvForm.resetValidation(); // clear validation states
-    });
+//     this.$nextTick(() => {
+//       this.$refs.cvForm.resetValidation(); // clear validation states
+//     });
 
-    alert("Your CV has been submitted successfully!");
-  } else {
-    alert("Please fill all fields correctly.");
-  }
-}
+//     alert("Your CV has been submitted successfully!");
+//   } else {
+//     alert("Please fill all fields correctly.");
+//   }
+// }
 
 
   
 
 },
-  watch: {},
+  watch: {startPicker() {
+      this.startMenu = false;
+      this.user.startDate = format(this.startPicker, "dd-MM-yyyy");
+    },},
    components: {}
 };
 
