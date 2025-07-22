@@ -20,6 +20,7 @@ declare module 'vue-router/auto-routes' {
   export interface RouteNamedMap {
     '/': RouteRecordInfo<'/', '/', Record<never, never>, Record<never, never>>,
     '/AboutUs': RouteRecordInfo<'/AboutUs', '/AboutUs', Record<never, never>, Record<never, never>>,
+    '/Certificate': RouteRecordInfo<'/Certificate', '/Certificate', Record<never, never>, Record<never, never>>,
     '/Comments': RouteRecordInfo<'/Comments', '/Comments', Record<never, never>, Record<never, never>>,
     '/Courses': RouteRecordInfo<'/Courses', '/Courses', Record<never, never>, Record<never, never>>,
     '/Exam': RouteRecordInfo<'/Exam', '/Exam', Record<never, never>, Record<never, never>>,
@@ -27,6 +28,7 @@ declare module 'vue-router/auto-routes' {
     '/Language': RouteRecordInfo<'/Language', '/Language', Record<never, never>, Record<never, never>>,
     '/Lessons': RouteRecordInfo<'/Lessons', '/Lessons', Record<never, never>, Record<never, never>>,
     '/login': RouteRecordInfo<'/login', '/login', Record<never, never>, Record<never, never>>,
+    '/Quiz': RouteRecordInfo<'/Quiz', '/Quiz', Record<never, never>, Record<never, never>>,
     '/Rating': RouteRecordInfo<'/Rating', '/Rating', Record<never, never>, Record<never, never>>,
     '/Ratings': RouteRecordInfo<'/Ratings', '/Ratings', Record<never, never>, Record<never, never>>,
     '/TeacherForStudent': RouteRecordInfo<'/TeacherForStudent', '/TeacherForStudent', Record<never, never>, Record<never, never>>,

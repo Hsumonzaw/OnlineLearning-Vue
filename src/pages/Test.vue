@@ -69,11 +69,23 @@
       </v-col>
     </v-row>
 
-    <v-row v-if="showEnrollButton" class="justify-center mt-6 mb-16">
+    <v-row v-if="showEnrollButton" class="justify-center mt-6 mb-16 handle">
       <v-btn color="primary" large @click="handleEnroll">
         Enroll to Access All Paid Videos
       </v-btn>
     </v-row>
+
+     <!-- <template v-slot:activator="{ props }">
+    <v-btn
+      v-bind="props"
+      icon
+      color="blue"
+      class="fab-button"
+      @click="showForm = true"
+    >
+      <v-icon size="36" color="white">mdi-plus</v-icon>
+    </v-btn>
+  </template> -->
 
     <v-dialog v-model="showForm" max-width="600" style="height: 730px">
       <v-card class="form pa-1" elevation="4" mb-0>
@@ -377,7 +389,7 @@ export default {
 
     languageListMethod() {
       languageService
-        .getLanguageList()
+        .getLanguageListFree()
         .then((response) => {
           this.languageList.splice(0);
           this.languageList.push(...response);
@@ -472,5 +484,14 @@ export default {
 }
 .bg-light-purple {
   background-color: #f3e5f5;
+}
+.handle{
+  position: fixed;
+  bottom: 24px;
+  margin-left: 40%;
+  border-radius: 20%;
+  width: fit-content;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  z-index: 999;
 }
 </style>

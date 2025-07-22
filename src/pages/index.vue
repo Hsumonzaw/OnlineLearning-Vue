@@ -395,7 +395,7 @@ export default {
     },
     
  getTeachers() {
-  userService.getUserList()
+  userService.getUserListFree("TE")
     .then((response) => {
       const sorted = response
         .filter(user => user.userType === "TEACHER")

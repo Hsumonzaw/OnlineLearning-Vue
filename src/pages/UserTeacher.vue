@@ -70,7 +70,7 @@
 
 <script>
 import axios from "@/config";
-
+import userService from "../service/UserAccountService.js";
 export default {
   data: () => ({
     teachers: [],
@@ -82,15 +82,27 @@ export default {
 
   methods: {
     getTeachers() {
-      axios
-        .get(`${axios.defaults.baseURL}/teachers`) // new endpoint returning all teachers
-        .then((res) => {
-          this.teachers = res.data.sort((a, b) => b.id - a.id);
-          console.log("Fetched teachers:", this.teachers);
+      userService
+        .getUserListFree("TE")
+        .then((response) => {
+          // console.log(response);
+
+          this.teachers.splice(0, this.teachers.length);
+          this.teachers.push(...response);
+
         })
         .catch((error) => {
-          console.error("Failed to fetch teachers:", error);
+          this.$swal("Fail!", error.response.data.message, "error");
         });
+      // axios
+      //   .get(`${axios.defaults.baseURL}/useraccounts`) 
+      //   .then((res) => {
+      //     this.teachers = res.data.sort((a, b) => b.id - a.id);
+      //     console.log("Fetched teachers:", this.teachers);
+      //   })
+      //   .catch((error) => {
+      //     console.error("Failed to fetch teachers:", error);
+      //   });
     },
 
     getUserPhotoUrl(photo) {

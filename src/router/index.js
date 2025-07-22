@@ -98,6 +98,19 @@ const router = createRouter({
       component: () =>
         import(/* webpackChunkName: "home" */ "../pages/Exam.vue"),
     },
+    {
+      path: "/quiz",
+      name: "quiz",
+      component: () =>
+        import(/* webpackChunkName: "home" */ "../pages/Quiz.vue"),
+    },
+    {
+      path: "/certificate",
+      name: "certificate",
+      component: () =>
+        import(/* webpackChunkName: "home" */ "../pages/Certificate.vue"),
+    },
+
 
   ],
 });

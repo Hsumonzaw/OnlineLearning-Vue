@@ -23,6 +23,10 @@ class LanguageService {
     let url = `/languages/${language.languagesId}`;
     return this.axios.delete(url).then((request) => request.data);
   }
+  getLanguageListFree() {
+    let url = `/free/languages`;
+    return this.axios.get(url).then((request) => request.data);
+  }
 }
 
 const service = new LanguageService();

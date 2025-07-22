@@ -116,7 +116,7 @@
       </v-col>
     </v-row>
 
-    <!-- Core Info -->
+    
     <v-container class="py-10">
       <v-row>
         <v-col cols="12" md="4" v-for="(item, i) in coreInfo" :key="i">

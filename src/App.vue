@@ -83,10 +83,10 @@
     </div>
 
     <!-- Page content -->
-    <v-container fluid class="pa-0">
+    <v-container fluid class="pa-0 pt-12" >
       <router-view :hideToolbar="hideToolbar" />
     </v-container>
-     <v-footer color="light-blue-4" class="pa-10" padless>
+     <v-footer color="#f3e5f5" class="pa-10 footer">
       <v-container>
         <v-row>
           <v-col cols="12" md="3">
@@ -173,6 +173,11 @@ export default {
 
     getLoginMethod() {
       this.userData = JSON.parse(localStorage.getItem("user"));
+      if(this.userData?.role=="TEACHER"){
+      this.showTeacher = false;
+    }else{
+      this.showTeacher = true;
+    }
       if (!this.userData?.password) {
         this.isLoggedIn = false;
         this.showNavigation = false;
@@ -212,6 +217,7 @@ export default {
     },
 
     hideToolbar() {
+      //this.userData = JSON.parse(localStorage.getItem("user"));
       this.getLoginMethod();
     },
 
@@ -257,12 +263,15 @@ export default {
 }
 .footer-link {
   display: block;
-  color: aliceblue;
+  color: #4ecddbf6;
   text-decoration: none;
   margin: 4px 0;
 }
 .footer-link:hover {
   color: #6a1b9a;
   text-decoration: underline;
+}
+.footer{
+  position: sticky;
 }
 </style>
