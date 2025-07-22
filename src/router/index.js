@@ -92,6 +92,12 @@ const router = createRouter({
       component: () =>
         import(/* webpackChunkName: "home" */ "../pages/AboutUs.vue"),
     },
+     {
+      path: "/userexam",
+      name: "userexam",
+      component: () =>
+        import(/* webpackChunkName: "home" */ "../pages/Exam.vue"),
+    },
 
   ],
 });

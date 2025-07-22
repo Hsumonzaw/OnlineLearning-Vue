@@ -1,9 +1,8 @@
-
 <template>
   <v-app>
     <v-container fluid class="py-8 px-4" style="background: #e1f5fe;">
       
-      <!-- Welcome Section with Motion -->
+      <!-- Welcome Section -->
       <v-slide-y-transition mode="in-out">
         <v-card
           elevation="3"
@@ -28,7 +27,7 @@
         </v-card>
       </v-slide-y-transition>
 
-      <!-- Teacher Cards with Fade-In Motion -->
+      <!-- Teacher Cards -->
       <v-row justify="center">
         <v-fade-transition group>
           <v-hover
@@ -70,40 +69,38 @@
 </template>
 
 <script>
-import userService from "@/service/UserAccountService";
 import axios from "@/config";
+
 export default {
   data: () => ({
-    teachers:[],
+    teachers: [],
   }),
-   props: {},   //parent's data
-  mounted: function() {
-        this.getTeachers();
+
+  mounted() {
+    this.getTeachers();
   },
+
   methods: {
-        getTeachers() {
-      userService
-        .getUserList()
-        .then((response) => {
-          const sorted = response
-            .filter((user) => user.userType === "TEACHER")
-            .sort((a, b) => b.id - a.id);
-         this.teachers = sorted;
+    getTeachers() {
+      axios
+        .get(`${axios.defaults.baseURL}/teachers`) // new endpoint returning all teachers
+        .then((res) => {
+          this.teachers = res.data.sort((a, b) => b.id - a.id);
+          console.log("Fetched teachers:", this.teachers);
         })
         .catch((error) => {
           console.error("Failed to fetch teachers:", error);
         });
     },
-   getUserPhotoUrl(photo) {
-  if (!photo) return "/default-avatar.png"; // fallback image
-  return `${axios.defaults.baseURL}/userphoto/${photo}.png`;
-},
-  },
 
-  watch: {},
-  components: {}
+    getUserPhotoUrl(photo) {
+      if (!photo) return "/default-avatar.png"; // fallback image
+      return `${axios.defaults.baseURL}/userphoto/${photo}.png`;
+    },
+  },
 };
 </script>
+
 <style scoped>
 .v-card {
   overflow: visible !important;
@@ -114,5 +111,4 @@ export default {
 .v-col {
   overflow: visible !important;
 }
-
 </style>

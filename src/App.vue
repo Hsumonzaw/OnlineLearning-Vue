@@ -117,7 +117,7 @@
             <h4 class="font-weight-bold mb-2">Links</h4>
             <router-link to="/usercourses" class="footer-link">Courses</router-link>
             <router-link to="/" class="footer-link">Lessons</router-link>
-            <router-link to="/teachers" class="footer-link">Teachers</router-link>
+            <router-link to="/userteacher" class="footer-link">Teachers</router-link>
           </v-col>
 
           <v-col cols="6" md="3">
