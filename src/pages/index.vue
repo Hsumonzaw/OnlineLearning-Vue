@@ -17,9 +17,13 @@
          Dive into coding with fun, hands-on courses in Java, Python, and more. Want to speak Japanese or boost your English? <br />
               Join expert-led courses in programming, tech, and world languages all in one place.
             </p>
-            <v-btn color="primary" large class="white--text">
-      Get Started
-    </v-btn>
+            
+              <router-link to="/aboutus" class="font-weight-bold  learn-more-btn">
+           Get Start  
+        
+            </router-link>
+ 
+
              </Motion>
          </v-col>
          <v-col cols="12" md="6" class="hero-image-col d-flex justify-center mt-5">
@@ -367,6 +371,7 @@ export default {
     
   },
   methods: {
+    
       saveUser() {
           this.showForm = false;
           userService.addUser(this.user);

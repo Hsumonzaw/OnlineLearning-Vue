@@ -53,6 +53,114 @@
         </v-row>
       </v-col>
     </v-row>
+    <v-row v-if="showEnrollButton" class="justify-center mt-6 mb-16 handle">
+      <v-btn>
+  <a
+    v-if="isRegistered(language.languagesId)"
+    @click="clickTakeExam(language)"
+    class="font-weight-bold learn-more-btn"
+  >Take Exam</a>
+  <a
+    v-else
+    @click="openRegistrationForm(language)"
+    class="font-weight-bold learn-more-btn"
+  >Register for Exam</a>
+</v-btn>
+    </v-row>
+     <v-dialog v-model="showForm" max-width="600" style="height: 730px">
+      <v-card class="form pa-1" elevation="4" mb-0>
+        <v-card-title class="d-flex justify-space-between align-center">
+          <span class="text-h4">Add User</span>
+          <v-btn icon color="red" @click="showForm = false">
+            <v-icon>mdi-close</v-icon>
+          </v-btn>
+        </v-card-title>
+        <v-card-text>
+          <v-menu
+            v-model="startMenu"
+            full-width
+            max-width="200px"
+            min-width="290px"
+            v-bind:close-on-content-click="false"
+          >
+            <template v-slot:activator="{ props }">
+              <v-text-field
+                v-model="user.startDate"
+                density="compact"
+                variant="outlined"
+                label="From Date"
+                readonly
+                v-bind="props"
+              ></v-text-field>
+            </template>
+            <v-date-picker
+              v-model="startPicker"
+              color="primary"
+              hide-header
+            ></v-date-picker>
+          </v-menu>
+
+          <v-text-field
+            label="Name"
+            v-model="user.name"
+            :rules="[(v) => !!v || 'required']"
+          ></v-text-field>
+
+          <v-text-field
+            label="User Name"
+            v-model="user.userName"
+            :rules="[(v) => !!v || 'required']"
+          ></v-text-field>
+
+          <v-text-field
+            label="Age"
+            v-model="user.age"
+            :rules="[(v) => !!v || 'required']"
+          ></v-text-field>
+
+          <v-text-field
+            v-model="user.nrc"
+            label="NRC"
+            :rules="[rules.required, rules.nrc]"
+            required
+          ></v-text-field>
+
+          <v-text-field
+            v-model="user.email"
+            label="Email"
+            :rules="[rules.required, rules.email]"
+            required
+          ></v-text-field>
+
+          <v-text-field
+            label="Password"
+            v-model="user.password"
+            :rules="[(v) => !!v || 'required']"
+          ></v-text-field>
+
+          <v-text-field
+            v-model="user.phonenum"
+            label="Phone Number"
+            :rules="[rules.required, rules.phone]"
+            required
+          ></v-text-field>
+          <v-text-field label="Address" v-model="user.address"></v-text-field>
+          <v-text-field
+            label="Degree"
+            v-model="user.degree"
+            :rules="[(v) => !!v || 'required']"
+          ></v-text-field>
+        </v-card-text>
+        <v-card-actions class="justify-end pr-5">
+          <v-btn
+            class="text-black"
+            style="background-color: #2196f3"
+            @click="saveUser()"
+            >{{ saveOrupdate }}</v-btn
+          >
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </v-container>
 </template>
 <script>
@@ -62,6 +170,27 @@ export default {
   data: () => ({
    languageList: [],
     languagesId: 0,
+    selectedOne: {},
+    userData: {},
+    lessonList: [],
+    showEnrollButton: true,
+    showForm: false,
+    user: { userType: "STUDENT" },
+    saveOrupdate: "SAVE",
+    rules: {
+      required: (v) => !!v || "This field is required",
+      email: (v) =>
+        /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) || "Invalid email format",
+      phone: (v) =>
+        /^(?:\+?95|0)(?:9\d{7,9})$/.test(v) || "Invalid Myanmar phone number",
+      nrc: (v) =>
+        /^\d{1,12}\/[A-Z]{3}\([A-Z]\)\d{6}$/.test(v) || "Invalid NRC format",
+    },
+    userTypeList: ["ALL", "STAFF", "STUDENT", "TEACHER", "ADMIN"],
+    startPicker: new Date(),
+    // startPicker: null,
+    startMenu: false,
+     saveOrupdate: "Register",
   }),
   mounted() {
     // const lessonsId = this.$route.query.lessonsId;
@@ -80,6 +209,25 @@ export default {
         query,
       });
     },
+    isRegistered(languageId) {
+   return this.registeredLanguages.includes(languageId);
+   },
+   openRegistrationForm(language) {
+  this.languagesId = language.languagesId;
+  this.user = {
+    name: "",
+    userName: "",
+    age: "",
+    nrc: "",
+    email: "",
+    password: "",
+    phonenum: "",
+    address: "",
+    degree: "",
+    startDate: "",
+  };
+  this.showForm = true;
+},
     // downloadPdf(pdf) {
     //   if (!pdf) {
     //     this.$swal("No PDF", "No PDF file available for this product.", "warning");

@@ -6,14 +6,7 @@
   >
     <v-row no-gutters>
       <!-- Sidebar -->
-      <v-col
-        md="2"
-        class="pa-4"
-        style="
-          background-color: white;
-          box-shadow: 2px 0 8px rgba(0, 0, 0, 0.05);
-        "
-      >
+      <v-col md="2" class="pa-4" style=" background-color: white; box-shadow: 2px 0 8px rgba(0, 0, 0, 0.05);" >
         <h3 class="text-center font-weight-bold mb-4" style="color: #1565c0">
           Languages
         </h3>
