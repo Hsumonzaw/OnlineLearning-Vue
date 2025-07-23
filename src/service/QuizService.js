@@ -1,16 +1,43 @@
 import axios from "../config";
 
-class CoursesService {
+class QuizService {
   axios;
   constructor() {
     this.axios = axios;
   }
 
-  getCourseList() {
-    let url = `/`;
+  getQuizList() {
+    let url = `/quiz`;
     return this.axios.get(url).then((request) => request.data);
   }
+  
+  getQuizStudent(languagesId) {
+    let url = `/quiz/student/${languagesId}`;
+    return this.axios.get(url).then((request) => request.data);
+  }
+  addQuizList(quiz) {
+    let url = `/quiz`;
+    return this.axios.post(url, quiz).then((request) => request.data);
+  }
+
+  updateQuiz(quiz) {
+    let url = `/quiz/${quiz.quizId}`;
+    return this.axios.put(url, quiz).then((request) => request.data);
+  }
+  deleteQuiz(quiz) {
+    let url = `/quiz/${quiz.quizId}`;
+    return this.axios.delete(url).then((request) => request.data);
+  }
+   saveAns(coursesId,quizList,minutesCount) {
+    let url = `/ans/${coursesId}/${minutesCount}`;
+    return this.axios.post(url,quizList).then((request) => request.data);
+  }
+  getExamMark(languagesId) {
+    let url = `/ans/exammark/${languagesId}`;
+    return this.axios.get(url).then((request) => request.data);
+  }
+  
 }
 
-const service = new CoursesService();
+const service = new QuizService();
 export default service;

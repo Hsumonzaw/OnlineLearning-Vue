@@ -29,14 +29,9 @@
                   {{  language.name }}
                 </p>
               </div>
-             <v-btn
-  color="orange darken-2"
-  :href="language.examLink"
-  target="_blank"
-  block
->
-  Take Exam
-</v-btn>
+             <v-btn>
+            <a v-if="language.buy==1" @click="clickTakeExam(language)" class="font-weight-bold  learn-more-btn">Take Exam</a>
+            </v-btn>
 
               <!-- <div class="">
                 <p class="mb-3 font-weight-bold product-detail" style="font-size: 15px">
@@ -65,9 +60,7 @@ import languageService from "../service/LanguageService.js";
 import axios from "@/config";
 export default {
   data: () => ({
-   languageList: [
-        
-    ],
+   languageList: [],
     languagesId: 0,
   }),
   mounted() {
@@ -78,6 +71,15 @@ export default {
     this.languageListMethod();
   },
   methods: {
+    clickTakeExam:function(languages){
+      let languagesId = languages.languagesId;
+      let coursesId = languages.coursesId;
+      let query = { languagesId,coursesId };
+      this.$router.push({
+        name: "userquiz",
+        query,
+      });
+    },
     // downloadPdf(pdf) {
     //   if (!pdf) {
     //     this.$swal("No PDF", "No PDF file available for this product.", "warning");
@@ -99,6 +101,7 @@ export default {
         .then((response) => {
           this.languageList.splice(0, this.languageList.length);
           this.languageList.push(...response);
+          console.log(this.languageList);
         })
         .catch((error) => {
            this.$swal("Fail!", error.response.data.message, "error");

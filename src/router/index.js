@@ -72,7 +72,7 @@ const router = createRouter({
       path: "/userlessons",
       name: "userlessons",
       component: () =>
-        import(/* webpackChunkName: "home" */ "../pages/Test.vue"),
+        import(/* webpackChunkName: "home" */ "../pages/UserLesson.vue"),
     },
     {
       path: "/teacherforstudent",
@@ -99,16 +99,28 @@ const router = createRouter({
         import(/* webpackChunkName: "home" */ "../pages/Exam.vue"),
     },
     {
-      path: "/quiz",
-      name: "quiz",
+      path: "/userquiz",
+      name: "userquiz",
       component: () =>
-        import(/* webpackChunkName: "home" */ "../pages/Quiz.vue"),
+        import(/* webpackChunkName: "home" */ "../pages/UserQuiz.vue"),
     },
     {
       path: "/certificate",
       name: "certificate",
       component: () =>
         import(/* webpackChunkName: "home" */ "../pages/Certificate.vue"),
+    },
+    {
+      path: "/quiz",
+      name: "quiz",
+      component: () =>
+        import(/* webpackChunkName: "home" */ "../pages/Quiz.vue"),
+    },
+{
+      path: "/ans",
+      name: "ans",
+      component: () =>
+        import(/* webpackChunkName: "home" */ "../pages/Ans.vue"),
     },
 
 

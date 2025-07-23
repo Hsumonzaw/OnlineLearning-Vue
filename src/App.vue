@@ -16,7 +16,7 @@
           <v-btn text to="/usercourses">Courses</v-btn>
           <v-btn text to="/userlessons">Lessons</v-btn>
           <v-btn text to="/userteacher">Teachers</v-btn>
-          <v-btn text to="">Exam</v-btn>
+          <v-btn text to="/userexam">Exam</v-btn>
           <v-btn text to="/aboutus">About Us</v-btn>
         </div>
 
@@ -83,7 +83,8 @@
     </div>
 
     <!-- Page content -->
-    <v-container fluid class="pa-0 pt-12" >
+    <v-container fluid class="pa-0 pt-16" >
+   
       <router-view :hideToolbar="hideToolbar" />
     </v-container>
      <v-footer color="#f3e5f5" class="pa-10 footer">

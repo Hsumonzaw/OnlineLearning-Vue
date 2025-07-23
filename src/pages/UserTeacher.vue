@@ -2,7 +2,7 @@
   <v-app>
     <v-container fluid class="py-8 px-4" style="background: #e1f5fe;">
       
-      <!-- Welcome Section -->
+      
       <v-slide-y-transition mode="in-out">
         <v-card
           elevation="3"
