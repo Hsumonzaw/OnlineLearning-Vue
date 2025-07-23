@@ -6,8 +6,8 @@ class AnsService {
     this.axios = axios;
   }
 
-  getAnsList() {
-    let url = `/ans`;
+  getExamMark() {
+    let url = `/ansmark`;
     return this.axios.get(url).then((request) => request.data);
   }
   

@@ -200,7 +200,11 @@
     style="border-radius: 16px;  width: 500px; height: 500px;"
   />
 
- <v-dialog v-model="showForm" max-width="600" style="height: 730px">
+
+
+</v-container>
+  </v-app>
+   <v-dialog v-model="showForm" max-width="600" style="height: 730px">
       <v-card class="form pa-1" elevation="4" mb-0>
         <v-card-title class="d-flex justify-space-between align-center">
           <span class="text-h4">Add User</span>
@@ -246,18 +250,18 @@
             :rules="[(v) => !!v || 'required']"
           ></v-text-field>
 
-          <!-- <v-text-field
+          <v-text-field
             label="Age"
             v-model="user.age"
             :rules="[(v) => !!v || 'required']"
-          ></v-text-field> -->
+          ></v-text-field>
 
-          <!-- <v-text-field
+          <v-text-field
             v-model="user.nrc"
             label="NRC"
             :rules="[rules.required, rules.nrc]"
             required
-          ></v-text-field> -->
+          ></v-text-field>
 
           <v-text-field
             v-model="user.email"
@@ -272,14 +276,14 @@
             :rules="[(v) => !!v || 'required']"
           ></v-text-field>
 
-          <!-- <v-text-field
+          <v-text-field
             v-model="user.phonenum"
             label="Phone Number"
             :rules="[rules.required, rules.phone]"
             required
-          ></v-text-field> -->
+          ></v-text-field>
 
-          <!-- <v-text-field label="Address" v-model="user.address"></v-text-field> -->
+           <v-text-field label="Address" v-model="user.address"></v-text-field>
          
 
           <v-text-field
@@ -298,9 +302,6 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
-
-</v-container>
-  </v-app>
 </template>
 
 

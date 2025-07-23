@@ -43,11 +43,17 @@
             <v-list-item @click="clickRouter('/courses')" v-if="showTeacher">
               <v-list-item-title><v-icon>mdi-folder-open</v-icon> Courses</v-list-item-title>
             </v-list-item>
-            <v-list-item @click="clickRouter('/languages')">
+            <v-list-item @click="clickRouter('/languages')" v-if="showTeacher">
               <v-list-item-title><v-icon>mdi-web</v-icon> Languages</v-list-item-title>
             </v-list-item>
             <v-list-item @click="clickRouter('/lessons')">
               <v-list-item-title><v-icon>mdi-lightbulb-on-outline</v-icon> Lessons</v-list-item-title>
+            </v-list-item>
+             <v-list-item @click="clickRouter('/quiz')">
+              <v-list-item-title><v-icon>mdi-format-list-checks</v-icon>Add Quiz</v-list-item-title>
+            </v-list-item>
+             <v-list-item @click="clickRouter('/ans')">
+              <v-list-item-title><v-icon>mdi mdi-account-school</v-icon>Exam Marks</v-list-item-title>
             </v-list-item>
             
           </v-list>

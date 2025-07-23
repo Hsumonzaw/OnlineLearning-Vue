@@ -56,9 +56,9 @@
               <td class="text-start">{{ item.date }}</td>
               <td class="text-start">{{ item.modifiedDate }}</td>
               <td class="text-center">
-                <v-btn class="ml-1" small icon color="black" density="compact">
+                <!-- <v-btn class="ml-1" small icon color="black" density="compact">
                   <v-icon size="small" @click="FileMethod(item)">mdi-file</v-icon></v-btn
-                >
+                > -->
                 <v-btn class="ml-1" small icon color="green" density="compact" @click="clickEdit(item)" >
                   <v-icon size="small" >mdi-pencil</v-icon>
                 </v-btn>

@@ -29,6 +29,11 @@
                   {{  courses.languagesDto?.name }}
                 </p>
               </div>
+              <div class="flex-grow-1 d-flex flex-column justify-center">
+                <p class="mb-3 font-weight-bold text-wrap product-title" style="font-size: 18px">
+                  {{  courses.amount }}
+                </p>
+              </div>
               <!-- <div class="">
                 <p class="mb-3 font-weight-bold product-detail" style="font-size: 15px">
                   {{ product?.detail }}
@@ -38,10 +43,10 @@
                 <v-btn
                   rounded
                   prepend-icon="mdi-download"
-                  @click="downloadPdf(product.file)"
+                  @click="downloadPdf(courses.pdf)"
                   class="mt-5 buttontext"
                 >
-                  Download PDF
+                  Download Book
                 </v-btn>
               </div>
             </v-card>
@@ -69,15 +74,15 @@ export default {
     this.coursesListMethod();
   },
   methods: {
-    // downloadPdf(pdf) {
-    //   if (!pdf) {
-    //     this.$swal("No PDF", "No PDF file available for this product.", "warning");
-    //     return;
-    //   }
-    //   const baseURL = axios?.defaults?.baseURL || "";
-    //   const pdfUrl = `${baseURL}/productfile/${pdf}.pdf`;
-    //   window.open(pdfUrl, "_blank");
-    // },
+    downloadPdf(pdf) {
+      if (!pdf) {
+        this.$swal("No PDF", "No PDF file available for this product.", "warning");
+        return;
+      }
+      const baseURL = axios?.defaults?.baseURL || "";
+      const pdfUrl = `${baseURL}/coursefile/${pdf}.pdf`;
+      window.open(pdfUrl, "_blank");
+    },
     getCoursePhotoUrl(cphoto) {
       // const baseURL = axios?.defaults?.baseURL || "";
       // return cphoto ? `${baseURL}/coursephoto/${cphoto}.png` : "";
