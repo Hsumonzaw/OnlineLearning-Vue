@@ -5,7 +5,7 @@
       <v-col cols="12">
         <h2 style="background-color:rgb(136, 210, 230); text-align: center;" >Student Answers</h2>
         <v-col cols="2" class="pl-1 pt-2">
- <v-autocomplete
+ <!-- <v-autocomplete
   v-model="selectedUserId"
   :items="userList"
   item-title="name"
@@ -15,7 +15,7 @@
   variant="outlined"
   required
   @update:modelValue="NameListMethodByType"
-/>
+/> -->
 
 
     </v-col>
@@ -28,13 +28,7 @@
               <th class="text-center white--text bg-primary">No.</th>
               <th class="text-center white--text bg-primary">Language Name</th>
               <th class="text-center white--text bg-primary">User Name</th>
-              <th class="text-center white--text bg-primary">Quiz Id</th>
-              <th class="text-center white--text bg-primary">Questions</th>
-              <th class="text-center white--text bg-primary">Option One</th>
-              <th class="text-center white--text bg-primary">Option Two</th>
-              <th class="text-center white--text bg-primary">Option Three</th>
-              <th class="text-center white--text bg-primary">Correct Answer</th>
-              <th class="text-center white--text bg-primary">Answer</th>
+              <th class="text-center white--text bg-primary">Exam Mark</th>
             </tr>
           </thead>
           <tbody>
@@ -52,13 +46,7 @@
               <td class="text-center">{{ index + 1 }}</td>
               <td class="text-center">{{ item.languageName }}</td>
               <td class="text-center">{{ item.userName }}</td>
-              <td class="text-center">{{ item.quiz.quizId}}</td>
-              <td class="text-center">{{ item.quiz.name }}</td>
-              <td class="text-center">{{ item.quiz.ansone }}</td>
-              <td class="text-center" >{{ item.quiz.anstwo }}</td>
-              <td class="text-center" >{{ item.quiz.ansthree }}</td>
-              <td class="text-center" >{{ item.quiz.correct }}</td>
-              <td class="text-center" >{{ item?.ans }}</td>
+              <td class="text-center" >{{item.totalAns }}</td>
 
               
              
@@ -95,39 +83,40 @@ export default {
     ans: {},
     selectedUserId : null,
     userData : {},
+    examId :0,
+    
   }),
   props: {},
-  mounted: function () {
-        // this.userData = JSON.parse(localStorage.getItem("user"));
-    // if(this.userData.role=="TEACHER"){
-    //   this.showTeacher = false;
-    // }else{
-    //   this.showTeacher = true;
-    // }
-    // this.courses.receivedDate = format(this.receivedPicker, "dd-MM-yyyy");
-    // this.courses.receivedDate = format(this.receivedPicker, "yyyy-MM-dd");
+ mounted() {
+  this.userListMethod();
+  this.languageListMethod();
+},
 
-     this.userListMethod();
-     this.languageListMethod();
-     this.ansListMethod();
-     this.quizListMethod();
-     this.NameListMethodByType();
-
+methods: {
+  languageListMethod() {
+    languageService
+      .getLanguageList()
+      .then((response) => {
+        this.languageList.splice(0);
+        this.languageList.push(...response);
+        this.ans.languages = this.languageList[0];
+        // Now call ansListMethod with the first languageId
+        if (this.languageList.length > 0) {
+          this.ansListMethod(this.languageList[0].languagesId);
+        }
+      })
+      .catch((err) => console.error("Fetch error:", err));
   },
-  methods: {
-   
-    NameListMethodByType() {
-  ansService.getAnsList()
+
+ ansListMethod() {
+  ansService
+    .getExamMark()
     .then((response) => {
-      if (!this.selectedUserId) {
-        this.ansList = response; 
-
-      } else {
-        this.ansList = response.filter(item => 
-            item.exam?.userAccountId == this.selectedUserId
-
-        );
-      }
+      this.ansList = response.map(item => ({
+        languageName: item.coursesDto.name,   // from backend DTO
+        userName: item.userAccountDto.name,
+        totalAns: item.examMark               // exam mark
+      }));
     })
     .catch((err) => console.error("Fetch error:", err));
 },
@@ -142,41 +131,10 @@ export default {
       this.$swal("Fail!", error.response.data.message, "error");
     });
 },
-
-
-    languageListMethod() {
-      languageService
-        .getLanguageList()
-        .then((response) => {
-          this.languageList.splice(0);
-          this.languageList.push(...response);
-          this.ans.languages = this.languageList[0];
-        })
-        .catch((err) => console.error("Fetch error:", err));
-    },
-    ansListMethod() {
-      ansService
-        .getAnsList()
-        .then((response) => {
-          this.ansList.splice(0);
-          this.ansList.push(...response);
-        })
-        .catch((err) => console.error("Fetch error:", err));
-    },
-    quizListMethod() {
-      quizService
-        .getQuizList()
-        .then((response) => {
-          this.quizList.splice(0);
-          this.quizList.push(...response);
-          this.ans.quiz = this.quizList[0];
-        })
-        .catch((err) => console.error("Fetch error:", err));
-    },
-  
+},
 
   
-  },
+
   watch: {
     // receivedPicker() {
     //   this.receivedMenu = false;

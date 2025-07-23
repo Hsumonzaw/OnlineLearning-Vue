@@ -34,6 +34,16 @@ class CoursesService {
       })
       .then((request) => request.data);
   }
+  updateFile(formData, coursesId) {
+    let url = `courses/${coursesId}/pdf`;
+    return axios
+      .put(url, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      })
+      .then((request) => request.data);
+  }
   courseListMethodByType() {
   coursesService.getCourseListByType(this.type)
     .then((response) => {

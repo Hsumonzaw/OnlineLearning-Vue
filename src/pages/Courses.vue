@@ -4,7 +4,8 @@
    <v-row class="title">
       <v-col cols="12">
         <h2 style="background-color:rgb(136, 210, 230); text-align: center;" >Courses</h2>
-        <v-col cols="2" class="pl-1 pt-2">
+        <v-row>
+        <v-col cols="2" class="pl-1 pt-5">
       <v-autocomplete
         v-model="type"
         item-text="typeName"
@@ -19,7 +20,13 @@
         filled
         @update:modelValue="courseListMethodByType"
       ></v-autocomplete>
+      </v-col>
+      <v-col cols="2" class="pl-12 pt-6">
+      <v-btn class="bg-blue" @click="demand()"> 
+        Customer Demand
+      </v-btn>
     </v-col>
+    </v-row>
         <v-tooltip location="top">
   <template v-slot:activator="{ props }">
     <v-btn
@@ -44,13 +51,13 @@
               <th class="text-center white--text bg-primary" v-if="showTeacher">Student Name</th>
               <th class="text-center white--text bg-primary">Language Name</th>
               <th class="text-center white--text bg-primary">Type</th>
-              <th class="text-center white--text bg-primary" v-if="showTeacher">Amount</th>
-              <th class="text-center white--text bg-primary" v-if="showTeacher">Courses Photo</th>
+              <th class="text-center white--text bg-primary">Amount</th>
+              <th class="text-center white--text bg-primary" v-if="showdemand">Courses Photo</th>
               <!-- <th class="text-center white--text bg-primary">Exam Link</th> -->
-              <th class="text-center white--text bg-primary">Book Link</th>
-              <th class="text-center white--text bg-primary" v-if="showTeacher">Descriptions</th>
+              <th class="text-center white--text bg-primary" v-if="showdemand">Book Link</th>
+              <th class="text-center white--text bg-primary" v-if="showdemand">Descriptions</th>
               
-              <th class="text-center white--text bg-primary">Action</th>
+              <th class="text-center white--text bg-primary" v-if="showdemand">Action</th>
             </tr>
           </thead>
           <tbody>
@@ -72,8 +79,8 @@
 
               <td class="text-center">{{ item.languagesDto?.name }}</td>
               <td class="text-center">{{ item?.type }}</td>
-              <td class="text-start" v-if="showTeacher">{{ item?.amount }}</td>
-              <td class="text-start" v-if="showTeacher"><v-img
+              <td class="text-center">{{ item?.amount }}</td>
+              <td class="text-center" v-if="showdemand"><v-img
   :src="getCoursePhotoUrl(item.cphoto)"
   alt="Course Photo"
   max-width="80"
@@ -82,11 +89,27 @@
   loading="lazy"
 /></td>
               <!-- <td class="text-start">{{ item?.examLink }}</td> -->
-              <td class="text-start">{{ item?.pdf }}</td>
+              <td class="text-center" v-if="showdemand">{{ item?.pdf }}</td>
 
-              <td class="text-start" v-if="showTeacher">{{ item?.description }}</td>
+              <!-- <td class="text-center" v-if="showdemand">{{ item?.description }}</td> -->
+               <td class="text-center" v-if="showdemand">
+                <div>
+                  <span v-if="!item.showFull">
+                    {{ item.description?.length > 100 ? item.description.slice(0, 50) + '...' : item.description }}
+                    <a v-if="item.description?.length > 50" href="#" @click.prevent="item.showFull = true">See more</a>
+                  </span>
+                  <span v-else>
+                    {{ item.description }}
+                    <a href="#" @click.prevent="item.showFull = false">See less</a>
+                  </span>
+                </div>
+              </td>
+
               
-              <td class="text-center">
+              <td class="text-center" v-if="showdemand"> 
+                <v-btn class="ml-1" small icon color="black" density="compact">
+                  <v-icon size="small" @click="FileMethod(item)">mdi-file</v-icon></v-btn
+                >
 
                  <v-btn class="ml-1" small icon color="black" density="compact">
                   <v-icon size="small" @click="photoMethod(item)">mdi-image</v-icon></v-btn
@@ -195,16 +218,15 @@
                   variant="outlined"
                 ></v-text-field> -->
 
-                <v-text-field
+                <!-- <v-text-field
                   label="Book Link (PDF)"
                   v-model.number="courses.pdf"
                   :rules="[(v) => !!v || 'required']"
                   density="compact"
                   variant="outlined"
-                ></v-text-field>
+                ></v-text-field> -->
 
                 <v-text-field
-                v-if="showTeacher"
                   type="number"
                   label="Amount"
                   v-model.number="courses.amount"
@@ -214,7 +236,6 @@
                 ></v-text-field>
 
                  <v-text-field
-                  v-if="showTeacher"
                   label="Descriptions"
                   v-model.number="courses.description"
                   :rules="[(v) => !!v || 'required']"
@@ -250,6 +271,17 @@
       </v-card>
           
     </v-dialog>
+    <v-col>
+          <v-bottom-sheet v-model="courseFileDialog" fullscreen scrollable>
+        <v-sheet class="information-window-v-sheet">
+          <CourseFile
+          @closeDialog="courseFileDialog=false"
+          :courses="selectedOne"
+          @loadUserList="loadUserList"
+          />
+        </v-sheet>
+      </v-bottom-sheet>
+    </v-col>
 
       <v-col>
           <v-bottom-sheet v-model="coursePhotoDialog" fullscreen scrollable>
@@ -288,9 +320,11 @@ export default {
     dialogDelete: false,
     showForm:false,
     coursePhotoDialog: false,
+    courseFileDialog : false,
     showTeacher: false,
     userData : {},
     type: "ALL",
+    showdemand : true,
   }),
   props: {},
   mounted: function () {
@@ -315,6 +349,9 @@ export default {
 
   },
   methods: {
+    demand(){
+      this.showdemand = false;
+    },
     getCoursePhotoUrl(cphoto) {
   if (!cphoto) return "path/to/default-image.png"; // fallback image path
   return `${axios.defaults.baseURL}/coursephoto/${cphoto}.png`;
@@ -335,7 +372,15 @@ export default {
        loadUserList:function(){
       this.coursePhotoDialog = false;
       this.coursesListMethod();
+      this.courseFileDialog = false;
+      this.showForm = false;
+
     },  
+
+     FileMethod:function(item){
+        this.selectedOne = item;
+        this.courseFileDialog = true;
+    },
     photoMethod:function(item){
         this.coursePhotoDialog = true;
     },
@@ -369,6 +414,7 @@ export default {
         .catch((err) => console.error("Fetch error:", err));
     },
     coursesListMethod() {
+      this.showTeacher = false;
       coursesService
         .getCourseList()
         .then((response) => {
@@ -552,4 +598,18 @@ tr:hover {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
   z-index: 999;
 }
+.v-data-table {
+  table-layout: fixed;
+  width: 100%;
+}
+
+.v-data-table th,
+.v-data-table td {
+  text-align: center;
+  vertical-align: middle;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 </style>
