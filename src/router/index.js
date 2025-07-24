@@ -116,7 +116,8 @@ const router = createRouter({
       component: () =>
         import(/* webpackChunkName: "home" */ "../pages/Quiz.vue"),
     },
-{
+    
+    {
       path: "/ans",
       name: "ans",
       component: () =>

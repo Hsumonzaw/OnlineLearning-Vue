@@ -3,9 +3,9 @@
     <!-- Table Section -->
     <v-row class="title">
       <v-col cols="12">
-        <h2 style="background-color: rgb(136, 210, 230); text-align: center">
+        <h1 style="background-color: #b3e5fc; text-align: center;" class="mt-1 mb-1">
           User Informations
-        </h2>
+        </h1>
         <v-col cols="2" class="pl-1 pt-2">
           <v-autocomplete
             v-model="userType"
@@ -500,15 +500,15 @@ export default {
 table,
 th,
 td {
-  border: 1px solid rgb(215, 215, 215);
+  border: 1px solid #b3e5fc;
   border-collapse: collapse;
   padding: 0 1px !important;
 }
 tbody {
-  background-color: rgb(153, 207, 238);
+  background-color: #b3e5fc;
 }
 tr:hover {
-  background-color: rgb(78, 136, 243) !important;
+  background-color: #e1f5fe !important;
   cursor: pointer;
 }
 .login-full {

@@ -3,7 +3,40 @@
     <!-- Table Section -->
     <v-row class="title">
       <v-col cols="12">
-        <h1 style="background-color:rgb(136, 210, 230);text-align: center;">Lessons</h1>
+        <h1 style="background-color:#b3e5fc;text-align: center;">Lessons</h1>
+                <v-row>
+        <v-col cols="2" class="pl-1 pt-5">
+          <v-autocomplete
+        v-model="selectedLanguage"
+        :items="languageList"
+        item-title="name"
+        item-value="languagesId"
+        label="Languages"
+        return-object
+        density="compact"
+        variant="outlined"
+        required
+        small
+        filled
+        @update:modelValue="LanguagesListMethodByType"
+      />
+      </v-col>
+      <v-col cols="2" class="pl-1 pt-5">
+     
+      <v-autocomplete
+        v-model="selectedLessonType"
+        :items="lessonListType"
+        label="Lesson Type"
+        density="compact"
+        variant="outlined"
+        required
+        small
+        filled
+        @update:modelValue="LessonListMethodByType"
+      />
+    
+      </v-col>
+      </v-row>
  <v-tooltip location="top">
   <template v-slot:activator="{ props }">
     <v-btn
@@ -199,7 +232,7 @@ export default {
      startMenu: false,
     dialogDelete:false,
     lesson: {},
-    lessonList:[],
+    lessonList : [],
     userList:[],
     userType: "STUDENT",
     VideoList : ["FREE", "PAID"],
@@ -209,7 +242,11 @@ export default {
     showForm: false,
     lessonFileDialog:false,
     showTeacher : false,
-userData:{},
+    userData:{},
+     selectedLanguage: null,
+  selectedLessonType: "ALL",
+  lessonList: [],
+  lessonListType: ["ALL", "FREE", "PAID"],
   }),
    props: {},
   mounted: function() {
@@ -223,9 +260,44 @@ userData:{},
     this.languageListMethod();
     this.lessonListMethod();
     this.userListMethod();
+    this.LanguagesListMethodByType();
+    this.LessonListMethodByType();
 
     },
   methods: {
+    LanguagesListMethodByType() {
+  lessonService.getLessonList()
+    .then((response) => {
+      if (!this.selectedLanguage || !this.selectedLanguage.languagesId) {
+        this.lessonList = response;
+      } else {
+        this.lessonList = response.filter(
+          item => item.languagesDto?.languagesId === this.selectedLanguage.languagesId
+        );
+      }
+    })
+    .catch((error) => {
+      this.$swal("Fail!", error.response?.data?.message || "Error loading lessons", "error");
+    });
+},
+
+LessonListMethodByType() {
+  lessonService.getLessonList()
+    .then((response) => {
+      if (this.selectedLessonType === "ALL") {
+        this.lessonList = response;
+      } else {
+        this.lessonList = response.filter(
+          item => item.freeVideo === this.selectedLessonType
+        );
+      }
+    })
+    .catch((error) => {
+      this.$swal("Fail!", error.response?.data?.message || "Error loading lessons", "error");
+    });
+},
+
+
      loadLessonList:function(){
       this.lessonFileDialog = false;
        this.lessonListMethod();
@@ -245,6 +317,8 @@ userData:{},
         .deleteLesson(this.selectedOne)
         .then((response) => {
           this.dialogDelete = false;
+          this.LanguagesListMethodByType();
+          this.LessonListMethodByType();
           this.$swal({
             icon: "success",
             title: "Your work has been deleted",
@@ -311,6 +385,8 @@ userData:{},
 
         //this.saveOrupdate = "SAVE";
         this.showForm = false;
+        this.LanguagesListMethodByType();
+        this.LessonListMethodByType();
        Swal.fire({
   icon: "success",
   title: "Lesson saved successfully!",
@@ -329,6 +405,8 @@ userData:{},
         
         this.saveOrupdate = "SAVE";
         this.showForm = false;
+        this.LanguagesListMethodByType();
+        this.LessonListMethodByType();
        Swal.fire({
   icon: "success",
   title: "Lesson updated successfully!",
@@ -439,24 +517,24 @@ lessonListMethod() {
 table,
 th,
 td {
-  border: 1px solid rgb(175, 175, 175);
+  border: 1px solid #b3e5fc;
   border-collapse: collapse;
   padding: 0 1px !important;
   
 }
 tbody{
-  background-color: rgb(153, 207, 238);
+  background-color: #b3e5fc;
 
 }
 tr:hover {
-  background-color: rgb(78, 136, 243) !important;
+  background-color: #e1f5fe !important;
   cursor: pointer;
 }
 
 
 
 thead{
-  background-color: rgb(25, 130, 216);
+  background-color: #b3e5fc;
 }
 .login-full {
   height: 100vh;

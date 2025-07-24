@@ -3,7 +3,7 @@
     <!-- Table Section -->
    <v-row class="title">
       <v-col cols="12">
-        <h2 style="background-color:rgb(136, 210, 230); text-align: center;" >Courses</h2>
+        <h1 style="background-color: #b3e5fc; text-align: center;" class="mt-1 mb-1">Courses</h1>
         <v-row>
         <v-col cols="2" class="pl-1 pt-5">
       <v-autocomplete
@@ -22,8 +22,13 @@
       ></v-autocomplete>
       </v-col>
       <v-col cols="2" class="pl-12 pt-6">
-      <v-btn class="bg-blue" @click="demand()"> 
-        Customer Demand
+      <v-btn rounded="xl" size="large"  class="bg-blue" style="font-size: small;" @click="demand()"> 
+        Customer Records
+      </v-btn>
+    </v-col>
+       <v-col cols="2" class="pl-12 pt-6">
+      <v-btn rounded="xl" size="large" block class="bg-blue" style="font-size: small;" @click="details()"> 
+        Course Details
       </v-btn>
     </v-col>
     </v-row>
@@ -48,7 +53,7 @@
 <tr>
               <th class="text-center white--text bg-primary">No.</th>
               <th class="text-center white--text bg-primary">Received Date</th>
-              <th class="text-center white--text bg-primary" v-if="showTeacher">Student Name</th>
+              <th class="text-center white--text bg-primary">Student Name</th>
               <th class="text-center white--text bg-primary">Language Name</th>
               <th class="text-center white--text bg-primary">Type</th>
               <th class="text-center white--text bg-primary">Amount</th>
@@ -75,7 +80,7 @@
               <td class="text-center">{{ index + 1 }}</td>
               <td class="text-center">{{ item?.receivedDate }}</td>
 
-              <td class="text-center" v-if="showTeacher">{{ item.studentDto?.userName }}</td>
+              <td class="text-center">{{ item.studentDto?.userName }}</td>
 
               <td class="text-center">{{ item.languagesDto?.name }}</td>
               <td class="text-center">{{ item?.type }}</td>
@@ -352,6 +357,9 @@ export default {
     demand(){
       this.showdemand = false;
     },
+    details(){
+      this.showdemand = true;
+    },
     getCoursePhotoUrl(cphoto) {
   if (!cphoto) return "path/to/default-image.png"; // fallback image path
   return `${axios.defaults.baseURL}/coursephoto/${cphoto}.png`;
@@ -565,15 +573,15 @@ export default {
 table,
 th,
 td {
-  border: 1px solid rgb(215, 215, 215);
+  border: 1px solid #b3e5fc;
   border-collapse: collapse;
   padding: 0 1px !important;
 }
 tbody{
-  background-color: rgb(153, 207, 238);
+  background-color: #b3e5fc;
 }
 tr:hover {
-  background-color: rgb(78, 136, 243) !important;
+  background-color: #e1f5fe !important;
   cursor: pointer;
 }
 

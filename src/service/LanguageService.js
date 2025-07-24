@@ -27,6 +27,7 @@ class LanguageService {
     let url = `/free/languages`;
     return this.axios.get(url).then((request) => request.data);
   }
+  
 }
 
 const service = new LanguageService();

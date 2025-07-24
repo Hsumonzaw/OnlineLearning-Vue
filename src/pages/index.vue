@@ -201,17 +201,42 @@
   <v-dialog v-model="showForm" max-width="700px">
   <v-card class="pa-4" elevation="4" style="background-color: #e8f5e9;">
     <v-card-title class="d-flex justify-space-between align-center">
-      <span class="text-h5 font-weight-bold">Add User</span>
+      <span class="text-h5 font-weight-bold">Apply Form</span>
       <v-btn icon color="red" @click="showForm = false">
         <v-icon>mdi-close</v-icon>
       </v-btn>
     </v-card-title>
 
-    <v-card-text>
-      <v-container fluid>
+    <v-card-text class="pt-0 pb-0 mb-0">
         <v-row dense>
+
+          <!-- Preview -->
+          <v-col cols="12" sm="6" class="d-flex justify-center align-center">
+            <v-img
+              v-if="photoPreview"
+              :src="photoPreview"
+              max-width="120"
+              max-height="120"
+              class="square"
+            ></v-img>
+          </v-col>
+
+          <!-- Photo Upload -->
+          <v-col col="12" sm="6">
+            <v-file-input
+              v-model="photo"
+              label="Profile Photo"
+              prepend-icon="mdi-camera"
+              accept="image/*"
+              @change="previewImage"
+              variant="outlined"
+              density="compact"
+            />
+         
+
+          
           <!-- Start Date -->
-          <v-col cols="12" sm="6">
+        
             <v-menu
               v-model="startMenu"
               :close-on-content-click="false"
@@ -247,18 +272,6 @@
               density="compact"
             />
           </v-col>
-
-          <!-- Username -->
-          <v-col cols="12" sm="6">
-            <v-text-field
-              v-model="user.userName"
-              label="Username"
-              :rules="[(v) => !!v || 'Username is required']"
-              variant="outlined"
-              density="compact"
-            />
-          </v-col>
-
           <!-- Age -->
           <v-col cols="12" sm="6">
             <v-text-field
@@ -266,6 +279,28 @@
               label="Age"
               type="number"
               :rules="[(v) => !!v || 'Age is required']"
+              variant="outlined"
+              density="compact"
+            />
+          </v-col>
+
+          <!-- Username -->
+          <v-col cols="12" sm="6">
+            <v-text-field
+              v-model="user.userName"
+              label="Please Fill UserName & Remember it for Log in!"
+              :rules="[(v) => !!v || 'Username is required']"
+              variant="outlined"
+              density="compact"
+            />
+          </v-col>
+
+           <v-col cols="12" sm="6">
+            <v-text-field
+              v-model="user.password"
+              label="Password"
+              type="password"
+              :rules="[(v) => !!v || 'Password is required']"
               variant="outlined"
               density="compact"
             />
@@ -296,16 +331,7 @@
           </v-col>
 
           <!-- Password -->
-          <v-col cols="12" sm="6">
-            <v-text-field
-              v-model="user.password"
-              label="Password"
-              type="password"
-              :rules="[(v) => !!v || 'Password is required']"
-              variant="outlined"
-              density="compact"
-            />
-          </v-col>
+         
 
           <!-- Phone Number -->
           <v-col cols="12" sm="6">
@@ -320,7 +346,7 @@
           </v-col>
 
           <!-- Address -->
-          <v-col cols="12">
+          <v-col cols="12" sm="6">
             <v-text-field
               v-model="user.address"
               label="Address"
@@ -329,8 +355,8 @@
             />
           </v-col>
 
-          <!-- Degree -->
-          <v-col cols="12" sm="6">
+           <!-- Degree -->
+          <v-col cols="12" sm="6" >
             <v-text-field
               v-model="user.degree"
               label="Degree"
@@ -338,16 +364,33 @@
               variant="outlined"
               density="compact"
             />
+
           </v-col>
+          
+          <!-- Document Upload -->
+        <v-col cols="12" sm="6">
+          <v-file-input
+            v-model="file"
+            label="Please Fill Your CV"
+            accept=".pdf"
+            prepend-icon="mdi-file"
+            variant="outlined"
+            density="compact"
+          />
+        </v-col>
+
+         
         </v-row>
-      </v-container>
     </v-card-text>
 
-    <v-card-actions class="justify-end">
-      <v-btn color="blue darken-1" class="white--text" @click="saveUser">
-        {{ saveOrupdate }}
-      </v-btn>
-    </v-card-actions>
+    <v-card-actions class="justify-end pr-5 mb-8">
+          <v-btn
+            class="text-black"
+            style="background-color: #2196f3"
+            @click="saveUser()"
+            >{{ saveOrupdate }}</v-btn
+          >
+        </v-card-actions>
   </v-card>
 </v-dialog>
 
@@ -376,19 +419,23 @@ export default {
         "/src/assets/homepageLanguage2.jpg",
 
       ],
-       photos: [],
+      photos: [],
+      photo: null,
+      photoPreview: null,
+      file : null,
+
       latestUserCourses: [],
       teachers:[],
     
-        valid: false,
-    user:{},
+      valid: false,
+      user:{},
       userAccounts: [],
       showForm : false,
       valid: false,
-    email: "",
-    phone: "",
-    nrc: "",
-    rules: {
+      email: "",
+      phone: "",
+      nrc: "",
+      rules: {
       required: (v) => !!v || "This field is required",
       email: (v) =>
         /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) || "Invalid email format",
@@ -428,17 +475,57 @@ export default {
   },
   methods: {
     
-      saveUser() {
-          this.showForm = false;
-          userService.addUser(this.user);
-          this.$swal({
-            icon: "success",
-            title: "Rigister successfully!",
-            showConfirmButton: false,
-            timer: 1000,
-          });
-            
+      // saveUser() {
+      //     this.showForm = false;
+      //     userService.addUser(this.user);
+      //     this.$swal({
+      //       icon: "success",
+      //       title: "Rigister successfully!",
+      //       showConfirmButton: false,
+      //       timer: 1000,
+      //     });
+      previewImage() {
+  if (this.photo) {
+    this.photoPreview = URL.createObjectURL(this.photo);
+  }
 },
+async saveUser() {
+  try {
+    // Create user (returns ID)
+    const createdUserId = await userService.addUser(this.user);
+
+    // Upload photo if provided
+    if (this.photo) {
+      const formData = new FormData();
+      formData.append("file", this.photo);
+      await userService.updatePhoto(formData, createdUserId);
+    }
+    if (this.file) {
+      const fileForm = new FormData();
+      fileForm.append("file", this.file);
+      await userService.updateFile(fileForm, createdUserId);
+    }
+
+    this.showForm = false;
+    this.$swal({
+      icon: "success",
+      title: "Congratulations!",
+      text: "You are now a CodeLingo Teacher.Please log in.",
+      showConfirmButton: true,
+      confirmButtonText: "OK",
+      timer: 10000,
+    });
+  } catch (error) {
+    console.error("Registration failed", error);
+    this.$swal({
+      icon: "error",
+      title: "Registration failed!",
+      text: "Please try again later.",
+    });
+  }
+},
+
+
      getLatestUserCourses() {
       coursesService.getCourseList() 
         .then((response) => {
