@@ -147,7 +147,7 @@ export default {
     };
   },
   mounted() {
-    this.getMinutes();
+    this.startTimer();
     this.languagesId = this.$route.query.languagesId;
     this.coursesId = this.$route.query.coursesId;
        quizService
@@ -169,14 +169,14 @@ export default {
     //
   },
   methods: {
-    getMinutes:function(){
-      let temp = this;
-      setTimeout(function () {
-        temp.minutesCount+=1;
-        temp.minutes = "cc "+temp.minutesCount;
-        temp.getMinutes();
-        }, 1000);
-    },
+   startTimer() {
+    this.timerSeconds = setInterval(() => {
+    this.minutesCount += 1;
+    const minutes = Math.floor(this.minutesCount / 60);
+    const seconds = this.minutesCount % 60;
+    this.minutes = `${minutes}m ${seconds}s`;
+  }, 1000);
+},
     goToCertificate:function(path){
         this.$router.push({ path }).catch(() => {});
     },
@@ -194,6 +194,7 @@ export default {
         });
     },
     submitQuiz() {
+       clearInterval(this.timerSeconds)
 
       const allAnswered = this.quizList.every(
         (q) => this.userAnswers[q.quizId] !== null
@@ -215,6 +216,7 @@ export default {
       total: this.quizList.length,
       date: new Date().toISOString(),
       answers: this.userAnswers,
+     
       };
    quizService
         .saveAns(this.coursesId,this.quizList,this.minutesCount)
