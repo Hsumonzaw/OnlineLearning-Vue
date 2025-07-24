@@ -232,10 +232,14 @@ export default {
     //   this.lessonsId = lessonsId;
     // }
 
-    this.languageListMethod();
+   
     this.user.startDate = format(this.startPicker, "dd-MM-yyyy");
     this.userData = JSON.parse(localStorage.getItem("user")) || {};
-
+      if (this.userData.password!=undefined &&  this.userData?.password!="") {
+       this.languageListMethod();
+    }else{
+      this.languageListMethodFree();
+    }
 
   },
   methods: {
@@ -251,13 +255,17 @@ export default {
        coursesService
           .addCourse(courses)
           .then((response) => {
-          const purchased = this.languageList.find(
-          (lang) => lang.languagesId === this.selectedOne.languagesId
-          );
-          if (purchased) {
-           purchased.buy = 1;
-         }
-
+        //   const purchased = this.languageList.find(
+        //   (lang) => lang.languagesId === this.selectedOne.languagesId
+        //   );
+        //   if (purchased) {
+        //    purchased.buy = 1;
+        //  }
+if (this.userData.password!=undefined &&  this.userData?.password!="") {
+       this.languageListMethod();
+    }else{
+      this.languageListMethodFree();
+    }
           this.$swal({
           icon: "success",
           title: "Your work saved successfully!",
@@ -376,11 +384,21 @@ export default {
     // },
     languageListMethod() {
       languageService
-        .getLanguageList(this.languagesId)
+        .getLanguageList()
         .then((response) => {
           this.languageList.splice(0, this.languageList.length);
           this.languageList.push(...response);
-          console.log(this.languageList);
+        })
+        .catch((error) => {
+           this.$swal("Fail!", error.response.data.message, "error");
+        });
+    },
+     languageListMethodFree() {
+      languageService
+        .getLanguageListFree(this.languagesId)
+        .then((response) => {
+          this.languageList.splice(0, this.languageList.length);
+          this.languageList.push(...response);
         })
         .catch((error) => {
            this.$swal("Fail!", error.response.data.message, "error");

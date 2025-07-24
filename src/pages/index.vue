@@ -1,9 +1,8 @@
 <template>
-  
   <v-app>
  <v-container fluid class="modern-contact px-0 py-0"> 
     <section class="hero-section modern-hero">
-      <v-row class="align-center justify-center" no-gutters>
+      <v-row class="align-center justify-center mt-0" no-gutters>
           <v-col cols="12" md="6" class="pl-10">
           <Motion preset="slideVisibleBottom" :duration="600" :delay="200">
             <div class="hero-badge mb-4 d-flex align-center">
@@ -529,7 +528,8 @@ export default {
 
 
 .modern-hero-img{
-  margin-top: 100px;
+  margin-top: 50px;
+  margin-bottom: 50px;
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 12px; 

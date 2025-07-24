@@ -82,18 +82,44 @@
 
 <script>
 import Useraccount from './Useraccount.vue';
-
+import quizService from "../service/QuizService.js";
 export default {
+  data: () => ({
+      languagesId:0,
+      coursesId:0,
+      userData:{},
+      score:0,
+      total:0,
+      name:"",
+  }),
+   props: {},
+  mounted: function() {
+     this.languagesId = this.$route.query.languagesId;
+    this.coursesId = this.$route.query.coursesId;
+    this.userData = JSON.parse(localStorage.getItem("user"));
+       quizService
+        .getExamMark(this.languagesId)
+        .then((response) => {
+          this.score = response;
+          this.total = 100;
+            
+        })
+        .catch(() => {
+          this.loadError = true;
+        }); 
+        this.name = this.userData.userName;
+  },
+  methods: {},
   computed: {
-    name() {
-      return this.$route.query.name || "Student";
-    },
-    score() {
-      return this.$route.query.score || 0;
-    },
-    total() {
-      return this.$route.query.total || 0;
-    },
+    // name() {
+    //   return this.$route.query.name || "Student";
+    // },
+    // score() {
+    //   return this.$route.query.score || 0;
+    // },
+    // total() {
+    //   return this.$route.query.total || 0;
+    // },
     date() {
       const d = this.$route.query.date ? new Date(this.$route.query.date) : new Date();
       return d.toLocaleDateString();
@@ -109,3 +135,4 @@ export default {
   }
 }
 </style>
+

@@ -43,7 +43,7 @@
                 <v-btn
                   rounded
                   prepend-icon="mdi-download"
-                  @click="downloadPdf(courses.pdf)"
+                  @click="download(courses.pdf)"
                   class="mt-5 buttontext"
                 >
                   Download Book
@@ -74,13 +74,16 @@ export default {
     this.coursesListMethod();
   },
   methods: {
-    downloadPdf(pdf) {
+    download(pdf) {
+      
       if (!pdf) {
         this.$swal("No PDF", "No PDF file available for this product.", "warning");
         return;
       }
       const baseURL = axios?.defaults?.baseURL || "";
+
       const pdfUrl = `${baseURL}/coursefile/${pdf}.pdf`;
+
       window.open(pdfUrl, "_blank");
     },
     getCoursePhotoUrl(cphoto) {

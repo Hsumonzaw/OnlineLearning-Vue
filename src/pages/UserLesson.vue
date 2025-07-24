@@ -62,7 +62,7 @@
       </v-col>
     </v-row>
 
-    <v-row v-if="showEnrollButton" class="justify-center mt-6 mb-16 handle">
+    <v-row v-if="(userData.role == 'STUDENT' || userData.role == undefined) && showEnrollButton" class="justify-center mt-6 mb-16 handle">
       <v-btn color="primary" large @click="handleEnroll">
         Enroll to Access All Paid Videos
       </v-btn>
@@ -275,7 +275,7 @@ export default {
        coursesService
           .addCourse(courses)
           .then((response) => {
-
+            this.showEnrollButton = false;
           this.$swal({
           icon: "success",
           title: "Your work saved successfully!",

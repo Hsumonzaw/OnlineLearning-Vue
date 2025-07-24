@@ -12,10 +12,10 @@
     >
       Failed to load quiz.
     </v-alert> -->
-    <v-chip class="ma-2" color="blue lighten-4" text-color="blue darken-2">
+    <v-chip v-if="!showResult" class="ma-2" color="blue lighten-4" text-color="blue darken-2">
   ⏳ Time: {{ minutes }}
 </v-chip>
-    <div v-if="quizList.length">
+    <div v-if="quizList.length && !showResult">
       <v-form ref="form" @submit.prevent="submitQuiz">
         <v-row v-for="(quiz, index) in quizList" :key="quiz.quizId" class="mb-6">
           <v-col cols="12">
@@ -77,7 +77,7 @@
       v-if="score >= passingScore * quizList.length"
       color="success"
       class="mt-4"
-      @click="goToCertificate('/certificate')"
+      @click="goToCertificate()"
     >  Generate Certificate
     </v-btn>
       </v-card-text>
@@ -156,9 +156,13 @@ export default {
         .getExamMark(this.languagesId)
         .then((response) => {
           if(response>0){
+            let languagesId = this.languagesId;
+      let coursesId = this.coursesId;
+      let query = { languagesId,coursesId };
              this.$router
           .push({
             path: "/certificate",
+             query,
           })
           .catch(() => {});
           }else{
@@ -179,8 +183,16 @@ export default {
     this.minutes = `${minutes}m ${seconds}s`;
   }, 1000);
 },
-    goToCertificate:function(path){
-        this.$router.push({ path }).catch(() => {});
+    goToCertificate:function(){
+        let languagesId = this.languagesId;
+      let coursesId = this.coursesId;
+      let query = { languagesId,coursesId };
+             this.$router
+          .push({
+            path: "/certificate",
+             query,
+          })
+          .catch(() => {});
     },
     fetchQuiz() {
       quizService
@@ -207,19 +219,26 @@ export default {
       }
 
       // Calculate score
-     this.score = this.quizList.reduce((acc, q) => {
-     const correctAnswerText = this.getCorrectAnswerText(q);
-     return acc + (this.userAnswers[q.quizId] === correctAnswerText ? 1 : 0);}, 0);
+     this.score = 0;
+     for(let i=0;i<this.quizList.length;i++){
+        let obj = this.quizList[i];
+        if(obj.ans==obj.correct){
+             this.score+=1
+        }
+     }
+    //  this.quizList.reduce((acc, q) => {
+    //  const correctAnswerText = this.getCorrectAnswerText(q);
+    //  return acc + (this.userAnswers[q.quizId] === correctAnswerText ? 1 : 0);}, 0);
 
       this.showResult = true;
-      const resultPayload = {
-      studentName: localStorage.getItem("userName"), 
-      score: this.score,
-      total: this.quizList.length,
-      date: new Date().toISOString(),
-      answers: this.userAnswers,
+      // const resultPayload = {
+      // studentName: localStorage.getItem("userName"), 
+      // score: this.score,
+      // total: this.quizList.length,
+      // date: new Date().toISOString(),
+      // answers: this.userAnswers,
      
-      };
+      // };
    quizService
         .saveAns(this.coursesId,this.quizList,this.minutesCount)
         .then((response) => {
