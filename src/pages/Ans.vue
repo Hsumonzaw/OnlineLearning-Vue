@@ -3,7 +3,7 @@
     <!-- Table Section -->
    <v-row class="title">
       <v-col cols="12">
-        <h2 style="background-color:rgb(136, 210, 230); text-align: center;" >Student Answers</h2>
+        <h2 style="background-color:rgb(136, 210, 230); text-align: center;" >Student Exam Marks<i class="fa fa-mars-stroke-v" aria-hidden="true"></i></h2>
         <v-col cols="2" class="pl-1 pt-2">
  <!-- <v-autocomplete
   v-model="selectedUserId"
@@ -38,15 +38,15 @@
               @click="selectedOne = item"
               :style="{
                 backgroundColor:
-                  item.ansId == selectedOne.ansId
+                  item.examId == selectedOne.examId
                     ? '#def3ff'
                     : 'transparent',
               }"
             >
               <td class="text-center">{{ index + 1 }}</td>
-              <td class="text-center">{{ item.languageName }}</td>
-              <td class="text-center">{{ item.userName }}</td>
-              <td class="text-center" >{{item.totalAns }}</td>
+              <td class="text-center">{{ item.languagesDto?.name }}</td>
+              <td class="text-center">{{ item.userAccountDto?.name }}</td>
+              <td class="text-center" >{{item.examMark }}</td>
 
               
              
@@ -83,13 +83,14 @@ export default {
     ans: {},
     selectedUserId : null,
     userData : {},
-    examId :0,
+    
     
   }),
   props: {},
  mounted() {
   this.userListMethod();
   this.languageListMethod();
+  this.ansListMethod();
 },
 
 methods: {
@@ -110,13 +111,15 @@ methods: {
 
  ansListMethod() {
   ansService
-    .getExamMark()
+    .getExamans()
     .then((response) => {
-      this.ansList = response.map(item => ({
-        languageName: item.coursesDto.name,   // from backend DTO
-        userName: item.userAccountDto.name,
-        totalAns: item.examMark               // exam mark
-      }));
+      // this.ansList = response.map(item => ({
+      //   languageName: item.coursesDto.languagesDto.name,   // from backend DTO
+      //   userName: item.userAccountDto.name,
+      //   examMark: item.examMark               // exam mark
+      // }));
+      this.ansList = response;
+      console.log(response);
     })
     .catch((err) => console.error("Fetch error:", err));
 },
