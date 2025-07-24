@@ -1,7 +1,7 @@
 <template>
   <v-container
     fluid
-    class="pa-4 pt-16 login-full"
+    class=" login-full"
     style="background-color: #f0f4f8"
   >
     <v-row no-gutters>

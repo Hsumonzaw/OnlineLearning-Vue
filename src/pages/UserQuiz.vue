@@ -12,7 +12,9 @@
     >
       Failed to load quiz.
     </v-alert> -->
-    <span>{{ minutes }}</span>
+    <v-chip class="ma-2" color="blue lighten-4" text-color="blue darken-2">
+  ⏳ Time: {{ minutes }}
+</v-chip>
     <div v-if="quizList.length">
       <v-form ref="form" @submit.prevent="submitQuiz">
         <v-row v-for="(quiz, index) in quizList" :key="quiz.quizId" class="mb-6">
@@ -82,7 +84,7 @@
     </v-card>
 
     <!-- Review Section -->
-    <v-card v-if="showResult" class="mt-6 pa-4" outlined>
+    <!-- <v-card v-if="showResult" class="mt-6 pa-4" outlined>
       <v-card-title>Review Your Answers</v-card-title>
       <v-card-text>
         <v-list dense>
@@ -123,7 +125,7 @@
           </v-list-item>
         </v-list>
       </v-card-text>
-    </v-card>
+    </v-card> -->
   </v-container>
 </template>
 
@@ -142,7 +144,7 @@ export default {
       passingScore: 0.6, // 60%
       languagesId :0,
       coursesId:0,
-      minutes:"abc",
+      minutes:"0m 0s",
       minutesCount:0,
     };
   },

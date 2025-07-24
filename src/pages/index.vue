@@ -199,109 +199,165 @@
     
     style="border-radius: 16px;  width: 500px; height: 500px;"
   />
+  <v-dialog v-model="showForm" max-width="700px">
+  <v-card class="pa-4" elevation="4" style="background-color: #e8f5e9;">
+    <v-card-title class="d-flex justify-space-between align-center">
+      <span class="text-h5 font-weight-bold">Add User</span>
+      <v-btn icon color="red" @click="showForm = false">
+        <v-icon>mdi-close</v-icon>
+      </v-btn>
+    </v-card-title>
+
+    <v-card-text>
+      <v-container fluid>
+        <v-row dense>
+          <!-- Start Date -->
+          <v-col cols="12" sm="6">
+            <v-menu
+              v-model="startMenu"
+              :close-on-content-click="false"
+              transition="scale-transition"
+              offset-y
+            >
+              <template v-slot:activator="{ props }">
+                <v-text-field
+                  v-model="user.startDate"
+                  label="From Date"
+                  readonly
+                  v-bind="props"
+                  variant="outlined"
+                  density="compact"
+                />
+              </template>
+              <v-date-picker
+                v-model="startPicker"
+                @input="user.startDate = startPicker"
+                color="primary"
+                hide-header
+              />
+            </v-menu>
+          </v-col>
+
+          <!-- Name -->
+          <v-col cols="12" sm="6">
+            <v-text-field
+              v-model="user.name"
+              label="Full Name"
+              :rules="[(v) => !!v || 'Name is required']"
+              variant="outlined"
+              density="compact"
+            />
+          </v-col>
+
+          <!-- Username -->
+          <v-col cols="12" sm="6">
+            <v-text-field
+              v-model="user.userName"
+              label="Username"
+              :rules="[(v) => !!v || 'Username is required']"
+              variant="outlined"
+              density="compact"
+            />
+          </v-col>
+
+          <!-- Age -->
+          <v-col cols="12" sm="6">
+            <v-text-field
+              v-model="user.age"
+              label="Age"
+              type="number"
+              :rules="[(v) => !!v || 'Age is required']"
+              variant="outlined"
+              density="compact"
+            />
+          </v-col>
+
+          <!-- NRC -->
+          <v-col cols="12" sm="6">
+            <v-text-field
+              v-model="user.nrc"
+              label="NRC"
+              :rules="[rules.required, rules.nrc]"
+              variant="outlined"
+              density="compact"
+              required
+            />
+          </v-col>
+
+          <!-- Email -->
+          <v-col cols="12" sm="6">
+            <v-text-field
+              v-model="user.email"
+              label="Email"
+              :rules="[rules.required, rules.email]"
+              variant="outlined"
+              density="compact"
+              required
+            />
+          </v-col>
+
+          <!-- Password -->
+          <v-col cols="12" sm="6">
+            <v-text-field
+              v-model="user.password"
+              label="Password"
+              type="password"
+              :rules="[(v) => !!v || 'Password is required']"
+              variant="outlined"
+              density="compact"
+            />
+          </v-col>
+
+          <!-- Phone Number -->
+          <v-col cols="12" sm="6">
+            <v-text-field
+              v-model="user.phonenum"
+              label="Phone Number"
+              :rules="[rules.required, rules.phone]"
+              variant="outlined"
+              density="compact"
+              required
+            />
+          </v-col>
+
+          <!-- Address -->
+          <v-col cols="12">
+            <v-text-field
+              v-model="user.address"
+              label="Address"
+              variant="outlined"
+              density="compact"
+            />
+          </v-col>
+
+          <!-- Degree -->
+          <v-col cols="12" sm="6">
+            <v-text-field
+              v-model="user.degree"
+              label="Degree"
+              :rules="[(v) => !!v || 'Degree is required']"
+              variant="outlined"
+              density="compact"
+            />
+          </v-col>
+        </v-row>
+      </v-container>
+    </v-card-text>
+
+    <v-card-actions class="justify-end">
+      <v-btn color="blue darken-1" class="white--text" @click="saveUser">
+        {{ saveOrupdate }}
+      </v-btn>
+    </v-card-actions>
+  </v-card>
+</v-dialog>
+
 
 
 
 </v-container>
   </v-app>
-   <v-dialog v-model="showForm" max-width="600" style="height: 730px">
-      <v-card class="form pa-1" elevation="4" mb-0>
-        <v-card-title class="d-flex justify-space-between align-center">
-          <span class="text-h4">Add User</span>
-          <v-btn icon color="red" @click="showForm = false">
-            <v-icon>mdi-close</v-icon>
-          </v-btn>
-        </v-card-title>
-        <v-card-text>
-          <v-menu
-            v-model="startMenu"
-            full-width
-            max-width="200px"
-            min-width="290px"
-            v-bind:close-on-content-click="false"
-          >
-            <template v-slot:activator="{ props }">
-              <v-text-field
-                v-model="user.startDate"
-                density="compact"
-                variant="outlined"
-                label="From Date"
-                readonly
-                v-bind="props"
-              ></v-text-field>
-            </template>
-            <v-date-picker
-              v-model="startPicker"
-              color="primary"
-              hide-header
-            ></v-date-picker>
-          </v-menu>
-
-          <v-text-field
-          
-            label="Name"
-            v-model="user.name"
-            :rules="[(v) => !!v || 'required']"
-          ></v-text-field>
-
-          <v-text-field
-            label="User Name"
-            v-model="user.userName"
-            :rules="[(v) => !!v || 'required']"
-          ></v-text-field>
-
-          <v-text-field
-            label="Age"
-            v-model="user.age"
-            :rules="[(v) => !!v || 'required']"
-          ></v-text-field>
-
-          <v-text-field
-            v-model="user.nrc"
-            label="NRC"
-            :rules="[rules.required, rules.nrc]"
-            required
-          ></v-text-field>
-
-          <v-text-field
-            v-model="user.email"
-            label="Email"
-            :rules="[rules.required, rules.email]"
-            required
-          ></v-text-field>
-
-          <v-text-field
-            label="Password"
-            v-model="user.password"
-            :rules="[(v) => !!v || 'required']"
-          ></v-text-field>
-
-          <v-text-field
-            v-model="user.phonenum"
-            label="Phone Number"
-            :rules="[rules.required, rules.phone]"
-            required
-          ></v-text-field>
-
-           <v-text-field label="Address" v-model="user.address"></v-text-field>
-         
-
-          <v-text-field
-            label="Degree"
-            v-model="user.degree"
-            :rules="[(v) => !!v || 'required']"
-          ></v-text-field>
-        </v-card-text>
-        <v-card-actions class="justify-end pr-5">
-          <v-btn
-            class="text-black"
-            style="background-color: #2196f3"
-            @click="saveUser()"
-            >{{ saveOrupdate }}</v-btn
-          >
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
+   
 </template>
 
 
