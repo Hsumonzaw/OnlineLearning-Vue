@@ -218,7 +218,7 @@ export default {
     });
   } else {
    
-      this.language.userAccountId = this.userData.userId;
+      // this.language.userAccountId = this.userData.userId;
     languageService
     .updateLanguage(this.language).then((response) => {
       this.saveOrupdate = "SAVE";
@@ -240,26 +240,26 @@ export default {
         .getLanguageList()
         .then((response) => {
 
-         if (this.userData.role === "TEACHER") {
-       const filteredLessons = response.filter(language => {
-  const creatorId = 
-    language.userAccount?.userAccountId || 
-    language.userAccountId || 
-    language.lessonsDto?.userAccount?.userAccountId;
+//          if (this.userData.role === "TEACHER") {
+//        const filteredLessons = response.filter(language => {
+//   const creatorId = 
+//     language.userAccount?.userAccountId || 
+//     language.userAccountId || 
+//     language.lessonsDto?.userAccount?.userAccountId;
 
-  console.log("Language creator userAccountId:", creatorId);
-  console.log("Logged-in userId:", this.userData.userId);
-  console.log("Language item:", language);
+//   console.log("Language creator userAccountId:", creatorId);
+//   console.log("Logged-in userId:", this.userData.userId);
+//   console.log("Language item:", language);
 
-  return creatorId == this.userData.userId;
-});
+//   return creatorId == this.userData.userId;
+// });
 
-        this.languageList.splice(0);
-        this.languageList.push(...filteredLessons);
-      } else {
+//         this.languageList.splice(0);
+//         this.languageList.push(...filteredLessons);
+//       } else {
         this.languageList.splice(0);
         this.languageList.push(...response);
-      }
+ //     }
         })
         .catch((error) => {
           this.$swal("Fail!", error.response.data.message, "error");
