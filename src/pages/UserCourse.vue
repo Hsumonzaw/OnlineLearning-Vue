@@ -14,6 +14,11 @@
             class="mt-4"
           >
             <v-card class="pa-6 text-center ml-2 h-100 d-flex flex-column" variant="text">
+              <div class="d-flex justify-end">
+                 <a  color="success" class="mt-4" @click="goToLesson()">
+                  <v-img src="@/assets/next.png" alt="Logo"  style="width: 40px; height: 35px; margin-right: 8px;" />
+                 </a>
+              </div>
               <v-avatar size="250" class="mb-4 mx-auto course-avatar" rounded="circle">
                 <v-img
                   :src="getCoursePhotoUrl(courses.cphoto)"
@@ -23,22 +28,16 @@
                   loading="lazy"
                 />
               </v-avatar>
-<!-- :lazy-src="getCoursePhotoUrl(courses.cphoto) + '?thumb=true'" -->
               <div class="flex-grow-1 d-flex flex-column justify-center">
-                <p class="mb-3 font-weight-bold text-wrap product-title" style="font-size: 18px">
+                <p class="mb-3 font-weight-bold text-wrap product-title" style="font-size: 18px; color: blue;">
                   {{  courses.languagesDto?.name }}
                 </p>
               </div>
-              <div class="flex-grow-1 d-flex flex-column justify-center">
-                <p class="mb-3 font-weight-bold text-wrap product-title" style="font-size: 18px">
-                  {{  courses.amount }}
-                </p>
+              <div class="d-flex justify-center align-center">
+              <img src="@/assets/save-money.png" alt="Money Icon" style="width: 40px; height: 40px; margin-right: 12px;"/>
+          <span class="text-body-1 font-weight-medium " style="color: black;">{{ courses.amount }} Kyats</span>
               </div>
-              <!-- <div class="">
-                <p class="mb-3 font-weight-bold product-detail" style="font-size: 15px">
-                  {{ product?.detail }}
-                </p>
-              </div> -->
+             
               <div class="pt-5">
                 <v-btn
                   rounded
@@ -74,6 +73,15 @@ export default {
     this.coursesListMethod();
   },
   methods: {
+    goToLesson(){
+       this.$router
+          .push({
+            path: "/userlessons",
+             
+          })
+          .catch(() => {});
+
+    },
     download(pdf) {
       
       if (!pdf) {
@@ -108,7 +116,7 @@ export default {
 </script>
 <style scoped>
 .v-container {
-  background: linear-gradient(135deg, #79d4eb 0%, #5c83aa 60%, #42a5f5 100%);
+  background: #b3e5fc;
 }
 
 p {
@@ -188,8 +196,8 @@ p {
 
 /* Glassmorphism card */
 .v-card {
-  /* background: linear-gradient(120deg, #084f91 0%, #1976d2 100%); */
-  background: transparent !important;
+   /* background: linear-gradient(120deg, #084f91 0%, #247ed9 100%);  */
+  background: transparent !important; 
 
   backdrop-filter: blur(15px);
   -webkit-backdrop-filter: blur(15px);

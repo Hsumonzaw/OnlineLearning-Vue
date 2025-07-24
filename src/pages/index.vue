@@ -63,43 +63,49 @@
 
       <Motion preset="slideVisibleBottom" :duration="500" :delay="index * 200">
       <v-card
-     class="glass-card text-center d-flex flex-column align-center justify-space-between"
-     elevation="8"
-     style="border-radius: 30px; padding: 20px; transition: transform 0.3s;">
-        <v-avatar size="180" class="mb-4 mx-auto" rounded="circle">
-          <v-img
-            :src="getCoursePhotoUrl(courses.cphoto)"
-            alt="Course"
-            cover
-            loading="lazy"
-          />
-        </v-avatar>
-         <div class="mt-2">
-        <h3 class="text-h6 font-weight-bold mb-2" style="color:#4577ed;">
-        {{ courses.languagesDto?.name }}
-        </h3>
+  class="glass-card text-center d-flex flex-column align-center justify-space-between"
+  elevation="8"
+  style="border-radius: 30px; padding: 20px; transition: transform 0.3s; height: 500px; max-height: 500px;"
+>
+  <v-avatar size="180" class="mb-4 mx-auto" rounded="circle">
+    <v-img
+      :src="getCoursePhotoUrl(courses.cphoto)"
+      alt="Course"
+      cover
+      loading="lazy"
+    />
+  </v-avatar>
 
-        <!-- description -->
-        <p class="text-subtitle-2 mt-1" style="color: #546e7a;">
-          {{ courses?.description }}
-       </p>
-        </div>
-        <v-chip
-      color="green lighten-2"
-      text-color="white"
-      class="mb-2 font-weight-bold"
-      style="font-size: 16px;"
-    >
-      💵 Fee: {{ courses.amount }} MMK
-    </v-chip>
-        <v-btn
-          color="primary"
-          :href="`/lessons/${lessonsId}`"
-           class="mt-4 px-6 py-2 text-uppercase font-weight-bold"
-         style=" background: linear-gradient(45deg, #4fc3f7, #1976d2);color: white;border-radius: 25px;transition: 0.3s ease; "
-        >Interested
-        </v-btn>
-      </v-card>
+  <div class="mt-2" style="flex: 1; overflow: hidden;">
+    <h3 class="text-h6 font-weight-bold mb-2" style="color:#4577ed;">
+      {{ courses.languagesDto?.name }}
+    </h3>
+
+    <!-- description -->
+    <p class="text-subtitle-2 mt-1" style="color: #546e7a; max-height: 60px; overflow: hidden; text-overflow: ellipsis;">
+      {{ courses?.description }}
+    </p>
+  </div>
+
+  <v-chip
+    color="green lighten-2"
+    text-color="white"
+    class="mb-2 font-weight-bold"
+    style="font-size: 16px;"
+  >
+    💵 Fee: {{ courses.amount }} MMK
+  </v-chip>
+
+  <v-btn
+    color="primary"
+    :href="`/lessons/${lessonsId}`"
+    class="mt-4 px-6 py-2 text-uppercase font-weight-bold"
+    style="background: linear-gradient(45deg, #4fc3f7, #1976d2); color: white; border-radius: 25px; transition: 0.3s ease;"
+  >
+    Interested
+  </v-btn>
+</v-card>
+
           </Motion>
     </v-col>
   </v-row>
@@ -350,10 +356,6 @@
     </v-card-actions>
   </v-card>
 </v-dialog>
-
-
-
-
 </v-container>
   </v-app>
    
@@ -402,19 +404,6 @@ export default {
     userTypeList: ["ALL", "STAFF", "STUDENT", "TEACHER", "ADMIN"],
     user: { userType: "TEACHER" },
     saveOrupdate: "SAVE",
-
-       
-      
-    //   isLoggedIn: false,
-    //  showHero: false,
-    //   courses:[
-    //     {
-    //       name:"java",
-    //       img:"@/assets/java.jp",
-    //       description:"asdfgjkjgkjlgjljgkjgljldjalsjfsjfdkj",
-    //     },
-    //   ],
-    // };
   }
 },
   

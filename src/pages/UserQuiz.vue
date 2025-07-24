@@ -1,27 +1,31 @@
 <template>
   <v-container class="pa-8" max-width="700">
-    <h2 class="text-h4 mb-6 text-center">Quiz</h2>
+    <h2 class="text-h4 mb-6 text-center font-weight-bold " style="color:blue;">Quiz</h2>
+    <p class="text-subtitle-1 text-center mb-4" style="color: #546e7a;">
+    Achieve a minimum of 50 to pass. A score of 60 or higher qualifies you for a certificate.
+   </p>
 
-    <!-- <v-alert
-      v-if="loadError"
-      type="error"
-      class="mb-6"
-      dense
-      border="left"
-      colored-border
-    >
-      Failed to load quiz.
-    </v-alert> -->
     <v-chip v-if="!showResult" class="ma-2" color="blue lighten-4" text-color="blue darken-2">
   ⏳ Time: {{ minutes }}
 </v-chip>
     <div v-if="quizList.length && !showResult">
-      <v-form ref="form" @submit.prevent="submitQuiz">
-        <v-row v-for="(quiz, index) in quizList" :key="quiz.quizId" class="mb-6">
-          <v-col cols="12">
-            <div class="font-weight-medium mb-2">
-              Q{{ index + 1 }}: {{ quiz.name }}
+     <v-form ref="form" @submit.prevent="submitQuiz">
+    <transition-group name="fade-slide" tag="div">
+      <v-row
+        v-for="(quiz, index) in quizList"
+        :key="quiz.quizId"
+        class="mb-4"
+      >
+        <v-col cols="12">
+          <v-card
+            elevation="4"
+            class="pa-4"
+            style="border-radius: 16px; background: #e1f5fe ;"
+          >
+            <div class="font-weight-bold mb-3 text-subtitle-1" style="color: #1976d2;">
+              Q{{ index + 1 }}. {{ quiz.name }}
             </div>
+
             <v-radio-group
               v-model="quiz.ans"
               :mandatory="true"
@@ -30,33 +34,38 @@
               <v-radio
                 :label="quiz.ansone"
                 :value="1"
-                dense
-                color="primary"
+                color="blue darken-2"
+                class="mb-2"
               />
               <v-radio
                 :label="quiz.anstwo"
                 :value="2"
-                dense
-                color="primary"
+                color="blue darken-2"
+                class="mb-2"
               />
               <v-radio
                 :label="quiz.ansthree"
                 :value="3"
-                dense
-                color="primary"
+                color="blue darken-2"
               />
             </v-radio-group>
-          </v-col>
-        </v-row>
+          </v-card>
+        </v-col>
+      </v-row>
+    </transition-group>
 
-        <v-btn
-          color="primary"
-          class="mt-4"
-          type="submit"
-        >
-          Submit
-        </v-btn>
-      </v-form>
+    <div class="text-center mt-6">
+      <v-btn
+        color="primary"
+        class="px-6 py-3 text-uppercase font-weight-bold"
+        style="border-radius: 25px; background: linear-gradient(45deg, #42a5f5, #1565c0);"
+        type="submit"
+      >
+        Submit Quiz
+      </v-btn>
+    </div>
+  </v-form>
+
     </div>
 
     <!-- Result Card -->
@@ -141,7 +150,7 @@ export default {
       loadError: false,
       showResult: false,
       score: 0,
-      passingScore: 0.6, // 60%
+      passingScore: 0.6, 
       languagesId :0,
       coursesId:0,
       minutes:"0m 0s",
