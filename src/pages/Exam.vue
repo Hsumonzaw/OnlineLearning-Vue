@@ -31,7 +31,10 @@
               </div>
              <v-btn>
             <a v-if="language.buy==1" @click="clickTakeExam(language)" class="font-weight-bold  learn-more-btn">Take Exam</a>
-            <a v-else @click="handleExam(language)" class="font-weight-bold  learn-more-btn">Start Now</a>
+            <a v-else @click="handleExam(language)" class="font-weight-bold  learn-more-btn d-flex align-center" style="cursor: pointer;">
+              Subscribe Now
+            <v-img src="@/assets/lock.png" alt="Logo"  style="width: 40px; height: 35px; margin-right: 8px;" />
+            </a>
 
             </v-btn>
 
@@ -296,12 +299,12 @@ if (this.userData.password!=undefined &&  this.userData?.password!="") {
         });
       } else {
         this.$swal({
-          title: "Buy Now",
-          text: "Now Now",
+          title: "Purchase Exam",
+          text: "Would you like to purchase access to the exam now?",
           icon: "info",
           showCancelButton: true,
-          confirmButtonText: "Buy",
-          cancelButtonText: "Cancel",
+          confirmButtonText: "Yes",
+          cancelButtonText: "May be later",
         }).then((result) => {
           if (result.isConfirmed) {
             //window.location.href = "/register";
