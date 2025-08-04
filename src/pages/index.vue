@@ -481,7 +481,7 @@ export default {
 async saveUser() {
   try {
     // Create user (returns ID)
-    const createdUserId = await userService.addUser(this.user);
+    const createdUserId = await userService.addUserFree(this.user);
 
     // Upload photo if provided
     if (this.photo) {
@@ -491,6 +491,7 @@ async saveUser() {
     }
     if (this.file) {
       const fileForm = new FormData();
+      
       fileForm.append("file", this.file);
       await userService.updateFile(fileForm, createdUserId);
     }

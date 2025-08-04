@@ -253,13 +253,16 @@ export default {
     startMenu: false,
     dialogBuyNow:false,
     rgType:"courses",
+    languagesId:0,
   }),
   mounted() {
     this.user.startDate = format(this.startPicker, "dd-MM-yyyy");
     this.userData = JSON.parse(localStorage.getItem("user")) || {};
+    this.languagesId = this.$route.query.languagesId;
   //  if (this.userData.role == undefined || this.userData?.role == "STUDENT") {
   //     this.showEnrollButton = true;
   //   }
+
     this.languageListMethod();
   },
   methods: {
@@ -386,7 +389,18 @@ export default {
         .then((response) => {
           this.languageList.splice(0);
           this.languageList.push(...response);
-          this.selectedOne = this.languageList[0];
+          if(this.languagesId==undefined){
+            this.selectedOne = this.languageList[0];
+          }else{
+          for(let i=0;i<this.languageList.length;i++){
+            let obj = this.languageList[i];
+              if(this.languagesId==obj.languagesId){
+                this.selectedOne = obj;
+              }
+          }
+          }
+
+         
           this.clickLanguage(this.selectedOne); // auto-load first
         })
         .catch((error) => {

@@ -47,7 +47,7 @@
         class="text-subtitle-2 text-center mb-4"
         style="color: #616161; max-width: 400px; margin: 0 auto;"
       >
-        For successfully completing the quiz with a score of
+        For successfully completing {{ languagesName }} quiz with a score of
         <strong>{{ score }} / {{ total }}</strong>
       </p>
 
@@ -66,12 +66,12 @@
           class="text-subtitle-2"
           style="color: #424242; font-weight: 600;"
         >
-          Director of Exams
+          Principle of LearnHub
         </div>
       </v-row>
 
       <v-row justify="center" class="mt-8">
-        <v-btn color="primary" rounded elevation="6" large style="text-transform: none;">
+        <v-btn @click="pdfCertificate()" color="primary" rounded elevation="6" large style="text-transform: none;">
      <v-icon left>mdi-download</v-icon> Download Certificate
       </v-btn>
       </v-row>
@@ -83,6 +83,7 @@
 <script>
 import Useraccount from './Useraccount.vue';
 import quizService from "../service/QuizService.js";
+import axios from "@/config";
 export default {
   data: () => ({
       languagesId:0,
@@ -91,15 +92,18 @@ export default {
       score:0,
       total:0,
       name:"",
+      languagesName:"",
   }),
    props: {},
   mounted: function() {
-     this.languagesId = this.$route.query.languagesId;
+     this.languagesId = this.$route.query.languagesId;    
     this.coursesId = this.$route.query.coursesId;
     this.userData = JSON.parse(localStorage.getItem("user"));
+
        quizService
         .getExamMark(this.languagesId)
         .then((response) => {
+          
           this.score = response;
           this.total = 100;
             
@@ -107,9 +111,34 @@ export default {
         .catch(() => {
           this.loadError = true;
         }); 
-        this.name = this.userData.userName;
+       quizService.getQuizStudent(this.languagesId)
+  .then((res) => {
+    console.log(res);
+          this.languagesName = res[0].languages.name;
+
+
+    // if (Array.isArray(res) && res.length > 0) {
+    //   this.languagesName = res[0].languages.name;
+    // } else {
+    //   this.languagesName = "Unknown";
+    // }
+  });
+
+
+  this.name = this.userData.userName;
+},
+  methods: {
+    pdfCertificate:function(){
+       quizService.pdfCertificate(this.score,this.languagesName).then((data) => {
+        const url = window.URL.createObjectURL(new Blob([data.data]));
+        const link = document.createElement("a");
+        link.href = url;
+        link.setAttribute("download", this.name+" ("+new Date().toISOString().substr(0, 10)+").pdf");
+        document.body.appendChild(link);
+        link.click();
+      });
+    }
   },
-  methods: {},
   computed: {
     // name() {
     //   return this.$route.query.name || "Student";

@@ -308,6 +308,8 @@ export default {
   languageService
     .getLanguageList()
     .then((response) => {
+
+      
       this.languageList = response.map(lang => ({
         ...lang,
         displayName: lang.name || lang.languageName || lang.languagesName || "Unknown"
@@ -323,6 +325,7 @@ export default {
       quizService
         .getQuizList()
         .then((response) => {
+          
           this.quizList.splice(0);
           this.quizList.push(...response);
         })

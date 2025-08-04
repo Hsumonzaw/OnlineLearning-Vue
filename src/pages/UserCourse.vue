@@ -15,7 +15,7 @@
           >
             <v-card class="pa-6 text-center ml-2 h-100 d-flex flex-column" variant="text">
               <div class="d-flex justify-end">
-                 <a  color="success" class="mt-4" @click="goToLesson()">
+                 <a  color="success" class="mt-4" @click="goToLesson(courses)">
                   <v-img src="@/assets/next.png" alt="Logo"  style="width: 40px; height: 35px; margin-right: 8px;" />
                  </a>
               </div>
@@ -73,13 +73,14 @@ export default {
     this.coursesListMethod();
   },
   methods: {
-    goToLesson(){
-       this.$router
-          .push({
-            path: "/userlessons",
-             
-          })
-          .catch(() => {});
+    goToLesson(courses){
+      //console.log(languages);
+      let languagesId = courses.languagesDto.languagesId;
+      let query = { languagesId };
+      this.$router.push({
+        name: "userlessons",
+        query,
+      });
 
     },
     download(pdf) {

@@ -37,7 +37,12 @@ class UserAccountService {
     headers: { "Content-Type": "application/json" },
   }).then((request) => request.data);
 }
-
+  addUserFree(user) {
+  let url = `/free/useraccounts`;
+  return this.axios.post(url, user, {
+    headers: { "Content-Type": "application/json" },
+  }).then((request) => request.data);
+}
 
  saveFreeUserAccounts(user) {
     let url = `/free/useraccounts`;

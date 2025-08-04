@@ -36,7 +36,17 @@ class QuizService {
     let url = `/ans/exammark/${languagesId}`;
     return this.axios.get(url).then((request) => request.data);
   }
-  
+  pdfCertificate(score,languagesName) {
+        return this.axios({
+          url: `/free/pdf/certificate`,
+          method: "GET",
+          responseType: "blob",
+          params: {
+          score, languagesName
+        }
+        });
+        
+    }
 }
 
 const service = new QuizService();
