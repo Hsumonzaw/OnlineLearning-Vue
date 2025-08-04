@@ -92,7 +92,7 @@
             elevation="8"
             class="pa-6 transition-swing text-center"
             :style="{
-              background: isHovering ? '#b3e5fc' : '#e1f5fe',
+              background: isHovering ? '#b3e5fc' : '# ',
               transform: isHovering ? 'scale(1.03)' : 'scale(1)',
               borderRadius: '24px',
               transition: 'all 0.4s ease-in-out'

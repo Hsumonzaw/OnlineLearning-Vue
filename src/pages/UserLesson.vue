@@ -83,7 +83,7 @@
     <v-dialog v-model="showForm" max-width="600" style="height: 730px">
       <v-card class="form pa-1" elevation="4" mb-0>
         <v-card-title class="d-flex justify-space-between align-center">
-          <span class="text-h4">Add User</span>
+          <span class="text-h4">Registration Form</span>
           <v-btn icon color="red" @click="showForm = false">
             <v-icon>mdi-close</v-icon>
           </v-btn>
@@ -102,6 +102,7 @@
                 density="compact"
                 variant="outlined"
                 label="From Date"
+                disabled
                 readonly
                 v-bind="props"
               ></v-text-field>
@@ -148,8 +149,13 @@
           <v-text-field
             label="Password"
             v-model="user.password"
-            :rules="[(v) => !!v || 'required']"
-          ></v-text-field>
+            :type="showPassword ? 'text' : 'password'"
+      :rules="passwordRules" :append-inner-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
+       @click:append-inner="showPassword = !showPassword"
+>
+          </v-text-field>
+                      <!-- :rules="[(v) => !!v || 'required']" -->
+
 
           <v-text-field
             v-model="user.phonenum"
@@ -158,7 +164,7 @@
             required
           ></v-text-field>
 
-          <v-text-field label="Address" v-model="user.address"></v-text-field>
+          <v-textarea label="Address" v-model="user.address"></v-textarea>
 
           <!-- <v-autocomplete
                   v-model="user.userType"
@@ -183,11 +189,11 @@
             filled
           ></v-autocomplete> -->
 
-          <v-text-field
+          <!-- <v-text-field
             label="Degree"
             v-model="user.degree"
             :rules="[(v) => !!v || 'required']"
-          ></v-text-field>
+          ></v-text-field> -->
         </v-card-text>
         <v-card-actions class="justify-end pr-5">
           <v-btn
@@ -236,6 +242,7 @@ export default {
     userData: {},
     lessonList: [],
     showEnrollButton: true,
+    showPassword : false,
     showForm: false,
     user: { userType: "STUDENT" },
     saveOrupdate: "SAVE",

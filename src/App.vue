@@ -6,7 +6,7 @@
           <v-avatar size="60" class="mr-2" color="white">
             <v-img src="@/assets/unilogo.png" alt="Logo" cover />
           </v-avatar>
-          CodeLingo
+        Learn Hub
         </v-toolbar-title>
 
         <v-spacer></v-spacer>
@@ -97,7 +97,7 @@
       <v-container>
         <v-row>
           <v-col cols="12" md="3">
-            <h3 class="font-weight-bold">CodeLingo</h3>
+            <h3 class="font-weight-bold">Learn Hub</h3>
             <p>Learn to code and speak new languages with us. Expert-led online courses to boost your skills from anywhere, at any time.</p>
             <v-row class="mt-2">
               <v-col cols="2" v-for="(icon, index) in socialIcons" :key="index">
@@ -137,7 +137,7 @@
 
         <v-divider class="my-4"></v-divider>
         <p class="text-center grey--text text--darken-1">
-          © 2025 CodeLingo. All Rights Reserved.
+          © 2025 Learn Hub. All Rights Reserved.
         </p>
       </v-container>
     </v-footer>

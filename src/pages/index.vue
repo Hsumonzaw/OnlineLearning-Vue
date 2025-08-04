@@ -17,8 +17,8 @@
               Join expert-led courses in programming, tech, and world languages all in one place.
             </p>
             
-              <router-link to="/aboutus" class="font-weight-bold  learn-more-btn">
-           Get Start  
+              <router-link to="/login" class="font-weight-bold  learn-more-btn">
+           Get Started  
         
             </router-link>
  
@@ -257,6 +257,7 @@
                   v-bind="props"
                   variant="outlined"
                   density="compact"
+                  disabled
                 />
               </template>
               <v-date-picker
@@ -305,8 +306,10 @@
             <v-text-field
               v-model="user.password"
               label="Password"
-              type="password"
-              :rules="[(v) => !!v || 'Password is required']"
+              
+              :type="showPassword ? 'text' : 'password'"
+              :rules="passwordRules" :append-inner-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
+              @click:append-inner="showPassword = !showPassword"
               variant="outlined"
               density="compact"
             />
@@ -353,7 +356,7 @@
 
           <!-- Address -->
           <v-col cols="12" sm="6">
-            <v-text-field
+            <v-textarea
               v-model="user.address"
               label="Address"
               variant="outlined"
@@ -437,6 +440,7 @@ export default {
       email: "",
       phone: "",
       nrc: "",
+      showPassword : false,
       rules: {
       required: (v) => !!v || "This field is required",
       email: (v) =>
