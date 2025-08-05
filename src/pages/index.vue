@@ -17,7 +17,7 @@
               Join expert-led courses in programming, tech, and world languages all in one place.
             </p>
             
-              <router-link to="/login" class="font-weight-bold  learn-more-btn">
+              <router-link to="/aboutus" class="font-weight-bold  learn-more-btn">
            Get Started  
         
             </router-link>
@@ -57,34 +57,45 @@
   <v-row justify="center" no-gutters>
   
     <v-col
-      v-for="(courses, index) in latestUserCourses"
-      :key="courses.coursesId"
+      v-for="(languages, index) in latestUserLanguages"
+      :key="languages.languagesId"
      cols="12" sm="6" md="3" class="px-2 mb-6">
 
       <Motion preset="slideVisibleBottom" :duration="500" :delay="index * 200">
-      <v-card
+     <v-card
   class="glass-card text-center d-flex flex-column align-center justify-space-between"
   elevation="8"
   style="border-radius: 30px; padding: 20px; transition: transform 0.3s; height: 500px; max-height: 500px;"
 >
   <v-avatar size="180" class="mb-4 mx-auto" rounded="circle">
     <v-img
-      :src="getCoursePhotoUrl(courses.cphoto)"
+      :src="getLanguagePhotoUrl(languages.lanPhoto)"
       alt="Course"
       cover
       loading="lazy"
     />
   </v-avatar>
 
-  <div class="mt-2" style="flex: 1; overflow: hidden;">
+  <div class="mt-2" style="flex: 1; width: 100%;">
     <h3 class="text-h6 font-weight-bold mb-2" style="color:#4577ed;">
-      {{ courses.languagesDto?.name }}
+      {{ languages.name }}
     </h3>
 
-    <!-- description -->
-    <p class="text-subtitle-2 mt-1" style="color: #546e7a; max-height: 60px; overflow: hidden; text-overflow: ellipsis;">
-      {{ courses?.description }}
-    </p>
+    <!-- Updated Description Section -->
+    <div
+      style="
+        color: #546e7a;
+        font-size: 14px;
+        max-height: 100px;
+        overflow-y: auto;
+        text-align: left;
+        padding: 6px 10px;
+        border-radius: 8px;
+        
+      "
+    >
+      {{ languages.description }}
+    </div>
   </div>
 
   <v-chip
@@ -93,12 +104,12 @@
     class="mb-2 font-weight-bold"
     style="font-size: 16px;"
   >
-    💵 Fee: {{ courses.amount }} MMK
+    💵 Fee: {{ languages.amount }} MMK
   </v-chip>
 
   <v-btn
     color="primary"
-    :href="`/lessons/${lessonsId}`"
+    @click="goToUserCourses(languages.languagesId)"
     class="mt-4 px-6 py-2 text-uppercase font-weight-bold"
     style="background: linear-gradient(45deg, #4fc3f7, #1976d2); color: white; border-radius: 25px; transition: 0.3s ease;"
   >
@@ -106,11 +117,12 @@
   </v-btn>
 </v-card>
 
+
           </Motion>
     </v-col>
   </v-row>
   <v-container class="d-flex justify-end" mb-0>
-   <router-link to="/userteacher" class="font-weight-bold  learn-more-btn">
+   <router-link to="/userlessons" class="font-weight-bold  learn-more-btn">
      Learn More
       <v-icon end>mdi-chevron-right</v-icon>
 </router-link>
@@ -416,10 +428,9 @@
 
 
 <script>
-import coursesService from "@/service/CoursesService";
+import languageService from "../service/LanguageService.js";
 import axios from "@/config";
 import { format } from "date-fns";
-
 import userService from "@/service/UserAccountService";
 export default {
   data() {
@@ -449,7 +460,7 @@ export default {
       photoPreview: null,
       file : null,
 
-      latestUserCourses: [],
+      latestUserLanguages: [],
       teachers:[],
     
       valid: false,
@@ -481,7 +492,7 @@ export default {
   mounted() {
     this.user.startDate = format(this.startPicker, "dd-MM-yyyy");
     
-    this.getLatestUserCourses();
+    this.getLatestUserLanguages();
     this.getTeachers();
     this.showForm = false;
     
@@ -540,21 +551,32 @@ async saveUser() {
 },
 
 
-     getLatestUserCourses() {
-      coursesService.getCourseList() 
+     getLatestUserLanguages() {
+      languageService.getLanguageList() 
         .then((response) => {
           // console.log("Course list response:", response);
           // Sort by ID (or createdAt if available), then take the latest 4
-          const sorted = response.sort((a, b) => b.coursesId - a.coursesId);
-          this.latestUserCourses = sorted.slice(0, 3);
+          const sorted = response.sort((a, b) => b.languagesId - a.languagesId);
+          this.latestUserLanguages = sorted.slice(0, 3);
         })
         .catch((error) => {
-          console.error("Failed to fetch courses:", error);
+          console.error("Failed to fetch languages:", error);
         });
     },
-    getCoursePhotoUrl(cphoto) {
-      return `${axios.defaults.baseURL}/coursephoto/${cphoto}.png`;
+     getLanguagePhotoUrl(lanPhoto) {
+      return `${axios.defaults.baseURL}/languagephoto/${lanPhoto}.png`;
     },
+    goToLesson(languages){
+     
+      let languagesId = languages.languagesId;
+      let query = { languagesId };
+      this.$router.push({
+        name: "userlessons",
+        query,
+      });
+
+    },
+    
     
  getTeachers() {
   userService.getUserListFree("TE")

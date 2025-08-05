@@ -5,8 +5,8 @@
       <v-col cols="12" md="12" class="px-2 mt-6 pt-2 pb-1">
         <v-row no-gutters align="stretch">
           <v-col
-            v-for="courses in coursesList"
-          :key="courses.coursesId "
+            v-for="languages in languagesList"
+          :key="languages.languagesId "
            
             cols="12"
             sm="12"
@@ -15,34 +15,33 @@
           >
             <v-card class="pa-6 text-center ml-2 h-100 d-flex flex-column" variant="text">
               <div class="d-flex justify-end">
-                 <a  color="success" class="mt-4" @click="goToLesson(courses)">
+                 <a  color="success" class="mt-4" @click="goToLesson(languages)">
                   <v-img src="@/assets/next.png" alt="Logo"  style="width: 40px; height: 35px; margin-right: 8px;" />
                  </a>
               </div>
               <v-avatar size="250" class="mb-4 mx-auto course-avatar" rounded="circle">
                 <v-img
-                  :src="getCoursePhotoUrl(courses.cphoto)"
-                  
-                  alt="Course"
+                  :src="getLanguagePhotoUrl(languages.lanPhoto)"
+                   alt="Course"
                   cover
                   loading="lazy"
                 />
               </v-avatar>
               <div class="flex-grow-1 d-flex flex-column justify-center">
                 <p class="mb-3 font-weight-bold text-wrap product-title" style="font-size: 18px; color: blue;">
-                  {{  courses.languagesDto?.name }}
+                  {{  languages.name }}
                 </p>
               </div>
               <div class="d-flex justify-center align-center">
               <img src="@/assets/save-money.png" alt="Money Icon" style="width: 40px; height: 40px; margin-right: 12px;"/>
-          <span class="text-body-1 font-weight-medium " style="color: black;">{{ courses.amount }} Kyats</span>
+          <span class="text-body-1 font-weight-medium " style="color: black;">{{ languages.amount }} Kyats</span>
               </div>
              
               <div class="pt-5">
                 <v-btn
                   rounded
                   prepend-icon="mdi-download"
-                  @click="download(courses.pdf)"
+                  @click="download(languages.pdf)"
                   class="mt-5 buttontext"
                 >
                   Download Book
@@ -56,11 +55,11 @@
   </v-container>
 </template>
 <script>
-import coursesService from "../service/CoursesService.js";
+import languageService from "../service/LanguageService.js";
 import axios from "@/config";
 export default {
   data: () => ({
-   coursesList: [
+   languagesList: [
         
     ],
     lessonsId: 0,
@@ -70,12 +69,13 @@ export default {
     // if (lessonsId !== undefined) {
     //   this.lessonsId = lessonsId;
     // }
-    this.coursesListMethod();
+    this.languagesListMethod();
+  
   },
   methods: {
-    goToLesson(courses){
-      //console.log(languages);
-      let languagesId = courses.languagesDto.languagesId;
+    goToLesson(languages){
+     
+      let languagesId = languages.languagesId;
       let query = { languagesId };
       this.$router.push({
         name: "userlessons",
@@ -91,22 +91,23 @@ export default {
       }
       const baseURL = axios?.defaults?.baseURL || "";
 
-      const pdfUrl = `${baseURL}/coursefile/${pdf}.pdf`;
+      const pdfUrl = `${baseURL}/languagefile/${pdf}.pdf`;
 
       window.open(pdfUrl, "_blank");
     },
-    getCoursePhotoUrl(cphoto) {
+    getLanguagePhotoUrl(lanPhoto) {
+      //  console.log('lanPhoto:', lanPhoto);
       // const baseURL = axios?.defaults?.baseURL || "";
-      // return cphoto ? `${baseURL}/coursephoto/${cphoto}.png` : "";
-        return `${axios.defaults.baseURL}/coursephoto/${cphoto}.png`;
+      // return lanPhoto ? `${baseURL}/coursephoto/${lanPhoto}.png` : "";
+        return `${axios.defaults.baseURL}/languagephoto/${lanPhoto}.png`;
       
     },
-    coursesListMethod() {
-      coursesService
-        .getCourseList(this.coursesId)
+    languagesListMethod() {
+      languageService
+        .getLanguageList(this.languagesId)
         .then((response) => {
-          this.coursesList.splice(0, this.coursesList.length);
-          this.coursesList.push(...response);
+          this.languagesList.splice(0, this.languagesList.length);
+          this.languagesList.push(...response);
         })
         .catch((error) => {
            this.$swal("Fail!", error.response.data.message, "error");

@@ -55,7 +55,7 @@ export default {
               //this.$emit('userMethod');
         })
         .catch(error => {
-          this.$swal("မအောင်မြင်ပါ", error.response.data.message, "error");
+          this.$swal("Fail", error.response.data.message, "error");
         });
     },
         changeFile: function(e) {
