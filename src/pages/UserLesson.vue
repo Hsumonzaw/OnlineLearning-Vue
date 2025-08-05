@@ -251,7 +251,7 @@ export default {
       email: (v) =>
         /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) || "Invalid email format",
       phone: (v) =>
-        /^(?:\+?95|0)(?:9\d{7,9})$/.test(v) || "Invalid Myanmar phone number",
+        /^(?:0|\+95)9[24679]\d{7,9}$/.test(v) || "Invalid Myanmar phone number",
       nrc: (v) =>
         /^\d{1,12}\/[A-Z]{3}\([A-Z]\)\d{6}$/.test(v) || "Invalid NRC format",
     },

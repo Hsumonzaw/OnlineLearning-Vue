@@ -196,6 +196,11 @@
                  @click="saveQuiz()">{{
                   saveOrupdate
                 }}</v-btn>
+                <v-btn  class="text-black"
+                style="background-color: red;" 
+                  @click="showForm = false">
+                  CANCEL
+              </v-btn>
               </v-card-actions>
 
             
@@ -207,7 +212,7 @@
       <v-card>
         <v-card-title class="text-h5 white--text bg-red">Delete</v-card-title>
         <v-card-text class="text-h6">
-          Are you sure to delete({{ selectedOne.name }})?
+          Are you sure to delete {{ selectedOne.languages?.name }}'s quiz?
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>

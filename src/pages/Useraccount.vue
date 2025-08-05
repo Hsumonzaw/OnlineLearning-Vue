@@ -54,7 +54,7 @@
               <th class="text-center white--text bg-primary">Photo</th>
               <th class="text-center white--text bg-primary">Degree</th>
               <th class="text-center white--text bg-primary">File</th>
-              <th class="text-center white--text bg-primary">Action</th>
+              <!-- <th class="text-center white--text bg-primary">Action</th> -->
             </tr>
           </thead>
           <tbody>
@@ -93,7 +93,7 @@
               <td class="text-center">{{ item.degree }}</td>
               <td class="text-center">{{ item.file }}</td>
 
-              <td class="text-center">
+              <!-- <td class="text-center">
                 <v-btn class="ml-1" small icon color="black" density="compact">
                   <v-icon size="small" @click="FileMethod(item)"
                     >mdi-file</v-icon
@@ -124,7 +124,7 @@
                 >
                   <v-icon size="small">mdi-delete</v-icon></v-btn
                 >
-              </td>
+              </td> -->
             </tr>
             <v-divider />
           </tbody>
@@ -322,7 +322,7 @@ export default {
       email: (v) =>
         /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) || "Invalid email format",
       phone: (v) =>
-        /^(?:\+?95|0)(?:9\d{7,9})$/.test(v) || "Invalid Myanmar phone number",
+        /^(?:0|\+95)9[24679]\d{7,9}$/.test(v) || "Invalid Myanmar phone number",
       nrc: (v) =>
         /^\d{1,2}\/[A-Z]{3}\([A-Z]\)\d{6}$/.test(v) || "Invalid NRC format",
     },

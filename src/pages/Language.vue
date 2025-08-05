@@ -25,9 +25,14 @@
             <tr>
               <th class="text-center white--text bg-primary">No.</th>
               <th class="text-center white--text bg-primary">Name</th>
+              <th class="text-center white--text bg-primary" v-if="showdemand">Language Photo</th>
+
               <th class="text-center white--text bg-primary" v-if="showTeacher">Amount</th>
               <!-- <th class="text-center white--text bg-primary">Exam Link</th> -->
               <th class="text-center white--text bg-primary" v-if="showTeacher">Exam Fee</th>
+              <th class="text-center white--text bg-primary" v-if="showdemand">Book Link</th>
+              <th class="text-center white--text bg-primary" v-if="showdemand">Descriptions</th>
+
               <th class="text-center white--text bg-primary">Action</th>
             </tr>
           </thead>
@@ -45,13 +50,41 @@
             >
               <td class="text-center">{{ index + 1 }}</td>
               <td class="text-center">{{ item?.name }}</td>
+               <td class="text-center" v-if="showdemand"><v-img
+  :src="getLanguagePhotoUrl(item?.lanPhoto)"
+  alt="Language Photo"
+  max-width="80"
+  max-height="80"
+  contain
+  loading="lazy"
+/></td>
 
               <td class="text-start" v-if="showTeacher">{{ item?.amount }}</td>
 
               <!-- <td class="text-start">{{ item?.examLink }}</td> -->
               <td class="text-start" v-if="showTeacher">{{ item?.examFee }}</td>
+              <td class="text-center" v-if="showdemand">{{ item?.pdf }}</td>
+              <td class="text-center" v-if="showdemand">
+                <div>
+                  <span v-if="!item.showFull">
+                    {{ item.description?.length > 100 ? item.description.slice(0, 50) + '...' : item.description }}
+                    <a v-if="item.description?.length > 50" href="#" @click.prevent="item.showFull = true">See more</a>
+                  </span>
+                  <span v-else>
+                    {{ item.description }}
+                    <a href="#" @click.prevent="item.showFull = false">See less</a>
+                  </span>
+                </div>
+              </td>
 
               <td class="text-center">
+                <v-btn class="ml-1" small icon color="black" density="compact">
+                  <v-icon size="small" @click="FileMethod(item)">mdi-file</v-icon></v-btn
+                >
+
+                 <v-btn class="ml-1" small icon color="black" density="compact">
+                  <v-icon size="small" @click="photoMethod(item)">mdi-image</v-icon></v-btn
+                >
                 <v-btn class="ml-1" small icon color="green" density="compact">
                   <v-icon size="small" @click="clickEdit(item)"
                     >mdi-pencil</v-icon
@@ -116,6 +149,14 @@
                   variant="outlined"
                 ></v-text-field>
 
+                <v-text-field
+                  label="Descriptions"
+                  v-model="language.description"
+                  :rules="[(v) => !!v || 'required']"
+                  density="compact"
+                  variant="outlined"
+                ></v-text-field>
+
                 </v-card-text>
                <v-card-actions class="justify-end pr-5">  
                 <v-btn  class="text-black"
@@ -123,6 +164,12 @@
                  @click="saveLanguage()">{{
                   saveOrupdate
                 }}</v-btn>
+
+                <v-btn  class="text-black"
+                style="background-color: red;" 
+                 @click="showForm = false">
+                 CANCEL
+                  </v-btn>
               </v-card-actions>
           </v-card>
 </v-dialog>
@@ -150,11 +197,37 @@
         </v-card>
       </v-dialog>
     </v-col>
+        <v-col>
+          <v-bottom-sheet v-model="languageFileDialog" fullscreen scrollable>
+        <v-sheet class="information-window-v-sheet">
+          <LanguagesFile
+          @closeDialog="languageFileDialog=false"
+          :language="selectedOne"
+          @loadUserList="loadUserList"
+          />
+        </v-sheet>
+      </v-bottom-sheet>
+    </v-col>
+
+      <v-col>
+          <v-bottom-sheet v-model="languagePhotoDialog" fullscreen scrollable>
+        <v-sheet class="information-window-v-sheet">
+          <LanguagesPhoto
+          @closeDialog="languagePhotoDialog=false"
+          :language="selectedOne"
+          @loadUserList="loadUserList"
+          />
+        </v-sheet>
+      </v-bottom-sheet>
+    </v-col>
   </div>
 </template>
 <script>
+import axios from "../config";
+import LanguagesFile from "@/components/LanguagesFile.vue";
 import languageService from "../service/LanguageService.js";
 import lessonService from "../service/LessonsService.js";
+import LanguagesPhoto from "@/components/LanguagesPhoto.vue";
 
 export default {
   data: () => ({
@@ -169,7 +242,10 @@ export default {
     dialogDelete: false,
     showForm: false,
     showTeacher : false,
+    showdemand : true,
     lessonList : [],
+    languageFileDialog : false,
+    languagePhotoDialog: false,
   }),
   props: {},
   mounted: function () {
@@ -184,21 +260,40 @@ export default {
   //   // Now lessonsDto is set
   //   this.languageListMethod();
   // });
-    this.lessonListMethod();
+    // this.lessonListMethod();
     this.languageListMethod();
     this.showForm = false;
   },
   methods: {
+     loadUserList() {
+    this.languageListMethod();
+  },
+        getLanguagePhotoUrl(lanPhoto) {
+  if (!lanPhoto) return "path/to/default-image.png"; // fallback image path
+   const baseURL = axios?.defaults?.baseURL || "";
+       return lanPhoto ? `${baseURL}/languagephoto/${lanPhoto}.png` : "";
+  //return `${axios.defaults.baseURL}/languagephoto/${lanPhoto}.png`;
+},
+
+     FileMethod:function(item){
+        this.selectedOne = item;
+        this.languageFileDialog = true;
+    },
+    photoMethod:function(item){
+        this.languagePhotoDialog = true;
+    },
 
     saveLanguage: function () {
-      const languageDto = {
-    languagesId: this.language.languagesId || 0,
-    name: this.language.name,
-    amount: this.language.amount,
-    examLink: this.language.examLink,
-    examFee: this.language.examFee,
-    userAccountId: this.userData.userId
-  };
+  //     const languageDto = {
+  //   languagesId: this.language.languagesId || 0,
+  //   name: this.language.name,
+  //   lanPhoto: this.language.lanPhoto,
+  //   amount: this.language.amount,
+  //   examFee: this.language.examFee,
+  //   pdf: this.language.pdf,
+  //   description: this.language.description,
+  //   userAccountId: this.userData.userId
+  // };
   if (this.saveOrupdate == "SAVE") {
     // this.language.userAccount = {
     //   userAccountId: this.userData.userId
@@ -265,32 +360,43 @@ export default {
           this.$swal("Fail!", error.response.data.message, "error");
         });
     },
-    lessonListMethod() {
-    return lessonService
-    .getLessonList()
-    .then((response) => {
+//     lessonListMethod() {
+//     return lessonService
+//     .getLessonList()
+//     .then((response) => {
 
    
-        this.lessonList.splice(0);
-        this.lessonList.push(...response);
-        if (this.lessonList.length > 0) {
-  this.language.lessonsDto = this.lessonList[0];
-} else {
-  this.language.lessonsDto = null;
-}
+//         this.lessonList.splice(0);
+//         this.lessonList.push(...response);
+//         if (this.lessonList.length > 0) {
+//   this.language.lessonsDto = this.lessonList[0];
+// } else {
+//   this.language.lessonsDto = null;
+// }
 
-        this.languageListMethod();
-        this.language.lessonsDto = this.lessonList[0];
-        console.log("LessonsDto now set:", this.language.lessonsDto?.userAccountId);
+//         this.languageListMethod();
+//         this.language.lessonsDto = this.lessonList[0];
+//         console.log("LessonsDto now set:", this.language.lessonsDto?.userAccountId);
 
-    })
-    .catch((error) => {
-      console.error("Failed to load lessons:", error);
-    });
-},
+//     })
+//     .catch((error) => {
+//       console.error("Failed to load lessons:", error);
+//     });
+// },
     clickEdit(item) {
       this.showForm = true;
-      this.language = { ...item };
+      // this.language = { ...item };
+      this.language = {
+    ...item,
+    lessonsDto: item.lessonsDto || { lessonsId: 0 } // Add fallback
+  };
+    //   this.language = {
+    // languagesId: item.languagesId,
+    // name: item.name,
+    // amount: item.amount,
+    // examFee: item.examFee,
+    // description: item.description
+  //};
       this.saveOrupdate = "UPDATE";
     },
     clickDelete(item) {
@@ -332,8 +438,9 @@ export default {
       return (
         this.language.name &&
         this.language.amount &&
-        this.language.examLink &&
-        this.language.examFee
+        this.language.examFee &&
+        this.language.pdf &&
+        this.language.description
       );
     },
   },

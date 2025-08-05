@@ -21,7 +21,7 @@
         @update:modelValue="courseListMethodByType"
       ></v-autocomplete>
       </v-col>
-      <v-col cols="2" class="pl-12 pt-6">
+      <!-- <v-col cols="2" class="pl-12 pt-6">
       <v-btn rounded="xl" size="large"  class="bg-blue" style="font-size: small;" @click="demand()"> 
         Customer Records
       </v-btn>
@@ -30,7 +30,7 @@
       <v-btn rounded="xl" size="large" block class="bg-blue" style="font-size: small;" @click="details()"> 
         Course Details
       </v-btn>
-    </v-col>
+    </v-col> -->
     </v-row>
         <v-tooltip location="top">
   <template v-slot:activator="{ props }">
@@ -57,10 +57,10 @@
               <th class="text-center white--text bg-primary">Language Name</th>
               <th class="text-center white--text bg-primary">Type</th>
               <th class="text-center white--text bg-primary">Amount</th>
-              <th class="text-center white--text bg-primary" v-if="showdemand">Courses Photo</th>
+              <!-- <th class="text-center white--text bg-primary" v-if="showdemand">Courses Photo</th> -->
               <!-- <th class="text-center white--text bg-primary">Exam Link</th> -->
-              <th class="text-center white--text bg-primary" v-if="showdemand">Book Link</th>
-              <th class="text-center white--text bg-primary" v-if="showdemand">Descriptions</th>
+              <!-- <th class="text-center white--text bg-primary" v-if="showdemand">Book Link</th> -->
+              <!-- <th class="text-center white--text bg-primary" v-if="showdemand">Descriptions</th> -->
               
               <th class="text-center white--text bg-primary" v-if="showdemand">Action</th>
             </tr>
@@ -85,19 +85,19 @@
               <td class="text-center">{{ item.languagesDto?.name }}</td>
               <td class="text-center">{{ item?.type }}</td>
               <td class="text-center">{{ item?.amount }}</td>
-              <td class="text-center" v-if="showdemand"><v-img
+              <!-- <td class="text-center" v-if="showdemand"><v-img
   :src="getCoursePhotoUrl(item.cphoto)"
   alt="Course Photo"
   max-width="80"
   max-height="80"
   contain
   loading="lazy"
-/></td>
+/></td> -->
               <!-- <td class="text-start">{{ item?.examLink }}</td> -->
-              <td class="text-center" v-if="showdemand">{{ item?.pdf }}</td>
+              <!-- <td class="text-center" v-if="showdemand">{{ item?.pdf }}</td> -->
 
               <!-- <td class="text-center" v-if="showdemand">{{ item?.description }}</td> -->
-               <td class="text-center" v-if="showdemand">
+               <!-- <td class="text-center" v-if="showdemand">
                 <div>
                   <span v-if="!item.showFull">
                     {{ item.description?.length > 100 ? item.description.slice(0, 50) + '...' : item.description }}
@@ -108,17 +108,17 @@
                     <a href="#" @click.prevent="item.showFull = false">See less</a>
                   </span>
                 </div>
-              </td>
+              </td> -->
 
               
               <td class="text-center" v-if="showdemand"> 
-                <v-btn class="ml-1" small icon color="black" density="compact">
+                <!-- <v-btn class="ml-1" small icon color="black" density="compact">
                   <v-icon size="small" @click="FileMethod(item)">mdi-file</v-icon></v-btn
                 >
 
                  <v-btn class="ml-1" small icon color="black" density="compact">
                   <v-icon size="small" @click="photoMethod(item)">mdi-image</v-icon></v-btn
-                >
+                > -->
                 <v-btn class="ml-1" small icon color="green" density="compact">
                   <v-icon size="small" @click="clickEdit(item)"
                     >mdi-pencil</v-icon
@@ -174,7 +174,7 @@
                 </v-menu>
 
                 <v-autocomplete
-                v-if="showTeacher"
+                
                   v-model="courses.studentDto"
                   :items="studentList"
                   item-text="userName"
@@ -240,13 +240,13 @@
                   variant="outlined"
                 ></v-text-field>
 
-                 <v-text-field
+                 <!-- <v-text-field
                   label="Descriptions"
                   v-model.number="courses.description"
                   :rules="[(v) => !!v || 'required']"
                   density="compact"
                   variant="outlined"
-                ></v-text-field>
+                ></v-text-field> -->
 
                            </v-card-text>
                <v-card-actions class="justify-end pr-5">  
@@ -255,6 +255,11 @@
                  @click="saveCourse()">{{
                   saveOrupdate
                 }}</v-btn>
+                <v-btn  class="text-black"
+                style="background-color: red;" 
+                 @click="showForm = false">
+                  CANCEL
+                </v-btn>
               </v-card-actions>
 
             

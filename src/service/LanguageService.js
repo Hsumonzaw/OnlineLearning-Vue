@@ -28,6 +28,26 @@ class LanguageService {
     return this.axios.get(url).then((request) => request.data);
   }
   
+   updateLanPhoto(formData, languagesId) {
+    let url = `languages/${languagesId}/lanPhoto`;
+    return axios
+      .put(url, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      })
+      .then((request) => request.data);
+  }
+  updateLanFile(formData, languagesId) {
+    let url = `languages/${languagesId}/pdf`;
+    return axios
+      .put(url, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      })
+      .then((request) => request.data);
+  }
 }
 
 const service = new LanguageService();

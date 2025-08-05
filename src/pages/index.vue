@@ -355,8 +355,16 @@
           </v-col>
 
           <!-- Address -->
-          <v-col cols="12" sm="6">
+          <!-- <v-col cols="12" sm="6">
             <v-textarea
+              v-model="user.address"
+              label="Address"
+              variant="outlined"
+              density="compact"
+            />
+          </v-col> -->
+                    <v-col cols="12" sm="6">
+            <v-text-field
               v-model="user.address"
               label="Address"
               variant="outlined"
@@ -365,16 +373,15 @@
           </v-col>
 
            <!-- Degree -->
-          <v-col cols="12" sm="6" >
-            <v-text-field
-              v-model="user.degree"
-              label="Degree"
-              :rules="[(v) => !!v || 'Degree is required']"
-              variant="outlined"
-              density="compact"
-            />
+         <v-select
+  v-model="user.degree"
+  :items="degreeOptions"
+  label="Degree"
+  :rules="[(v) => !!v || 'Degree is required']"
+  variant="outlined"
+  density="compact"
+/>
 
-          </v-col>
           
           <!-- Document Upload -->
         <v-col cols="12" sm="6">
@@ -424,6 +431,19 @@ export default {
         "/src/assets/homepageLanguage2.jpg",
 
       ],
+      degreeOptions: [
+  "B.C.Sc",
+  "M.C.Sc",
+  "Ph.D(IT)",
+  "B.A (English)",
+  "M.A (English)",
+  "B.C.Tech",
+  "M.C.Teach",
+  "Ph.D (CHT)",
+  "D.C.Sc",
+  "M.A.Sc"
+],
+
       photos: [],
       photo: null,
       photoPreview: null,
@@ -446,7 +466,7 @@ export default {
       email: (v) =>
         /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) || "Invalid email format",
       phone: (v) =>
-        /^(?:\+?95|0)(?:9\d{7,9})$/.test(v) || "Invalid Myanmar phone number",
+        /^(?:0|\+95)9[24679]\d{7,9}$/.test(v) || "Invalid Myanmar phone number",
       nrc: (v) =>
         /^\d{1,2}\/[A-Z]{3}\([A-Z]\)\d{6}$/.test(v) || "Invalid NRC format",
     },
@@ -591,7 +611,26 @@ async saveUser() {
   
 
 },
-  watch: {startPicker() {
+computed: {
+  displayName() {
+    if (this.user.degree && this.user.degree.includes("Ph.D")) {
+      // If degree contains "Ph.D" prefix "Dr." if not already there
+      if (!this.user.name?.startsWith("Dr.")) {
+        return "Dr. " + (this.user.name || "");
+      }
+    }
+    return this.user.name || "";
+  }
+},
+  watch: {
+    'user.degree'(newDegree) {
+    if (newDegree && newDegree.includes("Ph.D")) {
+      if (!this.user.name?.startsWith("Dr.")) {
+        this.user.name = "Dr. " + (this.user.name || "");
+      }
+    }
+  },
+    startPicker() {
       this.startMenu = false;
       this.user.startDate = format(this.startPicker, "dd-MM-yyyy");
     },},

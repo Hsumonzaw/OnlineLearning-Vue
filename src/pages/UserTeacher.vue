@@ -110,6 +110,26 @@ export default {
       return `${axios.defaults.baseURL}/userphoto/${photo}.png`;
     },
   },
+//   computed: {
+//   displayName() {
+//     if (this.user.degree && this.user.degree.includes("Ph.D")) {
+//       // If degree contains "Ph.D" prefix "Dr." if not already there
+//       if (!this.user.name?.startsWith("Dr.")) {
+//         return "Dr. " + (this.user.name || "");
+//       }
+//     }
+//     return this.user.name || "";
+//   }
+// },
+// watch: {
+//     'user.degree'(newDegree) {
+//     if (newDegree && newDegree.includes("Ph.D")) {
+//       if (!this.user.name?.startsWith("Dr.")) {
+//         this.user.name = "Dr. " + (this.user.name || "");
+//       }
+//     }
+//   },
+// }
 };
 </script>
 

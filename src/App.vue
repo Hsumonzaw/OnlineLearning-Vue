@@ -31,9 +31,9 @@
           </template>
 
           <v-list>
-            <v-list-item @click="clickRouter('/')">
+            <!-- <v-list-item @click="clickRouter('/')">
               <v-list-item-title><v-icon>mdi-home</v-icon> Home</v-list-item-title>
-            </v-list-item>
+            </v-list-item> -->
             <v-list-item @click="clickRouter('/useraccount')" v-if="showTeacher">
               <v-list-item-title><v-icon>mdi-account-multiple-plus</v-icon> User Account</v-list-item-title>
             </v-list-item>
@@ -47,7 +47,7 @@
               <v-list-item-title><v-icon>mdi-web</v-icon> Languages</v-list-item-title>
             </v-list-item>
             <v-list-item @click="clickRouter('/lessons')">
-              <v-list-item-title><v-icon>mdi-lightbulb-on-outline</v-icon> Lessons</v-list-item-title>
+              <v-list-item-title><v-icon>mdi-lightbulb-on-outline</v-icon>Add Lessons</v-list-item-title>
             </v-list-item>
              <v-list-item @click="clickRouter('/quiz')">
               <v-list-item-title><v-icon>mdi-format-list-checks</v-icon>Add Quiz</v-list-item-title>

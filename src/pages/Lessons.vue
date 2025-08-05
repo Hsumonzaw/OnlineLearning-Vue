@@ -174,15 +174,20 @@
                   variant="outlined"
                   filled
                 ></v-autocomplete>
-
-             
                 </v-card-text>
+
                 <v-card-actions class="justify-end pr-5">  
                 <v-btn  class="text-black"
                 style="background-color: #2196f3;" 
                  @click="saveLesson()">{{
                   saveOrupdate
                 }}</v-btn>
+
+                <v-btn  class="text-black"
+                style="background-color: red;" 
+                 @click="showForm = false">CANCEL
+                  </v-btn>
+
               </v-card-actions>
         </v-card>
     </v-dialog>
@@ -192,7 +197,7 @@
       <v-card>
         <v-card-title class="text-h5 white--text bg-red">Delete</v-card-title>
         <v-card-text class="text-h6">
-          Are you sure to delete({{ selectedOne.name }})?
+          Are you sure to delete {{ selectedOne.languagesDto?.name }}'s this video?
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>

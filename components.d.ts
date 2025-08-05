@@ -11,6 +11,8 @@ declare module 'vue' {
     CourseFile: typeof import('./src/components/CourseFile.vue')['default']
     CoursePhoto: typeof import('./src/components/CoursePhoto.vue')['default']
     HelloWorld: typeof import('./src/components/HelloWorld.vue')['default']
+    LanguagesFile: typeof import('./src/components/LanguagesFile.vue')['default']
+    LanguagesPhoto: typeof import('./src/components/LanguagesPhoto.vue')['default']
     LessonFIle: typeof import('./src/components/LessonFIle.vue')['default']
     PhotoUser: typeof import('./src/components/PhotoUser.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
