@@ -10,7 +10,7 @@
           <v-autocomplete
             v-model="userType"
             item-text="userTypeName"
-            :items="userTypeList"
+            :items="userTypeListSearch"
             name="userType"
             label="User Type"
             return-object
@@ -45,7 +45,8 @@
               <th class="text-center white--text bg-primary">StartDate</th>
               <th class="text-center white--text bg-primary">Name</th>
               <th class="text-center white--text bg-primary">UserName</th>
-              <th class="text-center white--text bg-primary">Age</th>
+              <th class="text-center white--text bg-primary">Date Of Birth</th>
+              <th class="text-center white--text bg-primary">Gender</th>
               <th class="text-center white--text bg-primary">NRC</th>
               <th class="text-center white--text bg-primary">Email</th>
               <th class="text-center white--text bg-primary">Phone</th>
@@ -74,6 +75,7 @@
               <td class="text-center">{{ item.name }}</td>
               <td class="text-center">{{ item.userName }}</td>
               <td class="text-center">{{ item.age || "-" }}</td>
+              <td class="text-center">{{ item.gender || "-" }}</td>
               <td class="text-center">{{ item.nrc || "-" }}</td>
               <td class="text-center">{{ item.email || "-" }}</td>
 
@@ -155,6 +157,7 @@
                 density="compact"
                 variant="outlined"
                 label="From Date"
+                disabled
                 readonly
                 v-bind="props"
               ></v-text-field>
@@ -179,11 +182,51 @@
             :rules="[(v) => !!v || 'required']"
           ></v-text-field>
 
-          <v-text-field
-            label="Age"
+          <!-- <v-text-field
+            label="Date Of Birth"
             v-model="user.age"
             :rules="[(v) => !!v || 'required']"
-          ></v-text-field>
+          ></v-text-field> -->
+          <v-menu
+            v-model="dateBirth"
+            full-width
+            max-width="200px"
+            min-width="290px"
+            v-bind:close-on-content-click="false"
+          >
+            <template v-slot:activator="{ props }">
+              <v-text-field
+                v-model="user.age"
+                density="compact"
+                variant="outlined"
+                label="Date Of Birth"
+                readonly
+                v-bind="props"
+              ></v-text-field>
+            </template>
+            <v-date-picker
+              v-model="birthPicker"
+              color="primary"
+              hide-header
+            ></v-date-picker>
+          </v-menu>
+
+          <!-- <v-text-field
+            label="Gender"
+            v-model="user.gender"
+            :items="genderList"
+            :rules="[(v) => !!v || 'required']"
+          ></v-text-field> -->
+
+          <v-autocomplete
+            v-model="user.gender"
+            :items="genderList"
+            label="Gender"
+            required
+            density="compact"
+            variant="outlined"
+            filled
+          ></v-autocomplete>
 
           <v-text-field
             v-model="user.nrc"
@@ -240,7 +283,6 @@
           <v-text-field
             label="Degree"
             v-model="user.degree"
-            :rules="[(v) => !!v || 'required']"
           ></v-text-field>
         </v-card-text>
         <v-card-actions class="justify-end pr-5">
@@ -303,10 +345,14 @@ export default {
     selectedOne: {},
     user: {},
     userList: [],
-    userTypeList: ["ALL", "STAFF", "STUDENT", "TEACHER", "ADMIN"],
+    userTypeListSearch: ["ALL", "STAFF", "STUDENT", "TEACHER", "ADMIN"],
+    userTypeList: ["STAFF", "STUDENT", "TEACHER", "ADMIN"],
+
     saveOrupdate: "SAVE",
     startPicker: new Date(),
+    birthPicker: new Date(),
     startMenu: false,
+    dateBirth : false,
     dialogDelete: false,
     userPhotoDialog: false,
     showForm: false,
@@ -317,6 +363,7 @@ export default {
     email: "",
     phone: "",
     nrc: "",
+    genderList: ["Male","Female"],
     rules: {
       required: (v) => !!v || "This field is required",
       email: (v) =>
@@ -331,7 +378,8 @@ export default {
   mounted: function () {
     this.loggedInUser = JSON.parse(localStorage.getItem("user"));
     this.user.startDate = format(this.startPicker, "dd-MM-yyyy");
-    this.user.userType = this.userTypeList[0];
+    this.user.age = format(this.birthPicker, "dd-MM-yyyy");
+    this.user.userType = this.userTypeListSearch[0];
     // this.userType = this.userTypeList[0];
     this.userListMethod();
     this.showForm = false;
@@ -479,11 +527,25 @@ export default {
         }
       });
     },
+    calculateAge(dob) {
+  const today = new Date();
+  const birthDate = new Date(dob);
+  let age = today.getFullYear() - birthDate.getFullYear();
+  const m = today.getMonth() - birthDate.getMonth();
+  if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+    age--;
+  }
+  return age;
+}
   },
   watch: {
     startPicker() {
       this.startMenu = false;
-      this.user.startDate = format(this.startPicker, "dd-MM-yyyy");
+      this.user.startDate = format(this.startPicker, "dd-MM-yyyy"); 
+    },
+    birthPicker(){
+      this.dateBirth = false;
+      this.user.age = format(this.birthPicker,"dd-MM-yyyy");
     },
     showForm(newVal) {
       if (!newVal) {
