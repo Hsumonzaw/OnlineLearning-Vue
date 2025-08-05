@@ -188,7 +188,7 @@
             :rules="[(v) => !!v || 'required']"
           ></v-text-field> -->
           <v-menu
-            v-model="startMenu"
+            v-model="dateBirth"
             full-width
             max-width="200px"
             min-width="290px"
@@ -205,7 +205,7 @@
               ></v-text-field>
             </template>
             <v-date-picker
-              v-model="startPicker"
+              v-model="birthPicker"
               color="primary"
               hide-header
             ></v-date-picker>
@@ -283,7 +283,6 @@
           <v-text-field
             label="Degree"
             v-model="user.degree"
-            :rules="[(v) => !!v || 'required']"
           ></v-text-field>
         </v-card-text>
         <v-card-actions class="justify-end pr-5">
@@ -351,7 +350,9 @@ export default {
 
     saveOrupdate: "SAVE",
     startPicker: new Date(),
+    birthPicker: new Date(),
     startMenu: false,
+    dateBirth : false,
     dialogDelete: false,
     userPhotoDialog: false,
     showForm: false,
@@ -377,6 +378,7 @@ export default {
   mounted: function () {
     this.loggedInUser = JSON.parse(localStorage.getItem("user"));
     this.user.startDate = format(this.startPicker, "dd-MM-yyyy");
+    this.user.age = format(this.birthPicker, "dd-MM-yyyy");
     this.user.userType = this.userTypeListSearch[0];
     // this.userType = this.userTypeList[0];
     this.userListMethod();
@@ -525,11 +527,25 @@ export default {
         }
       });
     },
+    calculateAge(dob) {
+  const today = new Date();
+  const birthDate = new Date(dob);
+  let age = today.getFullYear() - birthDate.getFullYear();
+  const m = today.getMonth() - birthDate.getMonth();
+  if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+    age--;
+  }
+  return age;
+}
   },
   watch: {
     startPicker() {
       this.startMenu = false;
-      this.user.startDate = format(this.startPicker, "dd-MM-yyyy");
+      this.user.startDate = format(this.startPicker, "dd-MM-yyyy"); 
+    },
+    birthPicker(){
+      this.dateBirth = false;
+      this.user.age = format(this.birthPicker,"dd-MM-yyyy");
     },
     showForm(newVal) {
       if (!newVal) {
