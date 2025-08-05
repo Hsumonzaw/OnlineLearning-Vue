@@ -5,9 +5,9 @@
     Achieve a minimum of 50 to pass. A score of 60 or higher qualifies you for a certificate.
    </p>
 
-    <v-chip v-if="!showResult" class="ma-2" color="blue lighten-4" text-color="blue darken-2">
+    <!-- <v-chip v-if="!showResult" class="ma-2" color="blue lighten-4" text-color="blue darken-2">
   ⏳ Time: {{ minutes }}
-</v-chip>
+</v-chip> -->
     <div v-if="quizList.length && !showResult">
      <v-form ref="form" @submit.prevent="submitQuiz">
     <transition-group name="fade-slide" tag="div">
@@ -76,19 +76,23 @@
           You scored {{ score }} out of {{ quizList.length }} (
           {{ ((score / quizList.length) * 100).toFixed(2) }}% )
         </div>
-        <div v-if="score >= passingScore" class="text-success font-weight-bold mt-2">
-          🎉 Congratulations! You passed and can generate your certificate.
+        <div v-if="score / quizList.length >= certificateScore" class="text-success font-weight-bold mt-2"> 
+           🎉 Congratulations! You passed and can generate your certificate.
+        </div>
+        <div v-else-if="score / quizList.length >= passingScore" class="text-warning font-weight-bold mt-2">
+       ✅ You passed the quiz! (But not enough for a certificate.)
         </div>
         <div v-else class="text-error font-weight-bold mt-2">
           Sorry, you did not pass. Please try again.
         </div>
         <v-btn
-      v-if="score >= passingScore * quizList.length"
-      color="success"
-      class="mt-4"
-      @click="goToCertificate()"
-    >  Generate Certificate
-    </v-btn>
+  v-if="score / quizList.length >= certificateScore"
+  color="success"
+  class="mt-4"
+  @click="goToCertificate()"
+>
+  Generate Certificate
+</v-btn>
       </v-card-text>
     </v-card>
 
@@ -150,7 +154,8 @@ export default {
       loadError: false,
       showResult: false,
       score: 0,
-      passingScore: 0.6, 
+      passingScore: 0.5, 
+      certificateScore: 0.6,
       languagesId :0,
       coursesId:0,
       minutes:"0m 0s",

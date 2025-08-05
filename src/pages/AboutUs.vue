@@ -7,7 +7,7 @@
           <v-icon size="48" color="#1565c0" class="ml-2">mdi-school</v-icon>
         </h1>
         <p class="subtitle-1 mx-auto" style="max-width: 600px; color:#555;">
-          Learn more about our mission, values, and the passionate team behind our platform.
+          Learn more about our mission, values, and the passionate team behind our system.
         </p>
       </v-col>
     </v-row>
@@ -44,7 +44,7 @@
           </h2>
           <p class="text-body-1">
             Ready to gain in-demand skills to kickstart your tech career?
-            Our online platform offers <strong>free trial courses</strong> on
+            Our  system offers <strong>free trial courses</strong> on
             coding, language learning, and more — all taught by industry professionals.
           </p>
           <div class="mt-4 d-flex align-center">
@@ -172,9 +172,9 @@
             Join Our Learning Community
           </h2>
           <p>
-            Ready to start your learning journey? Join thousands of learners who trust us to guide them towards success. Follow us on social media, subscribe to our newsletter, and participate in live events.
+            Ready to start your learning journey? Join thousands of learners who trust us to guide them towards success. Contact with us.
           </p>
-          <v-btn
+          <!-- <v-btn
             class="mt-6"
             color="primary"
             href="https://facebook.com"
@@ -184,7 +184,7 @@
           >
             Follow us on Facebook
             <v-icon right>mdi-facebook</v-icon>
-          </v-btn>
+          </v-btn> -->
         </v-card>
       </v-col>
     </v-row>

@@ -123,6 +123,13 @@ const router = createRouter({
       component: () =>
         import(/* webpackChunkName: "home" */ "../pages/Ans.vue"),
     },
+    {
+      path: "/register",
+      name: "register",
+      component: () =>
+        import(/* webpackChunkName: "home" */ "../pages/Registration.vue"),
+    },
+
 
 
   ],

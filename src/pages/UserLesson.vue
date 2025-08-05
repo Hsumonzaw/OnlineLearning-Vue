@@ -432,9 +432,9 @@ export default {
         });
       } else {
         this.$swal({
-          title: "Buy Now",
-          text: "Now Now",
-          icon: "info",
+        title: "Buy Now",
+        text: `Price: ${this.selectedOne?.amount ?? 'Unknown'} MMK`, 
+        icon: "info",
           showCancelButton: true,
           confirmButtonText: "Buy",
           cancelButtonText: "Cancel",
