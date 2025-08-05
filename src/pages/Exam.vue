@@ -92,10 +92,11 @@
             ></v-date-picker>
           </v-menu>
 
-          <v-text-field
+               <v-text-field
+          
             label="Name"
             v-model="user.name"
-            :rules="[(v) => !!v || 'required']"
+            :rules="[rules.required, rules.name]"
           ></v-text-field>
 
           <v-text-field
@@ -104,11 +105,42 @@
             :rules="[(v) => !!v || 'required']"
           ></v-text-field>
 
-          <v-text-field
-            label="Age"
-            v-model="user.age"
-            :rules="[(v) => !!v || 'required']"
-          ></v-text-field>
+          <v-menu
+            v-model="dateBirth"
+            full-width
+            max-width="200px"
+            min-width="290px"
+            v-bind:close-on-content-click="false"
+          >
+            <template v-slot:activator="{ props }">
+              <v-text-field
+                v-model="user.age"
+                density="compact"
+                variant="outlined"
+                label="Date Of Birth"
+                :rules="[rules.required, rules.age]"
+
+                readonly
+                v-bind="props"
+              ></v-text-field>
+            </template>
+            <v-date-picker
+              v-model="birthPicker"
+              color="primary"
+              hide-header
+            ></v-date-picker>
+          </v-menu>
+
+            <v-autocomplete
+            v-model="user.gender"
+            :items="genderList"
+            label="Gender"
+            required
+            density="compact"
+            variant="outlined"
+            filled
+          ></v-autocomplete>
+
 
           <v-text-field
             v-model="user.nrc"
@@ -124,11 +156,16 @@
             required
           ></v-text-field>
 
-          <v-text-field
-            label="Password"
-            v-model="user.password"
-            :rules="[(v) => !!v || 'required']"
-          ></v-text-field>
+            <v-text-field
+              v-model="user.password"
+              label="Password"
+              
+              :type="showPassword ? 'text' : 'password'"
+              :rules="passwordRules" :append-inner-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
+              @click:append-inner="showPassword = !showPassword"
+              variant="outlined"
+              density="compact"
+            />
 
           <v-text-field
             v-model="user.phonenum"
@@ -137,7 +174,7 @@
             required
           ></v-text-field>
 
-          <v-text-field label="Address" v-model="user.address"></v-text-field>
+          <v-textarea label="Address" v-model="user.address"></v-textarea>
 
           <!-- <v-autocomplete
                   v-model="user.userType"
@@ -171,6 +208,13 @@
             @click="saveUser()"
             >{{ saveOrupdate }}</v-btn
           >
+
+          <v-btn
+            class="text-black"
+            style="background-color: red"
+           @click="showForm = false"
+            >CANCEL</v-btn
+          >
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -187,17 +231,46 @@
           <v-spacer></v-spacer>
           <v-btn class="black" text @click="dialogBuyNow = false">CANCEL</v-btn>
           <v-btn dark class="bg-red" text @click="clickBuyNowType()"
-            >SAVE</v-btn
+            >BUY</v-btn
           >
         </v-card-actions>
       </v-card>
     </v-dialog>
+              <!-- Payment Options Dialog -->
+<v-dialog v-model="paymentDialog" max-width="400">
+  <v-card>
+    <v-card-title class="text-h5">Choose Your Payment</v-card-title>
+    <v-card-text class="text-center">
+      <v-btn color="blue" class="mx-2" @click="choosePayment('kpay')">KPay</v-btn>
+      <v-btn color="yellow darken-2" class="mx-2" @click="choosePayment('wavepay')">WavePay</v-btn>
+      <v-btn color="red" class="mx-2" @click="choosePayment('ayapay')">AYA Pay</v-btn>
+    </v-card-text>
+    <v-card-actions>
+      <v-spacer></v-spacer>
+      <v-btn text @click="dialogBuyNow = false">Cancel</v-btn>
+    </v-card-actions>
+  </v-card>
+</v-dialog>
+
+<!-- QR Code Dialog -->
+<v-dialog v-model="qrDialog" max-width="300px" persistent>
+  <v-card class="pa-4 text-center">
+    <h3 class="mb-4">{{ paymentName }} - Please Scan with your Phone</h3>
+    <img :src="paymentQR" alt="Payment QR" style="max-width:250px; margin:auto; display:block;" />
+    <div class="payment-phone mt-2">092556774574</div>
+    <v-btn @click="doneMethod()">DONE</v-btn>
+
+    <v-btn class="mt-4" color="primary" @click="qrDialog = false">Close</v-btn>
+  </v-card>
+</v-dialog>
+
 </template>
 <script>
 import languageService from "../service/LanguageService.js";
 import userService from "../service/UserAccountService.js";
 import coursesService from "../service/CoursesService.js";
 import { format } from "date-fns";
+
 
 
 import axios from "@/config";
@@ -209,10 +282,14 @@ export default {
     selectedOne: {},
     userData: {},
     lessonList: [],
+    paymentDialog:false,
     showEnrollButton: true,
     showForm: false,
     user: { userType: "STUDENT" },
+    genderList: ["Male","Female"],
     saveOrupdate: "SAVE",
+    qrDialog: false,
+    showPaymentOptions: false,
     rules: {
       required: (v) => !!v || "This field is required",
       email: (v) =>
@@ -220,15 +297,44 @@ export default {
       phone: (v) =>
         /^(?:\+?95|0)(?:9\d{7,9})$/.test(v) || "Invalid Myanmar phone number",
       nrc: (v) =>
-        /^\d{1,12}\/[A-Z]{3}\([A-Z]\)\d{6}$/.test(v) || "Invalid NRC format",
+        /^\d{1,12}\/[A-Z]{3}\([NPE]\)\d{6}$/.test(v) || "Invalid NRC format",
+        name: (v) =>
+        /^[A-Za-z]+(?:\s[A-Za-z]+)*$/.test(v) || "Invalid name format",
+        age: (v) => {
+    if (!v) return "Date of Birth is required";
+    const today = new Date();
+    const birthDate = new Date(v.split("-").reverse().join("-")); // Convert dd-MM-yyyy to yyyy-MM-dd
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const m = today.getMonth() - birthDate.getMonth();
+    if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+      age--;
+    }
+    return age >= 15 || "You must be at least 15 years old";
+  }
+ 
     },
     userTypeList: ["ALL", "STAFF", "STUDENT", "TEACHER", "ADMIN"],
     startPicker: new Date(),
     startMenu: false,
+    birthPicker: new Date(),
+    dateBirth : false,
     dialogBuyNow:false,
     rgType:"exam",
+    showPassword : false,
+images: [
+  new URL('@/assets/s1.jpg', import.meta.url).href,
+  new URL('@/assets/s2.jpg', import.meta.url).href,
+  new URL('@/assets/s3.jpg', import.meta.url).href
+],
+
+
   }),
   mounted() {
+        console.log(this.images[0]);
+
+    console.log(this.images[1]);
+        console.log(this.images[2]);
+
     
     // const lessonsId = this.$route.query.lessonsId;
     // if (lessonsId !== undefined) {
@@ -237,6 +343,8 @@ export default {
 
    
     this.user.startDate = format(this.startPicker, "dd-MM-yyyy");
+        this.user.age = format(this.birthPicker, "dd-MM-yyyy");
+
     this.userData = JSON.parse(localStorage.getItem("user")) || {};
       if (this.userData.password!=undefined &&  this.userData?.password!="") {
        this.languageListMethod();
@@ -246,8 +354,28 @@ export default {
 
   },
   methods: {
-     clickBuyNowType:function(){
-      this.dialogBuyNow = false;
+
+       selectPayment(method) {
+      this.selectedPayment = method;
+      this.qrDialog = true; // Show QR code dialog when payment method selected
+    },
+   
+    clickBuyNowType:function(){
+        this.dialogBuyNow = false; // Close the Buy Now dialog
+        this.paymentDialog = true;
+        this.showPaymentOptions = true;  // show payment buttons now
+  
+    },
+      choosePayment(method) {
+    this.selectedPayment = method;
+    this.paymentDialog = false;   // Close Payment options dialog
+    this.qrDialog = true;         // Open QR code dialog
+  },
+
+     doneMethod:function(){
+      //this.dialogBuyNow = true
+       this.dialogBuyNow = false;
+       this.qrDialog = false;
       let courses = {studentDto:{}};
       courses.type = this.rgType;
       courses.receivedDate = this.user.startDate;
@@ -408,10 +536,34 @@ if (this.userData.password!=undefined &&  this.userData?.password!="") {
         });
     },
   },
+  computed: {
+ paymentQR() {
+  switch (this.selectedPayment) {
+    case "kpay": return this.images[0];
+    case "wavepay": return this.images[1];
+    case "ayapay": return this.images[2];
+    default: return "";
+  }
+},
+
+  paymentName() {
+    switch (this.selectedPayment) {
+      case "kpay": return "KPay";
+      case "wavepay": return "WavePay";
+      case "ayapay": return "AYA Pay";
+      default: return "";
+    }
+  }
+},
+
   watch: {
     startPicker() {
       this.startMenu = false;
       this.user.startDate = format(this.startPicker, "dd-MM-yyyy");
+    },
+        birthPicker(){
+      this.dateBirth = false;
+      this.user.age = format(this.birthPicker,"dd-MM-yyyy");
     },
   },
 };

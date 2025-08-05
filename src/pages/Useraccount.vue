@@ -173,13 +173,14 @@
           
             label="Name"
             v-model="user.name"
-            :rules="[(v) => !!v || 'required']"
+            :rules="[rules.required, rules.name]"
           ></v-text-field>
 
           <v-text-field
             label="User Name"
             v-model="user.userName"
             :rules="[(v) => !!v || 'required']"
+
           ></v-text-field>
 
           <!-- <v-text-field
@@ -242,11 +243,16 @@
             required
           ></v-text-field>
 
-          <v-text-field
-            label="Password"
-            v-model="user.password"
-            :rules="[(v) => !!v || 'required']"
-          ></v-text-field>
+             <v-text-field
+              v-model="user.password"
+              label="Password"
+              
+              :type="showPassword ? 'text' : 'password'"
+              :rules="passwordRules" :append-inner-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
+              @click:append-inner="showPassword = !showPassword"
+              variant="outlined"
+              density="compact"
+            />
 
           <v-text-field
             v-model="user.phonenum"
@@ -255,7 +261,7 @@
             required
           ></v-text-field>
 
-          <v-text-field label="Address" v-model="user.address"></v-text-field>
+          <v-textarea label="Address" v-model="user.address"></v-textarea>
 
           <!-- <v-autocomplete
                   v-model="user.userType"
@@ -291,6 +297,13 @@
             style="background-color: #2196f3"
             @click="saveUser()"
             >{{ saveOrupdate }}</v-btn
+          >
+
+          <v-btn
+            class="text-black"
+            style="background-color: red"
+           @click="showForm = false"
+            >CANCEL</v-btn
           >
         </v-card-actions>
       </v-card>
@@ -350,8 +363,8 @@ export default {
 
     saveOrupdate: "SAVE",
     startPicker: new Date(),
-    birthPicker: new Date(),
     startMenu: false,
+    birthPicker: new Date(),
     dateBirth : false,
     dialogDelete: false,
     userPhotoDialog: false,
@@ -363,6 +376,7 @@ export default {
     email: "",
     phone: "",
     nrc: "",
+    name: "",
     genderList: ["Male","Female"],
     rules: {
       required: (v) => !!v || "This field is required",
@@ -371,8 +385,11 @@ export default {
       phone: (v) =>
         /^(?:0|\+95)9[24679]\d{7,9}$/.test(v) || "Invalid Myanmar phone number",
       nrc: (v) =>
-        /^\d{1,2}\/[A-Z]{3}\([A-Z]\)\d{6}$/.test(v) || "Invalid NRC format",
+        /^\d{1,2}\/[A-Z]{3}\([NPE]\)\d{6}$/.test(v) || "Invalid NRC format",
+      name: (v) =>
+        /^[A-Za-z]+(?:\s[A-Za-z]+)*$/.test(v) || "Invalid name format"
     },
+    showPassword : false,
   }),
   props: { hideToolbar: Function },
   mounted: function () {
