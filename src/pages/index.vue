@@ -219,8 +219,7 @@
   <v-dialog v-model="showForm" max-width="700px">
   <v-card class="pa-4" elevation="4" style="background-color: #e8f5e9;">
     <v-card-title class="d-flex justify-space-between align-center">
-      <span class="text-h5 font-weight-bold">Apply Form</span>
-      <v-btn icon color="red" @click="showForm = false">
+      <span class="text-h5 font-weight-bold">Apply Form</span><v-btn icon color="red" @click="showForm = false">
         <v-icon>mdi-close</v-icon>
       </v-btn>
     </v-card-title>
@@ -282,26 +281,38 @@
           </v-col>
 
           <!-- Name -->
-          <v-col cols="12" sm="6">
-            <v-text-field
-              v-model="user.name"
-              label="Full Name"
-              :rules="[(v) => !!v || 'Name is required']"
-              variant="outlined"
-              density="compact"
-            />
-          </v-col>
+        <v-text-field
+          
+            label="Name"
+            v-model="user.name"
+            :rules="[rules.required, rules.name]"
+          ></v-text-field>
           <!-- Age -->
-          <v-col cols="12" sm="6">
-            <v-text-field
-              v-model="user.age"
-              label="Age"
-              type="number"
-              :rules="[(v) => !!v || 'Age is required']"
-              variant="outlined"
-              density="compact"
-            />
-          </v-col>
+          <v-menu
+            v-model="dateBirth"
+            full-width
+            max-width="200px"
+            min-width="290px"
+            v-bind:close-on-content-click="false"
+          >
+            <template v-slot:activator="{ props }">
+              <v-text-field
+                v-model="user.age"
+                density="compact"
+                variant="outlined"
+                label="Date Of Birth"
+                :rules="[rules.required, rules.age]"
+
+                readonly
+                v-bind="props"
+              ></v-text-field>
+            </template>
+            <v-date-picker
+              v-model="birthPicker"
+              color="primary"
+              hide-header
+            ></v-date-picker>
+          </v-menu>
 
           <!-- Username -->
           <v-col cols="12" sm="6">
@@ -327,17 +338,23 @@
             />
           </v-col>
 
+              <v-autocomplete
+            v-model="user.gender"
+            :items="genderList"
+            label="Gender"
+            required
+            density="compact"
+            variant="outlined"
+            filled
+          ></v-autocomplete>
+
           <!-- NRC -->
-          <v-col cols="12" sm="6">
-            <v-text-field
-              v-model="user.nrc"
-              label="NRC"
-              :rules="[rules.required, rules.nrc]"
-              variant="outlined"
-              density="compact"
-              required
-            />
-          </v-col>
+          <v-text-field
+            v-model="user.nrc"
+            label="NRC"
+            :rules="[rules.required, rules.nrc]"
+            required
+          ></v-text-field>
 
           <!-- Email -->
           <v-col cols="12" sm="6">
@@ -454,7 +471,8 @@ export default {
   "D.C.Sc",
   "M.A.Sc"
 ],
-
+// name : formatTeacherName(teacher),
+      genderList : ["Female","Male"],
       photos: [],
       photo: null,
       photoPreview: null,
@@ -472,14 +490,31 @@ export default {
       phone: "",
       nrc: "",
       showPassword : false,
+      birthPicker: new Date(),
+    dateBirth : false,
       rules: {
       required: (v) => !!v || "This field is required",
       email: (v) =>
         /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) || "Invalid email format",
       phone: (v) =>
         /^(?:0|\+95)9[24679]\d{7,9}$/.test(v) || "Invalid Myanmar phone number",
-      nrc: (v) =>
-        /^\d{1,2}\/[A-Z]{3}\([A-Z]\)\d{6}$/.test(v) || "Invalid NRC format",
+    nrc: (v) =>
+        /^\d{1,12}\/[A-Z]{3}\([NPE]\)\d{6}$/.test(v) || "Invalid NRC format",
+        name: (v) =>
+        /^[A-Za-z]+(?:\s[A-Za-z]+)*$/.test(v) || "Invalid name format",
+        // password: (v)=> /[A-Za-z0-9]\d{8}/.test(v) || "invalid",
+
+        age: (v) => {
+    if (!v) return "Date of Birth is required";
+    const today = new Date();
+    const birthDate = new Date(v.split("-").reverse().join("-")); // Convert dd-MM-yyyy to yyyy-MM-dd
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const m = today.getMonth() - birthDate.getMonth();
+    if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+      age--;
+    }
+    return (age >= 23 && age <= 70) || "You must be between 23 and 70 years old ";
+  }
     },
     startPicker: new Date(),
     startMenu: false,
@@ -498,6 +533,18 @@ export default {
     
   },
   methods: {
+    
+formatTeacherName(teacher) {
+  if (teacher.degree?.includes("Ph.D")) {
+    // Decide prefix based on gender
+    const prefix = teacher.gender === "Female" ? "Dr Daw" : "Dr U";
+    // Avoid double-prefixing if already present
+    if (!teacher.name.startsWith(prefix)) {
+      return `${prefix} ${teacher.name}`;
+    }
+  }
+  return teacher.name;
+},
     
       // saveUser() {
       //     this.showForm = false;
@@ -652,6 +699,10 @@ computed: {
       }
     }
   },
+   birthPicker(){
+      this.dateBirth = false;
+      this.user.age = format(this.birthPicker,"dd-MM-yyyy");
+    },
     startPicker() {
       this.startMenu = false;
       this.user.startDate = format(this.startPicker, "dd-MM-yyyy");
@@ -748,6 +799,3 @@ computed: {
 
 
 </style>
-
- 
- 
