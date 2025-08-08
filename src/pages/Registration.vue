@@ -1,4 +1,4 @@
-<template>
+<!-- <template>
   <v-app class="d-flex align-center justify-center">
     <div class="background-image d-flex align-center justify-center">
       <v-card class="pa-8 bg-light-blue-lighten-4" elevation="16" style="width: 400px; min-width: 300px;">
@@ -82,4 +82,4 @@ export default {
   object-fit: cover;
   border-radius: 50%;
 }
-</style>
+</style> -->

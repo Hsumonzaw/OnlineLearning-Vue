@@ -5,6 +5,7 @@ class LoginService {
   constructor() {
     this.axios = axios;
   }
+
   loginAccount(user) {
     let url = `/useraccounts/login`;
     return axios
@@ -15,6 +16,21 @@ class LoginService {
         },
       })
       .then((request) => request.data);
+  }
+
+  // Corrected method to send JSON data
+  registerAccount(user) {
+    return axios.post(`/free/useraccounts`, user)
+      .then(res => res.data);
+  }
+
+  // This new method is for sending the photo as multipart/form-data
+  updatePhoto(formData, userId) {
+    return axios.post(`/useraccounts/${userId}/photo`, formData, {
+      headers: {
+        "Content-Type": "multipart/form-data"
+      }
+    }).then(res => res.data);
   }
 }
 

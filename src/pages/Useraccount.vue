@@ -3,7 +3,10 @@
     <!-- Table Section -->
     <v-row class="title">
       <v-col cols="12">
-        <h1 style="background-color: #b3e5fc; text-align: center;" class="mt-1 mb-1">
+        <h1
+          style="background-color: #b3e5fc; text-align: center"
+          class="mt-1 mb-1"
+        >
           User Informations
         </h1>
         <v-col cols="2" class="pl-1 pt-2">
@@ -21,6 +24,10 @@
             filled
             @update:modelValue="userListMethodByType"
           ></v-autocomplete>
+          <v-btn color="green" class="ml-2" @click="exportToWord">
+            <v-icon left>mdi-microsoft-word</v-icon>
+            Export to Word
+          </v-btn>
         </v-col>
         <v-tooltip location="top">
           <template v-slot:activator="{ props }">
@@ -170,7 +177,6 @@
           </v-menu>
 
           <v-text-field
-          
             label="Name"
             v-model="user.name"
             :rules="[rules.required, rules.name]"
@@ -180,7 +186,6 @@
             label="User Name"
             v-model="user.userName"
             :rules="[(v) => !!v || 'required']"
-
           ></v-text-field>
 
           <!-- <v-text-field
@@ -243,16 +248,16 @@
             required
           ></v-text-field>
 
-             <v-text-field
-              v-model="user.password"
-              label="Password"
-              
-              :type="showPassword ? 'text' : 'password'"
-              :rules="passwordRules" :append-inner-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
-              @click:append-inner="showPassword = !showPassword"
-              variant="outlined"
-              density="compact"
-            />
+          <v-text-field
+            v-model="user.password"
+            label="Password"
+            :type="showPassword ? 'text' : 'password'"
+            :rules="passwordRules"
+            :append-inner-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
+            @click:append-inner="showPassword = !showPassword"
+            variant="outlined"
+            density="compact"
+          />
 
           <v-text-field
             v-model="user.phonenum"
@@ -286,10 +291,7 @@
             filled
           ></v-autocomplete>
 
-          <v-text-field
-            label="Degree"
-            v-model="user.degree"
-          ></v-text-field>
+          <v-text-field label="Degree" v-model="user.degree"></v-text-field>
         </v-card-text>
         <v-card-actions class="justify-end pr-5">
           <v-btn
@@ -302,7 +304,7 @@
           <v-btn
             class="text-black"
             style="background-color: red"
-           @click="showForm = false"
+            @click="showForm = false"
             >CANCEL</v-btn
           >
         </v-card-actions>
@@ -365,7 +367,7 @@ export default {
     startPicker: new Date(),
     startMenu: false,
     birthPicker: new Date(),
-    dateBirth : false,
+    dateBirth: false,
     dialogDelete: false,
     userPhotoDialog: false,
     showForm: false,
@@ -377,7 +379,7 @@ export default {
     phone: "",
     nrc: "",
     name: "",
-    genderList: ["Male","Female"],
+    genderList: ["Male", "Female"],
     rules: {
       required: (v) => !!v || "This field is required",
       email: (v) =>
@@ -387,9 +389,9 @@ export default {
       nrc: (v) =>
         /^\d{1,2}\/[A-Z]{3}\([NPE]\)\d{6}$/.test(v) || "Invalid NRC format",
       name: (v) =>
-        /^[A-Za-z]+(?:\s[A-Za-z]+)*$/.test(v) || "Invalid name format"
+        /^[A-Za-z]+(?:\s[A-Za-z]+)*$/.test(v) || "Invalid name format",
     },
-    showPassword : false,
+    showPassword: false,
   }),
   props: { hideToolbar: Function },
   mounted: function () {
@@ -403,6 +405,38 @@ export default {
     this.userListMethodByType();
   },
   methods: {
+    exportToWord() {
+  // Get the table HTML
+  const tableHTML = document.querySelector("table").outerHTML;
+
+  // Create Word-compatible HTML
+  const wordHTML = `
+    <html xmlns:o='urn:schemas-microsoft-com:office:office' 
+          xmlns:w='urn:schemas-microsoft-com:office:word' 
+          xmlns='http://www.w3.org/TR/REC-html40'>
+    <head><meta charset="utf-8"><title>User Informations</title></head>
+    <body>
+      <h2 style="text-align:center;">User Informations</h2>
+      ${tableHTML}
+    </body>
+    </html>
+  `;
+
+  // Create Blob for Word file
+  const blob = new Blob(['\ufeff', wordHTML], {
+    type: 'application/msword'
+  });
+
+  // Create download link
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = "User_Informations.doc";
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+}
+,
     getUserPhotoUrl(photo) {
       if (!photo) return "path/to/default-image.png"; // fallback image path
       return `${axios.defaults.baseURL}/userphoto/${photo}.png`;
@@ -545,24 +579,24 @@ export default {
       });
     },
     calculateAge(dob) {
-  const today = new Date();
-  const birthDate = new Date(dob);
-  let age = today.getFullYear() - birthDate.getFullYear();
-  const m = today.getMonth() - birthDate.getMonth();
-  if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
-    age--;
-  }
-  return age;
-}
+      const today = new Date();
+      const birthDate = new Date(dob);
+      let age = today.getFullYear() - birthDate.getFullYear();
+      const m = today.getMonth() - birthDate.getMonth();
+      if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+        age--;
+      }
+      return age;
+    },
   },
   watch: {
     startPicker() {
       this.startMenu = false;
-      this.user.startDate = format(this.startPicker, "dd-MM-yyyy"); 
+      this.user.startDate = format(this.startPicker, "dd-MM-yyyy");
     },
-    birthPicker(){
+    birthPicker() {
       this.dateBirth = false;
-      this.user.age = format(this.birthPicker,"dd-MM-yyyy");
+      this.user.age = format(this.birthPicker, "dd-MM-yyyy");
     },
     showForm(newVal) {
       if (!newVal) {
@@ -610,5 +644,4 @@ tr:hover {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
   z-index: 999;
 }
-
 </style>

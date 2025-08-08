@@ -64,14 +64,18 @@
           <v-icon>{{ isDark ? 'mdi-white-balance-sunny' : 'mdi-weather-night' }}</v-icon>
         </v-btn>
 
+       <span style="color: white; font-weight: bold; margin-left: 12px; margin-right: 16px; align-self: center;">
+       {{ userData.userName || "Guest" }}
+       </span> 
+
         <!-- Profile Avatar -->
         <v-menu offset-y>
           <template v-slot:activator="{ props }">
-            <v-btn icon v-bind="props">
-              <v-avatar size="30">
+            <v-btn icon v-bind="props" class="d-flex align-center" style="gap: 8px;">
+              <v-avatar size="30" class="mr-2">
                 <img :src="photoSrc" alt="profile" class="profile-img" @error="onImgError">
               </v-avatar>
-            </v-btn>
+       </v-btn>
           </template>
 
           <v-card min-width="120">
@@ -82,6 +86,12 @@
               <v-list-item v-else @click="logout">
                 <v-list-item-title>Log Out</v-list-item-title>
               </v-list-item>
+              <v-list-item @click="showProfile = true">
+             <v-list-item-title>View Profile</v-list-item-title>
+             </v-list-item>
+             <v-list-item @click="showChangePassword = true">
+            <v-list-item-title>Change Password</v-list-item-title>
+            </v-list-item>
             </v-list>
           </v-card>
         </v-menu>
@@ -141,11 +151,77 @@
         </p>
       </v-container>
     </v-footer>
+    <!-- View Profile Dialog -->
+<v-dialog v-model="showProfile" max-width="500px">
+  <v-card>
+    <v-card-title>
+      <span class="text-h6">Your Profile</span>
+    </v-card-title>
+
+    <v-card-text>
+      <v-row>
+        <v-col cols="12" class="text-center">
+          <v-avatar size="100">
+            <v-img :src="photoSrc" @error="onImgError" />
+          </v-avatar>
+        </v-col>
+        <v-col cols="12">
+          <v-list>
+            <v-list-item><b>Username:</b> {{ userData.userName }}</v-list-item>
+            
+            <v-list-item><b>Role:</b> {{ userData.role }}</v-list-item>
+          </v-list>
+
+        </v-col>
+      </v-row>
+    </v-card-text>
+    <!-- <v-list-item><b>Name:</b> {{ userData.name }}</v-list-item> -->
+
+    <v-card-actions>
+      <v-btn color="primary" @click="showProfile = false">Close</v-btn>
+    </v-card-actions>
+  </v-card>
+</v-dialog>
+
+<!-- Change Password Dialog -->
+<v-dialog v-model="showChangePassword" max-width="500px">
+  <v-card>
+    <v-card-title>Change Password</v-card-title>
+    <v-card-text>
+      <v-text-field v-model="passwordForm.oldPassword" label="Old Password" type="password" />
+
+      <v-text-field
+        v-model="passwordForm.newPassword"
+        label="New Password"
+        :append-icon="showNewPassword ? 'mdi-eye' : 'mdi-eye-off'"
+        :type="showNewPassword ? 'text' : 'password'"
+        @click:append="showNewPassword = !showNewPassword"
+      />
+
+      <v-text-field
+        v-model="passwordForm.confirmPassword"
+        label="Confirm New Password"
+        :append-icon="showConfirmPassword ? 'mdi-eye' : 'mdi-eye-off'"
+        :type="showConfirmPassword ? 'text' : 'password'"
+        @click:append="showConfirmPassword = !showConfirmPassword"
+      />
+    </v-card-text>
+    <v-card-actions>
+      <v-btn color="primary" @click="submitPasswordChange">Change</v-btn>
+      <v-btn @click="showChangePassword = false">Cancel</v-btn>
+    </v-card-actions>
+  </v-card>
+</v-dialog>
+
+
+
   </v-app>
 </template>
 
 <script>
+import { ref, reactive } from 'vue'
 import axios from "./config";
+;
 
 export default {
   data: () => ({
@@ -154,21 +230,45 @@ export default {
     showNavigation: true,
     userData: {},
     isDark: false,
-    showTeacher : false,
-    isLoggedIn: localStorage.getItem("isLoggedIn") === "true"
+    showTeacher: false,
+    isLoggedIn: localStorage.getItem("isLoggedIn") === "true",
+    showProfile: false,
+    showNewPassword: false,
+  showConfirmPassword: false,
+    showChangePassword: false,
+    passwordForm: {
+      oldPassword: '',
+      newPassword: '',
+      confirmPassword: '',
+    },
+    socialIcons: ["mdi-facebook", "mdi-twitter", "mdi-instagram", "mdi-youtube"]
   }),
 
   mounted() {
-    this.userData = JSON.parse(localStorage.getItem("user"));
-    
-    if(this.userData?.role=="TEACHER"){
+    this.userData = JSON.parse(localStorage.getItem("user")) || {};
+    console.log('User data from localStorage:', this.userData);
+    if (this.userData?.role === "TEACHER") {
       this.showTeacher = false;
-    }else{
+    } else {
       this.showTeacher = true;
     }
+
     this.getLoginMethod();
     this.setTheme();
     this.setUserPhoto();
+  },
+
+  watch: {
+    isDark(val) {
+      this.$vuetify.theme.global.name = val ? 'dark' : 'light';
+    },
+
+    userData: {
+      handler(newVal) {
+        console.log("Updated userData:", newVal);
+      },
+      deep: true
+    }
   },
 
   methods: {
@@ -179,16 +279,17 @@ export default {
     },
 
     getLoginMethod() {
-      this.userData = JSON.parse(localStorage.getItem("user"));
-      if(this.userData?.role=="TEACHER"){
-      this.showTeacher = false;
-    }else{
-      this.showTeacher = true;
-    }
+      this.userData = JSON.parse(localStorage.getItem("user")) || {};
+
+      if (this.userData?.role === "TEACHER") {
+        this.showTeacher = false;
+      } else {
+        this.showTeacher = true;
+      }
+
       if (!this.userData?.password) {
         this.isLoggedIn = false;
         this.showNavigation = false;
-        //this.$router.push({ path: "/" }).catch(() => {});
       } else {
         axios.defaults.headers.common["Authorization"] = this.userData.password;
         this.showNavigation = true;
@@ -224,7 +325,6 @@ export default {
     },
 
     hideToolbar() {
-      //this.userData = JSON.parse(localStorage.getItem("user"));
       this.getLoginMethod();
     },
 
@@ -232,16 +332,87 @@ export default {
       this.isDark = !this.isDark;
       localStorage.setItem("theme", this.isDark ? "dark" : "light");
       this.$vuetify.theme.global.name = this.isDark ? 'dark' : 'light';
-    }
-  },
+    },
 
-  watch: {
-    isDark(val) {
-      this.$vuetify.theme.global.name = val ? 'dark' : 'light';
-    }
+//    submitPasswordChange() {
+//   // client-side validation
+//   if (this.passwordForm.newPassword !== this.passwordForm.confirmPassword) {
+//     alert("Passwords do not match!");
+//     return;
+//   }
+
+//   if (!this.userData?.password) {
+//     alert("You are not logged in.");
+//     return;
+//   }
+
+//   // Use relative path (no /api/v1 prefix) so it combines with axios.defaults.baseURL correctly
+// axios.put(`/useraccounts/${this.userData.userAccountId}/changepassword`, {
+//     oldPassword: this.passwordForm.oldPassword,
+//     newPassword: this.passwordForm.newPassword,
+//   })
+//   .then((res) => {
+//     alert("Password changed successfully!");
+//     this.showChangePassword = false;
+//     // clear sensitive fields only on success
+//     this.passwordForm.oldPassword = '';
+//     this.passwordForm.newPassword = '';
+//     this.passwordForm.confirmPassword = '';
+//   })
+//   .catch(err => {
+//     console.error('Change password error:', err);
+
+//     // Better error message for the user if server sent one
+//     if (err.response && err.response.data) {
+//       // try to show an informative message from the backend
+//       const serverMsg =
+//         typeof err.response.data === 'string'
+//           ? err.response.data
+//           : err.response.data.message || JSON.stringify(err.response.data);
+//       alert(`Failed to change password: ${serverMsg}`);
+//     } else if (err.request) {
+//       alert("No response from server. Please check your network or backend.");
+//     } else {
+//       alert("Failed to change password. Please try again.");
+//     }
+//   });
+// }
+
+submitPasswordChange() {
+  if (this.passwordForm.newPassword !== this.passwordForm.confirmPassword) {
+    alert("Passwords do not match!");
+    return;
+  }
+
+  if (!this.userData?.userAccountId) {
+    alert("User ID missing. Please login again.");
+    return;
+  }
+
+axios.put(`/useraccounts/${this.userData.userAccountId}/changepassword`, null, {
+  params: {
+    oldPassword: this.passwordForm.oldPassword,
+    newPassword: this.passwordForm.newPassword
+  }
+})
+  .then(res => {
+    alert("Password changed successfully!");
+    this.showChangePassword = false;
+    this.passwordForm.oldPassword = '';
+    this.passwordForm.newPassword = '';
+    this.passwordForm.confirmPassword = '';
+  })
+  .catch(err => {
+    console.error('Change password error:', err);
+    alert('Failed to change password. Please try again.');
+  });
+}
+
+
   }
 };
 </script>
+
 
 <style scoped>
 .v-toolbar.light-bar {

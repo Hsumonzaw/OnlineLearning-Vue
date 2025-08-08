@@ -117,6 +117,8 @@
   </v-btn>
 </v-card>
 
+   
+
 
           </Motion>
     </v-col>
@@ -613,7 +615,7 @@ async saveUser() {
      getLanguagePhotoUrl(lanPhoto) {
       return `${axios.defaults.baseURL}/languagephoto/${lanPhoto}.png`;
     },
-    goToLesson(languages){
+    goToUserCourses(languages){
      
       let languagesId = languages.languagesId;
       let query = { languagesId };
