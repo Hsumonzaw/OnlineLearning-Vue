@@ -3,7 +3,7 @@
       <!-- Table Section -->
     <v-row class="title">
       <v-col cols="12" >
-        <h1 style="background-color:#b3e5fc;text-align: center;">Languages</h1>
+        <h1 style="background-color:#b3e5fc;text-align: center;">Courses</h1>
   <v-tooltip location="top">
   <template v-slot:activator="{ props }">
     <v-btn
@@ -16,7 +16,7 @@
       <v-icon size="36" color="white">mdi-plus</v-icon>
     </v-btn>
   </template>
-  <span>Add Language</span>
+  <span>Add Courses</span>
 </v-tooltip>
 
 
@@ -24,10 +24,10 @@
           <thead>
             <tr>
               <th class="text-center white--text bg-primary">No.</th>
-              <th class="text-center white--text bg-primary">Name</th>
-              <th class="text-center white--text bg-primary" v-if="showdemand">Language Photo</th>
+              <th class="text-center white--text bg-primary">Course Name</th>
+              <th class="text-center white--text bg-primary" v-if="showdemand">Course Images</th>
 
-              <th class="text-center white--text bg-primary" v-if="showTeacher">Amount</th>
+              <th class="text-center white--text bg-primary" v-if="showTeacher">Course Fees</th>
               <!-- <th class="text-center white--text bg-primary">Exam Link</th> -->
               <th class="text-center white--text bg-primary" v-if="showTeacher">Exam Fee</th>
               <th class="text-center white--text bg-primary" v-if="showdemand">Book Link</th>
@@ -59,10 +59,10 @@
   loading="lazy"
 /></td>
 
-              <td class="text-start" v-if="showTeacher">{{ item?.amount }}</td>
+              <td class="text-center" v-if="showTeacher">{{ item?.amount }}</td>
 
               <!-- <td class="text-start">{{ item?.examLink }}</td> -->
-              <td class="text-start" v-if="showTeacher">{{ item?.examFee }}</td>
+              <td class="text-center" v-if="showTeacher">{{ item?.examFee }}</td>
               <td class="text-center" v-if="showdemand">{{ item?.pdf }}</td>
               <td class="text-center" v-if="showdemand">
                 <div>

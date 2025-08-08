@@ -50,18 +50,23 @@
             <tr>
               <th class="text-center white--text bg-primary">No.</th>
               <th class="text-center white--text bg-primary">StartDate</th>
-              <th class="text-center white--text bg-primary">Name</th>
-              <th class="text-center white--text bg-primary">UserName</th>
-              <th class="text-center white--text bg-primary">Date Of Birth</th>
+              <th class="text-center white--text bg-primary">Full Name</th>
+              <th class="text-center white--text bg-primary">Language Name</th>
+              <!-- <th class="text-center white--text bg-primary">UserName</th> -->
+              <!-- <th class="text-center white--text bg-primary">Date Of Birth</th> -->
               <th class="text-center white--text bg-primary">Gender</th>
               <th class="text-center white--text bg-primary">NRC</th>
               <th class="text-center white--text bg-primary">Email</th>
               <th class="text-center white--text bg-primary">Phone</th>
               <th class="text-center white--text bg-primary">Address</th>
-              <th class="text-center white--text bg-primary">UserType</th>
+              <!-- <th class="text-center white--text bg-primary">UserType</th> -->
               <th class="text-center white--text bg-primary">Photo</th>
               <th class="text-center white--text bg-primary">Degree</th>
               <th class="text-center white--text bg-primary">File</th>
+              <th class="text-center white--text bg-primary">Exam Mark</th>
+              <th class="text-center white--text bg-primary">Generate Certificate</th>
+              
+
               <!-- <th class="text-center white--text bg-primary">Action</th> -->
             </tr>
           </thead>
@@ -78,20 +83,22 @@
               }"
             >
               <td class="text-center">{{ index + 1 }}</td>
-              <td class="text-center">{{ item.startDate }}</td>
-              <td class="text-center">{{ item.name }}</td>
-              <td class="text-center">{{ item.userName }}</td>
-              <td class="text-center">{{ item.age || "-" }}</td>
-              <td class="text-center">{{ item.gender || "-" }}</td>
-              <td class="text-center">{{ item.nrc || "-" }}</td>
-              <td class="text-center">{{ item.email || "-" }}</td>
+              <td class="text-center">{{ item.studentDto?.startDate }}</td>
+              <td class="text-center">{{ item.studentDto?.name }}</td>
+              <td class="text-center">{{ item.languagesDto?.name }}</td>
 
-              <td class="text-start">{{ item.phonenum || "-" }}</td>
-              <td class="text-start">{{ item.address || "-" }}</td>
-              <td class="text-start">{{ item.userType }}</td>
+              <!-- <td class="text-center">{{ item.userName }}</td> -->
+              <!-- <td class="text-center">{{ item.age || "-" }}</td> -->
+              <td class="text-center">{{ item.studentDto?.gender || "-" }}</td>
+              <td class="text-center">{{ item.studentDto?.nrc || "-" }}</td>
+              <td class="text-center">{{ item.studentDto?.email || "-" }}</td>
+
+              <td class="text-start">{{ item.studentDto?.phonenum || "-" }}</td>
+              <td class="text-start">{{ item.studentDto?.address || "-" }}</td>
+              <!-- <td class="text-start">{{ item?.studentDto.userType }}</td> -->
               <td class="text-center">
                 <v-img
-                  :src="getUserPhotoUrl(item.photo)"
+                  :src="getUserPhotoUrl(item?.studentDto?.photo)"
                   alt="People Photo"
                   max-width="80"
                   max-height="80"
@@ -99,8 +106,11 @@
                   loading="lazy"
                 />
               </td>
-              <td class="text-center">{{ item.degree }}</td>
-              <td class="text-center">{{ item.file }}</td>
+              <td class="text-center">{{ item.studentDto?.degree }}</td>
+              <td class="text-center">{{ item.studentDto?.file }}</td>
+              <td class="text-center">{{ item.languagesDto?.examDto?.examMark }}</td>
+              <td class="text-center">{{ item.studentDto.certificate }}</td>
+
 
               <!-- <td class="text-center">
                 <v-btn class="ml-1" small icon color="black" density="compact">
@@ -360,8 +370,8 @@ export default {
     selectedOne: {},
     user: {},
     userList: [],
-    userTypeListSearch: ["ALL", "STAFF", "STUDENT", "TEACHER", "ADMIN"],
-    userTypeList: ["STAFF", "STUDENT", "TEACHER", "ADMIN"],
+    userTypeListSearch: ["ALL", "STUDENT", "TEACHER", "ADMIN"],
+    userTypeList: ["STUDENT", "TEACHER", "ADMIN"],
 
     saveOrupdate: "SAVE",
     startPicker: new Date(),

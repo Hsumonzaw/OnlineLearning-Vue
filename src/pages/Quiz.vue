@@ -23,7 +23,7 @@
 
 
     </v-col>
-        <v-tooltip location="top">
+        <v-tooltip location="top" v-if="showTeacher">
   <template v-slot:activator="{ props }">
     <v-btn
       v-bind="props"
@@ -52,7 +52,7 @@
               <th class="text-center white--text bg-primary">Correct Answer</th>
               <th class="text-center white--text bg-primary">Date</th>
               <th class="text-center white--text bg-primary">Modified Date</th>
-              <th class="text-center white--text bg-primary">Action</th>
+              <th class="text-center white--text bg-primary" v-if="showTeacher">Action</th>
             </tr>
           </thead>
           <tbody>
@@ -80,7 +80,7 @@
               <td class="text-center" >{{ item?.modifiedDate }}</td>
 
               
-              <td class="text-center">
+              <td class="text-center" v-if="showTeacher">
 
                 <v-btn class="ml-1" small icon color="green" density="compact">
                   <v-icon size="small" @click="clickEdit(item)"
@@ -101,7 +101,7 @@
     </v-row>
 
     <!-- Form Section (centered) -->
-<v-dialog v-model="showForm" max-width="500">
+<v-dialog v-model="showForm" max-width="500" v-if="showTeacher">
         <v-card class="form pa-4" elevation="4">
           
       <v-card-title class="d-flex justify-space-between align-center">
@@ -253,7 +253,13 @@ export default {
   }),
   props: {},
   mounted: function () {
-        this.userData = JSON.parse(localStorage.getItem("user"));
+         this.userData = JSON.parse(localStorage.getItem("user")) || {};
+          console.log('User data from localStorage:', this.userData);
+          if (this.userData?.role === "ADMIN") {
+            this.showTeacher = false;
+          } else {
+            this.showTeacher = true;
+          }
     // if(this.userData.role=="TEACHER"){
     //   this.showTeacher = false;
     // }else{

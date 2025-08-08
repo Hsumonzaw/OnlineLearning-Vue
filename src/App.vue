@@ -41,20 +41,55 @@
               <v-list-item-title><v-icon>mdi-account-multiple</v-icon> My Students</v-list-item-title>
             </v-list-item>
             <v-list-item @click="clickRouter('/courses')" v-if="showTeacher">
-              <v-list-item-title><v-icon>mdi-folder-open</v-icon> Courses</v-list-item-title>
+              <v-list-item-title><v-icon>mdi-folder-open</v-icon> Student Ledger</v-list-item-title>
             </v-list-item>
             <v-list-item @click="clickRouter('/languages')" v-if="showTeacher">
-              <v-list-item-title><v-icon>mdi-web</v-icon> Languages</v-list-item-title>
+              <v-list-item-title><v-icon>mdi-web</v-icon>Add Courses</v-list-item-title>
             </v-list-item>
-            <v-list-item @click="clickRouter('/lessons')">
+            <!-- <v-list-item @click="clickRouter('/lessons')">
               <v-list-item-title><v-icon>mdi-lightbulb-on-outline</v-icon>Add Lessons</v-list-item-title>
-            </v-list-item>
-             <v-list-item @click="clickRouter('/quiz')">
-              <v-list-item-title><v-icon>mdi-format-list-checks</v-icon>Add Quiz</v-list-item-title>
-            </v-list-item>
-             <v-list-item @click="clickRouter('/ans')">
+            </v-list-item> -->
+            <v-list-item
+  @click="clickRouter('/lessons')"
+  v-if="userData.role === 'ADMIN'"
+>
+  <v-list-item-title>
+    <v-icon>mdi-lightbulb-on-outline</v-icon>
+    View lesson
+  </v-list-item-title>
+</v-list-item>
+
+<v-list-item
+  @click="clickRouter('/lessons')"
+  v-if="userData.role === 'TEACHER'"
+>
+  <v-list-item-title>
+    <v-icon>mdi-lightbulb-on-outline</v-icon>
+    Add Lesson
+  </v-list-item-title>
+</v-list-item>
+             <v-list-item
+  @click="clickRouter('/quiz')"
+  v-if="userData.role === 'ADMIN'"
+>
+  <v-list-item-title>
+    <v-icon>mdi-format-list-checks</v-icon>
+    View Quiz
+  </v-list-item-title>
+</v-list-item>
+
+<v-list-item
+  @click="clickRouter('/quiz')"
+  v-if="userData.role === 'TEACHER'"
+>
+  <v-list-item-title>
+    <v-icon>mdi-format-list-checks</v-icon>
+    Add Quiz
+  </v-list-item-title>
+</v-list-item>
+             <!-- <v-list-item @click="clickRouter('/ans')">
               <v-list-item-title><v-icon>mdi mdi-account-school</v-icon>Exam Marks</v-list-item-title>
-            </v-list-item>
+            </v-list-item> -->
             
           </v-list>
         </v-menu>
@@ -272,6 +307,9 @@ export default {
   },
 
   methods: {
+    clickRouter(path) {
+      this.$router.push(path);
+    },
     setTheme() {
       const savedTheme = localStorage.getItem("theme");
       this.isDark = savedTheme === "dark";

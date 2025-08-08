@@ -37,7 +37,7 @@
     
       </v-col>
       </v-row>
- <v-tooltip location="top">
+ <v-tooltip location="top" v-if="showTeacher">
   <template v-slot:activator="{ props }">
     <v-btn
       v-bind="props"
@@ -65,7 +65,7 @@
               <!-- <th class="text-center white--text bg-primary" v-if="showTeacher">Amount</th> -->
               <th class="text-center white--text bg-primary">Date</th>
               <th class="text-center white--text bg-primary">ModifiedDate</th>
-              <th class="text-center white--text bg-primary">Action</th>
+              <th class="text-center white--text bg-primary" v-if="showTeacher">Action</th>
             </tr>
           </thead>
           <tbody>
@@ -88,7 +88,7 @@
               <!-- <td class="text-center" v-if="showTeacher">{{ item.languagesDto.amount || '-' }}</td> -->
               <td class="text-start">{{ item.date }}</td>
               <td class="text-start">{{ item.modifiedDate }}</td>
-              <td class="text-center">
+              <td class="text-center" v-if="showTeacher">
                 <!-- <v-btn class="ml-1" small icon color="black" density="compact">
                   <v-icon size="small" @click="FileMethod(item)">mdi-file</v-icon></v-btn
                 > -->
@@ -107,7 +107,7 @@
     </v-row>
 
     <!-- Form Section (centered) -->
-    <v-dialog v-model="showForm" max-width="500">
+    <v-dialog v-model="showForm" max-width="500" v-if="showTeacher">
 
         <v-card class="form pa-4" elevation="4">
           
@@ -256,7 +256,7 @@ export default {
    props: {},
   mounted: function() {
     this.userData = JSON.parse(localStorage.getItem("user"));
-    if(this.userData.role=="TEACHER"){
+    if(this.userData.role=="ADMIN"){
       this.showTeacher = false;
     }else{
       this.showTeacher = true;

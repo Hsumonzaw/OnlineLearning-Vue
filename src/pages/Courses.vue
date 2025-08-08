@@ -3,7 +3,7 @@
     <!-- Table Section -->
    <v-row class="title">
       <v-col cols="12">
-        <h1 style="background-color: #b3e5fc; text-align: center;" class="mt-1 mb-1">Courses</h1>
+        <h1 style="background-color: #b3e5fc; text-align: center;" class="mt-1 mb-1">Student Ledger</h1>
         <v-row>
         <v-col cols="2" class="pl-1 pt-5">
       <v-autocomplete
@@ -20,6 +20,22 @@
         filled
         @update:modelValue="courseListMethodByType"
       ></v-autocomplete>
+      </v-col>
+        <v-col cols="2" class="pl-1 pt-5">
+          <v-autocomplete
+        v-model="selectedLanguage"
+        :items="languageList"
+        item-title="name"
+        item-value="languagesId"
+        label="Languages"
+        return-object
+        density="compact"
+        variant="outlined"
+        required
+        small
+        filled
+        @update:modelValue="LanguagesListMethodByType"
+      />
       </v-col>
       <!-- <v-col cols="2" class="pl-12 pt-6">
       <v-btn rounded="xl" size="large"  class="bg-blue" style="font-size: small;" @click="demand()"> 
@@ -44,7 +60,7 @@
       <v-icon size="36" color="white">mdi-plus</v-icon>
     </v-btn>
   </template>
-  <span>Add Course</span>
+  <span>Add Student Ledger</span>
 </v-tooltip>
 
         <!-- Table Full Width -->
@@ -83,6 +99,7 @@
               <td class="text-center">{{ item.studentDto?.userName }}</td>
 
               <td class="text-center">{{ item.languagesDto?.name }}</td>
+
               <td class="text-center">{{ item?.type }}</td>
               <td class="text-center">{{ item?.amount }}</td>
               <!-- <td class="text-center" v-if="showdemand"><v-img
@@ -133,6 +150,16 @@
             </tr>
             <v-divider />
           </tbody>
+          <tfoot>
+      <tr 
+        v-for="(total, index) in dynamicTotals" 
+        :key="index"
+        :class="{ 'grand-total': total.isGrandTotal }"
+      >
+        <td colspan="6" class="total-label text-center white--text bg-primary">{{ total.label }}</td>
+        <td class="total-amount text-center white--text bg-primary">{{ total.value }}</td>
+      </tr>
+    </tfoot>
         </v-table>
       </v-col>
     </v-row>
@@ -356,9 +383,25 @@ export default {
     this.courses.type = this.courseList[0];
     this.showForm = false;
     this.courseListMethodByType();
+    this.LanguagesListMethodByType();
 
   },
   methods: {
+    LanguagesListMethodByType() {
+  coursesService.getCourseList()
+    .then((response) => {
+      if (!this.selectedLanguage || !this.selectedLanguage.languagesId) {
+        this.coursesList = response;
+      } else {
+        this.coursesList = response.filter(
+          item => item.languagesDto?.languagesId === this.selectedLanguage.languagesId
+        );
+      }
+    })
+    .catch((error) => {
+      this.$swal("Fail!", error.response?.data?.message || "Error loading lessons", "error");
+    });
+},
     demand(){
       this.showdemand = false;
     },
@@ -471,6 +514,8 @@ export default {
             };
             this.showForm =false;
              this.courseListMethodByType();
+                 this.LanguagesListMethodByType();
+
           this.$swal({
           icon: "success",
           title: "Your work saved successfully!",
@@ -500,6 +545,8 @@ export default {
             this.coursesListMethod();
             this.showForm =false;
              this.courseListMethodByType();
+                 this.LanguagesListMethodByType();
+
             this.$swal({
           icon: "success",
           title: "Your work updated successfully!",
@@ -532,6 +579,8 @@ export default {
 
           this.dialogDelete = false;
           this.courseListMethodByType();
+              this.LanguagesListMethodByType();
+
           this.$swal({
             icon: "success",
             title: "Your work has been deleted",
@@ -570,6 +619,65 @@ export default {
       this.saveOrupdate = "SAVE";
     }
   },
+  },
+  computed: {
+    // Total amount for all items combined
+    totalAmount() {
+      return this.coursesList.reduce((sum, item) => sum + item.amount, 0);
+    },
+
+    // Total amount for all courses
+    totalCoursesAmount() {
+      return this.coursesList.reduce((sum, item) => {
+        if (item.type === 'COURSES') {
+          return sum + item.amount;
+        }
+        return sum;
+      }, 0);
+    },
+
+    // Total amount for all exams
+    totalExamsAmount() {
+      return this.coursesList.reduce((sum, item) => {
+        if (item.type === 'EXAM') {
+          return sum + item.amount;
+        }
+        return sum;
+      }, 0);
+    },
+
+    // Amount for each specific course or exam
+    itemTotals() {
+      const totals = {};
+      this.coursesList.forEach(item => {
+        const key = `${item.languagesDto.name} - ${item.type}`;
+        if (!totals[key]) {
+          totals[key] = 0;
+        }
+        totals[key] += item.amount;
+      });
+      return totals;
+    },
+     dynamicTotals() {
+    // If 'ALL' is selected, return all three totals.
+    if (this.type === 'ALL') {
+      return [
+       
+        { label: 'Total Amount:', value: this.totalAmount, isGrandTotal: true }
+      ];
+    } 
+    // If 'COURSES' is selected, return only the total for courses.
+    else if (this.type === 'COURSES') {
+      return [{ label: 'Total Course Amount:', value: this.totalCoursesAmount }];
+    } 
+    // If 'EXAM' is selected, return only the total for exams.
+    else if (this.type === 'EXAM') {
+      return [{ label: 'Total Exam Amount:', value: this.totalExamsAmount }];
+    }
+    
+    // Fallback if no type is selected
+    return [];
+  }
   },
   components: {},
 };
@@ -624,5 +732,6 @@ tr:hover {
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
 
 </style>
