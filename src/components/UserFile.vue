@@ -58,7 +58,7 @@ var formData = new FormData();
               //this.$emit('userMethod');
         })
         .catch(error => {
-          this.$swal("မအောင်မြင်ပါ", error.response.data.message, "error");
+          this.$swal("Unfortunately, Error", error.response.data.message, "error");
         });
     },
         changeFile: function(e) {

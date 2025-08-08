@@ -51,11 +51,11 @@
                   <v-img :src="getUserPhotoUrl(teacher.photo)" cover />
                 </v-avatar>
               </div>
-
+<!-- formatTeacherName(teacher)  -->
               <!-- Card Content -->
               <v-card-text class="text-center mt-10 px-4 pb-6">
                 <h3 class="text-h6 font-weight-bold" style="color:#1976d2;">
-                  {{ formatTeacherName(teacher) }}
+                  {{ teacher.name }}
                 </h3>
                 <p style="color: #607d8b;">🎓 Degree: {{ teacher.degree }}</p>
                 <p style="color: #607d8b;">📧 {{ teacher.email }}</p>
@@ -133,26 +133,25 @@ export default {
 
 formatTeacherName(teacher) {
   if (teacher.degree?.includes("Ph.D")) {
-    // Decide prefix based on gender
-    const prefix = teacher.gender === "Female" ? "Dr Daw" : "Dr U";
-    // Avoid double-prefixing if already present
-    if (!teacher.name.startsWith(prefix)) {
-      return `${prefix} ${teacher.name}`;
-    }
+    return `Dr. ${teacher.name}`;
+  } else {
+    return teacher.gender === "Female"
+      ? `Daw ${teacher.name}`
+      : `U ${teacher.name}`;
   }
-  return teacher.name;
 }
+
 },
 computed: {
-  displayName() {
-    if (this.user.degree && this.user.degree.includes("Ph.D")) {
-      // If degree contains "Ph.D" prefix "Dr." if not already there
-      if (!this.user.name?.startsWith("Dr.")) {
-        return "Dr. " + (this.user.name || "");
-      }
-    }
-    return this.user.name || "";
-  }
+  // displayName() {
+  //   if (this.user.degree && this.user.degree.includes("Ph.D")) {
+  //     // If degree contains "Ph.D" prefix "Dr." if not already there
+  //     if (!this.user.name?.startsWith("Dr.")) {
+  //       return "Dr. " + (this.user.name || "");
+  //     }
+  //   }
+  //   return this.user.name || "";
+  // }
 },
   watch: {
     'user.degree'(newDegree) {

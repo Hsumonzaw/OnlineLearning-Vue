@@ -56,21 +56,18 @@ class UserAccountService {
     let url = `/useraccounts/${userAccountId}`;
     return this.axios.delete(url).then((request) => request.data);
   }
-  async updatePhoto(formData, userId) {
-  try {
-    const response = await axios.post(`/api/users/${userId}/photo`, formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data'
-      }
-    });
-    return response.data;
-  } catch (error) {
-    console.error("Error uploading photo:", error);
-    throw error;
+  updatePhoto(formData, userAccountId) {
+    let url = `/useraccounts/${userAccountId}/photo`;
+    return axios
+      .put(url, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      })
+      .then((request) => request.data);
   }
-}
     updateFile(formData, userAccountId) {
-    let url = `useraccounts/${userAccountId}/file`;
+    let url = `/useraccounts/${userAccountId}/file`;
     return axios
       .put(url, formData, {
         headers: {

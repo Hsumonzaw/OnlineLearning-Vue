@@ -160,7 +160,7 @@
         <v-img :src="getUserPhotoUrl(teacher.photo)" cover />
       </v-avatar>
     </div>
-
+<!-- formatTeacherName(teacher) -->
     <!-- Card Content -->
     <v-card-text class="text-center mt-10 px-4 pb-6">
       <h3 class="text-h6 font-weight-bold" style="color:#1976d2;">{{ teacher.name }}</h3>
@@ -219,227 +219,209 @@
     style="border-radius: 16px;  width: 500px; height: 500px;"
   />
   <v-dialog v-model="showForm" max-width="700px">
-  <v-card class="pa-4" elevation="4" style="background-color: #e8f5e9;">
-    <v-card-title class="d-flex justify-space-between align-center">
-      <span class="text-h5 font-weight-bold">Apply Form</span><v-btn icon color="red" @click="showForm = false">
-        <v-icon>mdi-close</v-icon>
-      </v-btn>
-    </v-card-title>
+    <v-card class="rounded-xl" elevation="12" style="background-color: #f0f4f8;">
+      
+      <v-card-title class="d-flex justify-space-between align-center px-6 pt-6">
+        <span class="text-h5 font-weight-bold" style="color: #1a237e;">Join Our Team</span>
+        <v-btn icon color="red" @click="showForm = false">
+          <v-icon>mdi-close</v-icon>
+        </v-btn>
+      </v-card-title>
 
-    <v-card-text class="pt-0 pb-0 mb-0">
-        <v-row dense>
-
-          <!-- Preview -->
-          <v-col cols="12" sm="6" class="d-flex justify-center align-center">
-            <v-img
-              v-if="photoPreview"
-              :src="photoPreview"
-              max-width="120"
-              max-height="120"
-              class="square"
-            ></v-img>
-          </v-col>
-
-          <!-- Photo Upload -->
-          <v-col col="12" sm="6">
-            <v-file-input
-              v-model="photo"
-              label="Profile Photo"
-              prepend-icon="mdi-camera"
-              accept="image/*"
-              @change="previewImage"
-              variant="outlined"
-              density="compact"
-            />
-         
-
-          
-          <!-- Start Date -->
-        
-            <v-menu
-              v-model="startMenu"
-              :close-on-content-click="false"
-              transition="scale-transition"
-              offset-y
-            >
-              <template v-slot:activator="{ props }">
-                <v-text-field
-                  v-model="user.startDate"
-                  label="From Date"
-                  readonly
-                  v-bind="props"
-                  variant="outlined"
-                  density="compact"
-                  disabled
-                />
-              </template>
-              <v-date-picker
-                v-model="startPicker"
-                @input="user.startDate = startPicker"
-                color="primary"
-                hide-header
-              />
-            </v-menu>
-          </v-col>
-
-          <!-- Name -->
-        <v-text-field
-          
-            label="Name"
-            v-model="user.name"
-            :rules="[rules.required, rules.name]"
-          ></v-text-field>
-          <!-- Age -->
-          <v-menu
-            v-model="dateBirth"
-            full-width
-            max-width="200px"
-            min-width="290px"
-            v-bind:close-on-content-click="false"
-          >
-            <template v-slot:activator="{ props }">
-              <v-text-field
-                v-model="user.age"
-                density="compact"
+      <v-card-text class="pa-6 overflow-y-auto" style="max-height: 500px;">
+        <v-form ref="form" v-model="valid">
+          <v-row dense>
+            <v-col cols="12" class="d-flex flex-column align-center">
+              <v-avatar size="120" class="mb-4 elevation-6" style="border: 4px solid #fff;">
+                <v-img
+                  v-if="photoPreview"
+                  :src="photoPreview"
+                  alt="Profile Photo Preview"
+                  cover
+                ></v-img>
+                <v-icon v-else size="80" color="grey lighten-1">mdi-account-circle</v-icon>
+              </v-avatar>
+              <v-file-input
+                v-model="photo"
+                label="Upload Profile Photo"
+                prepend-icon="mdi-camera"
+                accept="image/*"
+                @change="previewImage"
                 variant="outlined"
-                label="Date Of Birth"
-                :rules="[rules.required, rules.age]"
+                density="compact"
+                class="mb-4"
+              />
+            </v-col>
+               <v-col cols="12" sm="6">
+              <v-select
+                v-model="user.gender"
+                :items="genderList"
+                label="Gender"
+                :rules="[(v) => !!v || 'Gender is required']"
+                variant="outlined"
+                density="compact"
+              />
+            </v-col>
 
-                readonly
-                v-bind="props"
-              ></v-text-field>
-            </template>
-            <v-date-picker
-              v-model="birthPicker"
-              color="primary"
-              hide-header
-            ></v-date-picker>
-          </v-menu>
+            <v-col cols="12" sm="6">
+              <v-text-field
+                label="Full Name"
+                v-model="formattedName"
+                :rules="[rules.required, rules.name]"
+                variant="outlined"
+                density="compact"
+              />
+            </v-col>
+            
+            <v-col cols="12" sm="6">
+              <v-text-field
+                label="Username (for login)"
+                v-model="user.userName"
+                :rules="[(v) => !!v || 'Username is required']"
+                variant="outlined"
+                density="compact"
+              />
+            </v-col>
 
-          <!-- Username -->
-          <v-col cols="12" sm="6">
-            <v-text-field
-              v-model="user.userName"
-              label="Please Fill UserName & Remember it for Log in!"
-              :rules="[(v) => !!v || 'Username is required']"
-              variant="outlined"
-              density="compact"
-            />
-          </v-col>
+            <v-col cols="12" sm="6">
+              <v-text-field
+                v-model="user.password"
+                label="Password"
+                :type="showPassword ? 'text' : 'password'"
+                :rules="passwordRules"
+                :append-inner-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
+                @click:append-inner="showPassword = !showPassword"
+                variant="outlined"
+                density="compact"
+              />
+            </v-col>
+            <v-col cols="12" sm="6">
+              <v-text-field
+                v-model="user.email"
+                label="Email"
+                :rules="[rules.required, rules.email]"
+                variant="outlined"
+                density="compact"
+              />
+            </v-col>
 
-           <v-col cols="12" sm="6">
-            <v-text-field
-              v-model="user.password"
-              label="Password"
-              
-              :type="showPassword ? 'text' : 'password'"
-              :rules="passwordRules" :append-inner-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
-              @click:append-inner="showPassword = !showPassword"
-              variant="outlined"
-              density="compact"
-            />
-          </v-col>
+            <v-col cols="12" sm="6">
+              <v-text-field
+                v-model="user.nrc"
+                label="NRC"
+                :rules="[rules.required, rules.nrc]"
+                variant="outlined"
+                density="compact"
+              />
+            </v-col>
+            <v-col cols="12" sm="6">
+              <v-text-field
+                v-model="user.phonenum"
+                label="Phone Number"
+                :rules="[rules.required, rules.phone]"
+                variant="outlined"
+                density="compact"
+              />
+            </v-col>
 
-              <v-autocomplete
-            v-model="user.gender"
-            :items="genderList"
-            label="Gender"
-            required
-            density="compact"
-            variant="outlined"
-            filled
-          ></v-autocomplete>
-
-          <!-- NRC -->
-          <v-text-field
-            v-model="user.nrc"
-            label="NRC"
-            :rules="[rules.required, rules.nrc]"
-            required
-          ></v-text-field>
-
-          <!-- Email -->
-          <v-col cols="12" sm="6">
-            <v-text-field
-              v-model="user.email"
-              label="Email"
-              :rules="[rules.required, rules.email]"
-              variant="outlined"
-              density="compact"
-              required
-            />
-          </v-col>
-
-          <!-- Password -->
+            <v-col cols="12" sm="6">
+              <v-menu
+                v-model="dateBirth"
+                :close-on-content-click="false"
+                transition="scale-transition"
+                offset-y
+              >
+                <template v-slot:activator="{ props }">
+                  <v-text-field
+                    v-model="user.age"
+                    label="Date of Birth"
+                    :rules="[rules.required, rules.age]"
+                    readonly
+                    v-bind="props"
+                    variant="outlined"
+                    density="compact"
+                  />
+                </template>
+                <v-date-picker
+                  v-model="birthPicker"
+                  color="primary"
+                  hide-header
+                  @update:modelValue="dateBirth = false"
+                />
+              </v-menu>
+            </v-col>
          
 
-          <!-- Phone Number -->
-          <v-col cols="12" sm="6">
-            <v-text-field
-              v-model="user.phonenum"
-              label="Phone Number"
-              :rules="[rules.required, rules.phone]"
-              variant="outlined"
-              density="compact"
-              required
-            />
-          </v-col>
+            <v-col cols="12" sm="6">
+              <v-select
+                v-model="user.degree"
+                :items="degreeOptions"
+                label="Degree"
+                :rules="[(v) => !!v || 'Degree is required']"
+                variant="outlined"
+                density="compact"
+              />
+            </v-col>
+            <v-col cols="12" sm="6">
+              <v-menu
+                v-model="startMenu"
+                :close-on-content-click="false"
+                transition="scale-transition"
+                offset-y
+              >
+                <template v-slot:activator="{ props }">
+                  <v-text-field
+                    v-model="user.startDate"
+                    label="From Date"
+                    readonly
+                    v-bind="props"
+                    variant="outlined"
+                    density="compact"
+                    disabled
+                  />
+                </template>
+                <v-date-picker
+                  v-model="startPicker"
+                  color="primary"
+                  hide-header
+                  @update:modelValue="startMenu = false"
+                />
+              </v-menu>
+            </v-col>
 
-          <!-- Address -->
-          <!-- <v-col cols="12" sm="6">
-            <v-textarea
-              v-model="user.address"
-              label="Address"
-              variant="outlined"
-              density="compact"
-            />
-          </v-col> -->
-                    <v-col cols="12" sm="6">
-            <v-text-field
-              v-model="user.address"
-              label="Address"
-              variant="outlined"
-              density="compact"
-            />
-          </v-col>
+            <v-col cols="12" sm="6">
+              <v-text-field
+                v-model="user.address"
+                label="Address"
+                variant="outlined"
+                density="compact"
+              />
+            </v-col>
+            <v-col cols="12" sm="6">
+              <v-file-input
+                v-model="file"
+                label="Please Upload Your CV"
+                accept=".pdf"
+                prepend-icon="mdi-file-document"
+                variant="outlined"
+                density="compact"
+                :rules="[(v) => !!v || 'CV is required']"
+              />
+            </v-col>
+          </v-row>
+        </v-form>
+      </v-card-text>
 
-           <!-- Degree -->
-         <v-select
-  v-model="user.degree"
-  :items="degreeOptions"
-  label="Degree"
-  :rules="[(v) => !!v || 'Degree is required']"
-  variant="outlined"
-  density="compact"
-/>
-
-          
-          <!-- Document Upload -->
-        <v-col cols="12" sm="6">
-          <v-file-input
-            v-model="file"
-            label="Please Fill Your CV"
-            accept=".pdf"
-            prepend-icon="mdi-file"
-            variant="outlined"
-            density="compact"
-          />
-        </v-col>
-
-         
-        </v-row>
-    </v-card-text>
-
-    <v-card-actions class="justify-end pr-5 mb-8">
+      <v-card-actions class="justify-end px-6 pb-6">
           <v-btn
             class="text-black"
             style="background-color: #2196f3"
             @click="saveUser()"
             >{{ saveOrupdate }}</v-btn
           >
-        </v-card-actions>
-  </v-card>
-</v-dialog>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
 </v-container>
   </v-app>
    
@@ -454,47 +436,60 @@ import userService from "@/service/UserAccountService";
 export default {
   data() {
     return {
-      images:[
-        "/src/assets/homepage.jpg",
-        "/src/assets/homepage1.jpg",
-        "/src/assets/hpp.jpg",
-        "/src/assets/homepageLanguage2.jpg",
-
-      ],
-      degreeOptions: [
-  "B.C.Sc",
-  "M.C.Sc",
-  "Ph.D(IT)",
-  "B.A (English)",
-  "M.A (English)",
-  "B.C.Tech",
-  "M.C.Teach",
-  "Ph.D (CHT)",
-  "D.C.Sc",
-  "M.A.Sc"
-],
-// name : formatTeacherName(teacher),
-      genderList : ["Female","Male"],
-      photos: [],
-      photo: null,
-      photoPreview: null,
-      file : null,
-
-      latestUserLanguages: [],
-      teachers:[],
+      images: [
+      "/src/assets/homepage.jpg",
+      "/src/assets/homepage1.jpg",
+      "/src/assets/hpp.jpg",
+      "/src/assets/homepageLanguage2.jpg",
+    ],
+    degreeOptions: [
+      "B.C.Sc",
+      "M.C.Sc",
+      "Ph.D(IT)",
+      "B.A (English)",
+      "M.A (English)",
+      "B.C.Tech",
+      "M.C.Teach",
+      "Ph.D (CHT)",
+      "D.C.Sc",
+      "M.A.Sc",
+    ],
+    genderList: ["Female", "Male"],
+    photos: [],
+    photo: null,
+    photoPreview: null,
+    file: null,
+    latestUserLanguages: [],
+    teachers: [],
     
-      valid: false,
-      user:{},
-      userAccounts: [],
-      showForm : false,
-      valid: false,
-      email: "",
-      phone: "",
+    // This is the duplicate declaration that causes the problem
+    // You have another 'valid: false' later on as well.
+    // valid: false, 
+
+    user: {
+      userType: "TEACHER",
+      name: "",
+      gender: "",
+      degree: "",
+      startDate: "",
+      age: "",
+      userName: "",
+      password: "",
       nrc: "",
-      showPassword : false,
-      birthPicker: new Date(),
-    dateBirth : false,
-      rules: {
+      email: "",
+      phonenum: "",
+      address: ""
+    },
+    userAccounts: [],
+    showForm: false, // Keep this one and initialize it
+    valid: false, // Keep this one and initialize it
+    email: "",
+    phone: "",
+    nrc: "",
+    showPassword: false,
+    birthPicker: new Date(),
+    dateBirth: false,
+    rules: {
       required: (v) => !!v || "This field is required",
       email: (v) =>
         /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) || "Invalid email format",
@@ -503,7 +498,7 @@ export default {
     nrc: (v) =>
         /^\d{1,12}\/[A-Z]{3}\([NPE]\)\d{6}$/.test(v) || "Invalid NRC format",
         name: (v) =>
-        /^[A-Za-z]+(?:\s[A-Za-z]+)*$/.test(v) || "Invalid name format",
+        /^(?:Dr\.\s*)?[A-Za-z]+(?:\s[A-Za-z]+)*$/.test(v) || "Invalid name format",
         // password: (v)=> /[A-Za-z0-9]\d{8}/.test(v) || "invalid",
 
         age: (v) => {
@@ -521,8 +516,10 @@ export default {
     startPicker: new Date(),
     startMenu: false,
     userTypeList: ["ALL", "STAFF", "STUDENT", "TEACHER", "ADMIN"],
-    user: { userType: "TEACHER" },
     saveOrupdate: "SAVE",
+
+   
+     
   }
 },
   
@@ -538,15 +535,15 @@ export default {
     
 formatTeacherName(teacher) {
   if (teacher.degree?.includes("Ph.D")) {
-    // Decide prefix based on gender
-    const prefix = teacher.gender === "Female" ? "Dr Daw" : "Dr U";
-    // Avoid double-prefixing if already present
-    if (!teacher.name.startsWith(prefix)) {
-      return `${prefix} ${teacher.name}`;
-    }
+    return `Dr. ${teacher.name}`;
+  } else {
+    return teacher.gender === "Female"
+      ? `Daw ${teacher.name}`
+      : `U ${teacher.name}`;
   }
-  return teacher.name;
 },
+
+
     
       // saveUser() {
       //     this.showForm = false;
@@ -564,8 +561,11 @@ formatTeacherName(teacher) {
 },
 async saveUser() {
   try {
+    // Prepare user object to save with formattedName
+    const userToSave = { ...this.user, name: this.formattedName };
+
     // Create user (returns ID)
-    const createdUserId = await userService.addUserFree(this.user);
+    const createdUserId = await userService.addUserFree(userToSave);
 
     // Upload photo if provided
     if (this.photo) {
@@ -575,7 +575,6 @@ async saveUser() {
     }
     if (this.file) {
       const fileForm = new FormData();
-      
       fileForm.append("file", this.file);
       await userService.updateFile(fileForm, createdUserId);
     }
@@ -584,7 +583,7 @@ async saveUser() {
     this.$swal({
       icon: "success",
       title: "Congratulations!",
-      text: "You are now a CodeLingo Teacher.Please log in.",
+      text: "You are now a CodeLingo Teacher. Please log in.",
       showConfirmButton: true,
       confirmButtonText: "OK",
       timer: 10000,
@@ -598,6 +597,7 @@ async saveUser() {
     });
   }
 },
+
 
 
      getLatestUserLanguages() {
@@ -627,7 +627,7 @@ async saveUser() {
     },
     
     
- getTeachers() {
+getTeachers() {
   userService.getUserListFree("TE")
     .then((response) => {
       const sorted = response
@@ -640,6 +640,7 @@ async saveUser() {
       console.error("Failed to fetch teachers:", error);
     });
 },
+
   getUserPhotoUrl(photo) {
   if (!photo) return "/default-avatar.png"; // fallback image
   return `${axios.defaults.baseURL}/userphoto/${photo}.png`;
@@ -683,16 +684,27 @@ async saveUser() {
 
 },
 computed: {
-  displayName() {
-    if (this.user.degree && this.user.degree.includes("Ph.D")) {
-      // If degree contains "Ph.D" prefix "Dr." if not already there
-      if (!this.user.name?.startsWith("Dr.")) {
-        return "Dr. " + (this.user.name || "");
-      }
+formattedName: {
+  get() {
+    const rawName = this.user.name.replace(/^(Dr\.|U|Daw)\s*/, '');
+    if (this.user.degree?.includes("Ph.D")) {
+      return `Dr. ${rawName}`;
     }
-    return this.user.name || "";
+    const prefix = this.user.gender === "Female" ? "Daw" : "U";
+    return `${prefix} ${rawName}`;
+
+    
+  },
+  set(value) {
+    this.user.name = value.replace(/^(Dr\.|U|Daw)\s*/, '');
   }
+}
+
+  
 },
+
+
+
   watch: {
     'user.degree'(newDegree) {
     if (newDegree && newDegree.includes("Ph.D")) {
