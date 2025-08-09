@@ -129,6 +129,12 @@ const router = createRouter({
       component: () =>
         import(/* webpackChunkName: "home" */ "../pages/Registration.vue"),
     },
+    {
+      path: "/admin",
+      name: "admin",
+      component: () =>
+        import(/* webpackChunkName: "home" */ "../pages/AdminDashboard.vue"),
+    },
 
 
 

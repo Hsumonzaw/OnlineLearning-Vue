@@ -35,7 +35,7 @@
               <v-list-item-title><v-icon>mdi-home</v-icon> Home</v-list-item-title>
             </v-list-item> -->
             <v-list-item @click="clickRouter('/useraccount')" v-if="showTeacher">
-              <v-list-item-title><v-icon>mdi-account-multiple-plus</v-icon> User Account</v-list-item-title>
+              <v-list-item-title><v-icon>mdi-account-multiple</v-icon> User Account</v-list-item-title>
             </v-list-item>
             <v-list-item @click="clickRouter('/teacherforstudent')" v-else>
               <v-list-item-title><v-icon>mdi-account-multiple</v-icon> My Students</v-list-item-title>

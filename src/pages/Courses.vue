@@ -677,7 +677,37 @@ export default {
     
     // Fallback if no type is selected
     return [];
-  }
+  },
+    popularCoursesData() {
+    // Filter only courses (not exams)
+    const filtered = this.coursesList.filter(item => item.type === 'COURSES');
+    
+    // Aggregate amounts by course name
+    const totals = {};
+    filtered.forEach(item => {
+      const courseName = item.languagesDto?.name || 'Unknown Course';
+      if (!totals[courseName]) {
+        totals[courseName] = 0;
+      }
+      totals[courseName] += item.amount || 0;
+    });
+
+    // Convert totals object to labels and data arrays
+    const labels = Object.keys(totals);
+    const data = Object.values(totals);
+
+    return {
+      labels,
+      datasets: [
+        {
+          label: 'Total Revenue',
+          backgroundColor: '#3f51b5',
+          data,
+        },
+      ],
+    };
+  },
+
   },
   components: {},
 };

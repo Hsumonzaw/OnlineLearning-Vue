@@ -14,10 +14,14 @@
   variant="outlined"
   @update:modelValue="fetchUserList"
 />
-
+<!-- 
           <v-btn color="green" class="ml-2" @click="exportToWord">
             <v-icon left>mdi-microsoft-word</v-icon>
             Export to Word
+          </v-btn> -->
+          <v-btn color="orange" class="ml-2" @click="exportToExcel">
+           <v-icon left>mdi-microsoft-excel</v-icon>
+               Export to Excel
           </v-btn>
         </v-col>
         <v-tooltip location="top">
@@ -261,6 +265,7 @@
 import { format } from "date-fns";
 import axios from "../config";
 import userService from "../service/UserAccountService.js";
+import * as XLSX from "xlsx";
 export default {
   data: () => ({
     selectedOne: {},
@@ -327,28 +332,102 @@ fetchUserList() {
 },
 
 
-    exportToWord() {
-      const tableHTML = document.querySelector("table").outerHTML;
-      const wordHTML = `
-        <html xmlns:o='urn:schemas-microsoft-com:office:office' 
-              xmlns:w='urn:schemas-microsoft-com:office:word' 
-              xmlns='http://www.w3.org/TR/REC-html40'>
-        <head><meta charset="utf-8"><title>User Informations</title></head>
-        <body>
-          <h2 style="text-align:center;">User Informations</h2>
-          ${tableHTML}
-        </body>
-        </html>
-      `;
-      const blob = new Blob(['\ufeff', wordHTML], { type: 'application/msword' });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = "User_Informations.doc";
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    },
+    // exportToWord() {
+    //   const tableHTML = document.querySelector("table").outerHTML;
+    //   const wordHTML = `
+    //     <html xmlns:o='urn:schemas-microsoft-com:office:office' 
+    //           xmlns:w='urn:schemas-microsoft-com:office:word' 
+    //           xmlns='http://www.w3.org/TR/REC-html40'>
+    //     <head><meta charset="utf-8"><title>User Informations</title></head>
+    //     <body>
+    //       <h2 style="text-align:center;">User Informations</h2>
+    //       ${tableHTML}
+    //     </body>
+    //     </html>
+    //   `;
+    //   const blob = new Blob(['\ufeff', wordHTML], { type: 'application/msword' });
+    //   const url = URL.createObjectURL(blob);
+    //   const link = document.createElement("a");
+    //   link.href = url;
+    //   link.download = "User_Informations.doc";
+    //   document.body.appendChild(link);
+    //   link.click();
+    //   document.body.removeChild(link);
+    // },
+    exportToExcel() {
+  try {
+    const data = this.userList.map((item, index) => {
+      // safe handling for fields that might be absent
+      const startDate = item.startDate ? new Date(item.startDate).toLocaleDateString() : "";
+      const fullName = item.name || item.studentDto?.name || "";
+      const languageName = item.languagesDto?.name || "-";
+      const gender = item.gender || item.studentDto?.gender || "";
+      const nrc = item.nrc || item.studentDto?.nrc || "";
+      const email = item.email || item.studentDto?.email || "";
+      const phone = item.phonenum || item.studentDto?.phonenum || "";
+      const address = item.address || item.studentDto?.address || "";
+      const photoUrl = this.getUserPhotoUrl(item.photo) || "";
+      const degree = item.degree || item.studentDto?.degree || "";
+      const file = item.file || item.studentDto?.file || "";
+      const examMark = item.examDto?.examMark ?? "";
+
+      // Build row object; include columns conditionally to match UI
+      const row = {
+        "No.": index + 1,
+        "Start Date": startDate,
+        "Full Name": fullName,
+        "Gender": gender,
+        "NRC": nrc,
+        "Email": email,
+        "Phone": phone,
+        "Address": address,
+        "Photo URL": photoUrl
+      };
+
+      if (this.isStudent) {
+        row["Language Name"] = languageName;
+        row["Exam Mark"] = examMark;
+      } else {
+        row["Degree"] = degree;
+        row["File"] = file;
+      }
+
+      return row;
+    });
+
+    // Create worksheet & workbook and save file
+    const worksheet = XLSX.utils.json_to_sheet(data);
+      worksheet['!cols'] = [
+      { wch: 5 },   // No.
+      { wch: 12 },  // Start Date
+      { wch: 20 },  // Full Name
+      { wch: 10 },  // Gender
+      { wch: 20 },  // NRC
+      { wch: 20 },  // Email
+      { wch: 13 },  // Phone
+      { wch: 20 },  // Address 
+      { wch: 50 },  // Photo URL 
+    ];
+    if (this.isStudent) {
+      worksheet['!cols'].push(
+        { wch: 15 }, // Language Name
+        { wch: 10 }  // Exam Mark
+      );
+    } else {
+      worksheet['!cols'].push(
+        { wch: 20 }, // Degree
+        { wch: 30 }  // File
+      );
+    }
+
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "User Informations");
+    XLSX.writeFile(workbook, "User_Informations.xlsx");
+  } catch (error) {
+    console.error("Export to Excel failed", error);
+    this.$swal("Error", "Failed to export to Excel", "error");
+  }
+},
     getUserPhotoUrl(photo) {
       if (!photo) return "path/to/default-image.png";
       return `${axios.defaults.baseURL}/userphoto/${photo}.png`;
