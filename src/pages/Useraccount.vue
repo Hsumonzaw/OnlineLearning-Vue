@@ -1,29 +1,20 @@
 <template>
   <div>
-    <!-- Table Section -->
     <v-row class="title">
       <v-col cols="12">
-        <h1
-          style="background-color: #b3e5fc; text-align: center"
-          class="mt-1 mb-1"
-        >
+        <h1 style="background-color: #b3e5fc; text-align: center" class="mt-1 mb-1">
           User Informations
         </h1>
         <v-col cols="2" class="pl-1 pt-2">
           <v-autocomplete
-            v-model="userType"
-            item-text="userTypeName"
-            :items="userTypeListSearch"
-            name="userType"
-            label="User Type"
-            return-object
-            density="compact"
-            variant="outlined"
-            required
-            small
-            filled
-            @update:modelValue="userListMethodByType"
-          ></v-autocomplete>
+  v-model="userType"
+  :items="userTypeListSearch"
+  label="User Type"
+  dense
+  variant="outlined"
+  @update:modelValue="fetchUserList"
+/>
+
           <v-btn color="green" class="ml-2" @click="exportToWord">
             <v-icon left>mdi-microsoft-word</v-icon>
             Export to Word
@@ -43,116 +34,64 @@
           </template>
           <span>Add User</span>
         </v-tooltip>
-
-        <!-- Table Full Width -->
         <v-table fixed-header height="92vh">
           <thead>
             <tr>
               <th class="text-center white--text bg-primary">No.</th>
               <th class="text-center white--text bg-primary">StartDate</th>
               <th class="text-center white--text bg-primary">Full Name</th>
-              <th class="text-center white--text bg-primary">Language Name</th>
-              <!-- <th class="text-center white--text bg-primary">UserName</th> -->
-              <!-- <th class="text-center white--text bg-primary">Date Of Birth</th> -->
+              <th v-if="isStudent" class="text-center white--text bg-primary">Language Name</th>
               <th class="text-center white--text bg-primary">Gender</th>
               <th class="text-center white--text bg-primary">NRC</th>
               <th class="text-center white--text bg-primary">Email</th>
               <th class="text-center white--text bg-primary">Phone</th>
               <th class="text-center white--text bg-primary">Address</th>
-              <!-- <th class="text-center white--text bg-primary">UserType</th> -->
               <th class="text-center white--text bg-primary">Photo</th>
-              <th class="text-center white--text bg-primary">Degree</th>
-              <th class="text-center white--text bg-primary">File</th>
-              <th class="text-center white--text bg-primary">Exam Mark</th>
-              <th class="text-center white--text bg-primary">Generate Certificate</th>
-              
-
+              <th v-if="!isStudent" class="text-center white--text bg-primary">Degree</th>
+              <th v-if="!isStudent" class="text-center white--text bg-primary">File</th>
+              <th v-if="isStudent"  class="text-center white--text bg-primary">Exam Mark</th>
+              <th v-if="isStudent" class="text-center white--text bg-primary">Generate Certificate</th>
               <!-- <th class="text-center white--text bg-primary">Action</th> -->
             </tr>
           </thead>
           <tbody>
-            <tr
-              v-for="(item, index) in userList"
-              :key="index"
-              @click="selectedOne = item"
-              :style="{
+            <tr v-for="(item, index) in userList" :key="index" @click="selectedOne = item" :style="{
                 backgroundColor:
                   item.userAccountId == selectedOne.userAccountId
                     ? '#def3ff'
                     : 'transparent',
-              }"
-            >
-              <td class="text-center">{{ index + 1 }}</td>
-              <td class="text-center">{{ item.studentDto?.startDate }}</td>
-              <td class="text-center">{{ item.studentDto?.name }}</td>
-              <td class="text-center">{{ item.languagesDto?.name }}</td>
-
-              <!-- <td class="text-center">{{ item.userName }}</td> -->
-              <!-- <td class="text-center">{{ item.age || "-" }}</td> -->
-              <td class="text-center">{{ item.studentDto?.gender || "-" }}</td>
-              <td class="text-center">{{ item.studentDto?.nrc || "-" }}</td>
-              <td class="text-center">{{ item.studentDto?.email || "-" }}</td>
-
-              <td class="text-start">{{ item.studentDto?.phonenum || "-" }}</td>
-              <td class="text-start">{{ item.studentDto?.address || "-" }}</td>
-              <!-- <td class="text-start">{{ item?.studentDto.userType }}</td> -->
-              <td class="text-center">
-                <v-img
-                  :src="getUserPhotoUrl(item?.studentDto?.photo)"
-                  alt="People Photo"
+              }">
+  <td class="text-center">{{ index + 1 }}</td>
+  <td class="text-center">{{ new Date(item.startDate).toLocaleDateString() }}</td>
+  <td class="text-center">{{ item.name || item.studentDto?.name }}</td>
+  <td v-if="isStudent" class="text-center">{{ item.languagesDto?.name || '-' }}</td>
+  <td class="text-center">{{ item.gender || item.studentDto?.gender }}</td>
+  <td class="text-center">{{ item.nrc || item.studentDto?.nrc }}</td>
+  <td class="text-center">{{ item.email || item.studentDto?.email }}</td>
+  <td class="text-start">{{ item.phonenum || item.studentDto?.phonenum }}</td>
+  <td class="text-start">{{ item.address || item.studentDto?.address }}</td>
+  <td class="text-center">
+    <v-img :src="getUserPhotoUrl(item.photo)" 
+    alt="People Photo"
                   max-width="80"
                   max-height="80"
                   contain
-                  loading="lazy"
-                />
-              </td>
-              <td class="text-center">{{ item.studentDto?.degree }}</td>
-              <td class="text-center">{{ item.studentDto?.file }}</td>
-              <td class="text-center">{{ item.languagesDto?.examDto?.examMark }}</td>
-              <td class="text-center">{{ item.studentDto.certificate }}</td>
+                  loading="lazy" />
+  </td>
+  <td v-if="!isStudent" class="text-center">{{ item.degree || item.studentDto?.degree}}</td>
+  <td v-if="!isStudent" class="text-center">{{ item.file || item.studentDto?.file}}</td>
+  <td v-if="isStudent" class="text-center">{{ item.examDto?.examMark ?? '-' }}</td>
+<td v-if="isStudent" class="text-center">
+  <v-icon v-if="item.examDto?.examMark > 50" color="green" title="Pass">mdi-check-circle</v-icon>
+  <v-icon v-else color="red" title="Fail">mdi-close-circle</v-icon>
+</td></tr>
 
-
-              <!-- <td class="text-center">
-                <v-btn class="ml-1" small icon color="black" density="compact">
-                  <v-icon size="small" @click="FileMethod(item)"
-                    >mdi-file</v-icon
-                  ></v-btn
-                >
-                <v-btn class="ml-1" small icon color="black" density="compact">
-                  <v-icon size="small" @click="photoMethod(item)"
-                    >mdi-image</v-icon
-                  ></v-btn
-                >
-                <v-btn
-                  class="ml-1"
-                  small
-                  icon
-                  color="green"
-                  density="compact"
-                  @click.stop="editUser(item)"
-                >
-                  <v-icon size="small">mdi-pencil</v-icon></v-btn
-                >
-                <v-btn
-                  class="ml-1"
-                  small
-                  icon
-                  color="red"
-                  density="compact"
-                  @click.stop="deleteUserMethod(item)"
-                >
-                  <v-icon size="small">mdi-delete</v-icon></v-btn
-                >
-              </td> -->
-            </tr>
             <v-divider />
           </tbody>
         </v-table>
       </v-col>
     </v-row>
-
-    <!-- Form Section (centered) -->
-    <v-dialog v-model="showForm" max-width="600" style="height: 730px">
+    <!-- <v-dialog v-model="showForm" max-width="600" style="height: 730px">
       <v-card class="form pa-1" elevation="4" mb-0>
         <v-card-title class="d-flex justify-space-between align-center">
           <span class="text-h4">Add User</span>
@@ -185,24 +124,16 @@
               hide-header
             ></v-date-picker>
           </v-menu>
-
           <v-text-field
             label="Name"
             v-model="user.name"
             :rules="[rules.required, rules.name]"
           ></v-text-field>
-
           <v-text-field
             label="User Name"
             v-model="user.userName"
             :rules="[(v) => !!v || 'required']"
           ></v-text-field>
-
-          <!-- <v-text-field
-            label="Date Of Birth"
-            v-model="user.age"
-            :rules="[(v) => !!v || 'required']"
-          ></v-text-field> -->
           <v-menu
             v-model="dateBirth"
             full-width
@@ -226,14 +157,6 @@
               hide-header
             ></v-date-picker>
           </v-menu>
-
-          <!-- <v-text-field
-            label="Gender"
-            v-model="user.gender"
-            :items="genderList"
-            :rules="[(v) => !!v || 'required']"
-          ></v-text-field> -->
-
           <v-autocomplete
             v-model="user.gender"
             :items="genderList"
@@ -243,21 +166,18 @@
             variant="outlined"
             filled
           ></v-autocomplete>
-
           <v-text-field
             v-model="user.nrc"
             label="NRC"
             :rules="[rules.required, rules.nrc]"
             required
           ></v-text-field>
-
           <v-text-field
             v-model="user.email"
             label="Email"
             :rules="[rules.required, rules.email]"
             required
           ></v-text-field>
-
           <v-text-field
             v-model="user.password"
             label="Password"
@@ -268,29 +188,13 @@
             variant="outlined"
             density="compact"
           />
-
           <v-text-field
             v-model="user.phonenum"
             label="Phone Number"
             :rules="[rules.required, rules.phone]"
             required
           ></v-text-field>
-
           <v-textarea label="Address" v-model="user.address"></v-textarea>
-
-          <!-- <v-autocomplete
-                  v-model="user.userType"
-                  item-text="userType"
-                  item-title="userType"
-                  :items="userTypeList"
-                  label="UserType"
-                  name="brand1212Name"
-                  return-object
-                  required
-                  density="compact"
-                  variant="outlined"
-                  filled
-                ></v-autocomplete> -->
           <v-autocomplete
             v-model="user.userType"
             :items="userTypeList"
@@ -300,7 +204,6 @@
             variant="outlined"
             filled
           ></v-autocomplete>
-
           <v-text-field label="Degree" v-model="user.degree"></v-text-field>
         </v-card-text>
         <v-card-actions class="justify-end pr-5">
@@ -308,21 +211,16 @@
             class="text-black"
             style="background-color: #2196f3"
             @click="saveUser()"
-            >{{ saveOrupdate }}</v-btn
-          >
-
+          >{{ saveOrupdate }}</v-btn>
           <v-btn
             class="text-black"
             style="background-color: red"
             @click="showForm = false"
-            >CANCEL</v-btn
-          >
+          >CANCEL</v-btn>
         </v-card-actions>
       </v-card>
-    </v-dialog>
-
-    <!-- Delete Dialog -->
-    <v-dialog v-model="dialogDelete" width="500">
+    </v-dialog> -->
+    <!-- <v-dialog v-model="dialogDelete" width="500">
       <v-card>
         <v-card-title class="text-h5 white--text bg-red">Delete</v-card-title>
         <v-card-text class="text-h6">
@@ -331,13 +229,11 @@
         <v-card-actions>
           <v-spacer></v-spacer>
           <v-btn class="black" text @click="dialogDelete = false">CANCEL</v-btn>
-          <v-btn dark class="bg-red" text @click="clickDeleteDialog()"
-            >DELETE</v-btn
-          >
+          <v-btn dark class="bg-red" text @click="clickDeleteDialog()">DELETE</v-btn>
         </v-card-actions>
       </v-card>
-    </v-dialog>
-    <v-col>
+    </v-dialog> -->
+    <!-- <v-col>
       <v-bottom-sheet v-model="userPhotoDialog" fullscreen scrollable>
         <v-sheet class="information-window-v-sheet">
           <PhotoUser
@@ -358,7 +254,7 @@
           />
         </v-sheet>
       </v-bottom-sheet>
-    </v-col>
+    </v-col> -->
   </div>
 </template>
 <script>
@@ -372,7 +268,6 @@ export default {
     userList: [],
     userTypeListSearch: ["ALL", "STUDENT", "TEACHER", "ADMIN"],
     userTypeList: ["STUDENT", "TEACHER", "ADMIN"],
-
     saveOrupdate: "SAVE",
     startPicker: new Date(),
     startMenu: false,
@@ -409,65 +304,54 @@ export default {
     this.user.startDate = format(this.startPicker, "dd-MM-yyyy");
     this.user.age = format(this.birthPicker, "dd-MM-yyyy");
     this.user.userType = this.userTypeListSearch[0];
-    // this.userType = this.userTypeList[0];
-    this.userListMethod();
     this.showForm = false;
-    this.userListMethodByType();
+    // Updated to use a single, more robust fetch method
+    this.fetchUserList();
   },
   methods: {
+
+    // Renamed for clarity and to be consistent with the logic
+fetchUserList() {
+  userService.getUserList(this.userType)
+    .then((data) => {   // rename param to data to avoid confusion
+      console.log("Received user list data:", data);
+      this.userList.splice(0);
+      if (Array.isArray(data)) {
+        this.userList.push(...data);
+      }
+    })
+    .catch((error) => {
+      console.error(error);
+      this.$swal("Fail!", error.response?.data?.message || "Failed to load user list.", "error");
+    });
+},
+
+
     exportToWord() {
-  // Get the table HTML
-  const tableHTML = document.querySelector("table").outerHTML;
-
-  // Create Word-compatible HTML
-  const wordHTML = `
-    <html xmlns:o='urn:schemas-microsoft-com:office:office' 
-          xmlns:w='urn:schemas-microsoft-com:office:word' 
-          xmlns='http://www.w3.org/TR/REC-html40'>
-    <head><meta charset="utf-8"><title>User Informations</title></head>
-    <body>
-      <h2 style="text-align:center;">User Informations</h2>
-      ${tableHTML}
-    </body>
-    </html>
-  `;
-
-  // Create Blob for Word file
-  const blob = new Blob(['\ufeff', wordHTML], {
-    type: 'application/msword'
-  });
-
-  // Create download link
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement("a");
-  link.href = url;
-  link.download = "User_Informations.doc";
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-}
-,
-    getUserPhotoUrl(photo) {
-      if (!photo) return "path/to/default-image.png"; // fallback image path
-      return `${axios.defaults.baseURL}/userphoto/${photo}.png`;
+      const tableHTML = document.querySelector("table").outerHTML;
+      const wordHTML = `
+        <html xmlns:o='urn:schemas-microsoft-com:office:office' 
+              xmlns:w='urn:schemas-microsoft-com:office:word' 
+              xmlns='http://www.w3.org/TR/REC-html40'>
+        <head><meta charset="utf-8"><title>User Informations</title></head>
+        <body>
+          <h2 style="text-align:center;">User Informations</h2>
+          ${tableHTML}
+        </body>
+        </html>
+      `;
+      const blob = new Blob(['\ufeff', wordHTML], { type: 'application/msword' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = "User_Informations.doc";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
     },
-
-    userListMethodByType() {
-      // console.log(this.userType);
-
-      userService
-        .getUserList(this.userType)
-        .then((response) => {
-          // console.log(response);
-
-          this.userList.splice(0, this.userList.length);
-          this.userList.push(...response);
-          console.log(this.userList);
-          this.saveOrupdate = "SAVE";
-        })
-        .catch((error) => {
-          this.$swal("Fail!", error.response.data.message, "error");
-        });
+    getUserPhotoUrl(photo) {
+      if (!photo) return "path/to/default-image.png";
+      return `${axios.defaults.baseURL}/userphoto/${photo}.png`;
     },
     FileMethod: function (item) {
       this.selectedOne = item;
@@ -476,23 +360,21 @@ export default {
     },
     loadUserList: function () {
       this.userPhotoDialog = false;
-      this.userListMethod();
+      this.fetchUserList();
       this.userFileDialog = false;
       this.showForm = false;
     },
     photoMethod: function (item) {
       this.userPhotoDialog = true;
     },
-    clickDeleteDialog: function (item) {
-      // console.log("Deleting user ID:", this.selectedOne.userAccountId);
+    clickDeleteDialog: function () {
       this.dialogDelete = false;
       userService
         .deleteUser(this.selectedOne?.userAccountId)
-        .then((response) => {
+        .then(() => {
           this.saveOrupdate = "SAVE";
           this.user = {};
-          this.userListMethod();
-          this.userListMethodByType();
+          this.fetchUserList();
           this.$swal({
             icon: "success",
             title: "Your work has been deleted",
@@ -501,7 +383,7 @@ export default {
           });
         })
         .catch((error) => {
-          this.$swal("Fail!", error.response.data.message, "error");
+          this.$swal("Fail!", error.response?.data?.message || "Failed to delete user.", "error");
         });
     },
     deleteUserMethod: function (item) {
@@ -517,28 +399,19 @@ export default {
       const [year, month, day] = datePicker.split("-");
       return `${day}-${month}-${year}`;
     },
-
     async saveUser() {
       try {
-        // Normalize userType
         let userType = this.user.userType;
         if (typeof userType === "object") {
           userType = userType.userType || userType.value || "";
         }
-
-        // Re-assign normalized value back
         this.user.userType = userType;
-
-        // Assign teacherId
         if (this.loggedInUser?.role === "TEACHER" && userType === "STUDENT") {
           this.user.teacherId = this.loggedInUser.userId;
         } else {
           this.user.teacherId = 0;
         }
-
-        // Save or update
         if (this.saveOrupdate === "SAVE") {
-          this.userListMethodByType();
           await userService.addUser(this.user);
           this.$swal({
             icon: "success",
@@ -548,8 +421,6 @@ export default {
           });
         } else {
           await userService.updateUser(this.user);
-          this.userListMethodByType();
-
           this.$swal({
             icon: "success",
             title: "User updated successfully!",
@@ -557,36 +428,14 @@ export default {
             timer: 1000,
           });
         }
-
         this.user = {};
         this.saveOrupdate = "SAVE";
         this.showForm = false;
-        this.userListMethod();
+        this.fetchUserList();
       } catch (error) {
-        console.error("User save failed", error);
-        this.$swal(
-          "Error",
-          error.response?.data?.message || "Failed to save user",
-          "error"
-        );
+        //console.error("User save failed", error);
+        this.$swal("Error", error.response?.data?.message || "Failed to save user", "error");
       }
-    },
-
-    userListMethod() {
-      userService.getUserList().then((response) => {
-        const allUsers = response.data || response;
-        this.loggedInUser = JSON.parse(localStorage.getItem("user"));
-
-        if (this.loggedInUser?.role === "TEACHER") {
-          this.userList = allUsers.filter(
-            (user) =>
-              user.userType === "STUDENT" &&
-              user.teacherId === this.loggedInUser.userId
-          );
-        } else {
-          this.userList = allUsers;
-        }
-      });
     },
     calculateAge(dob) {
       const today = new Date();
@@ -599,22 +448,34 @@ export default {
       return age;
     },
   },
-  watch: {
-    startPicker() {
-      this.startMenu = false;
-      this.user.startDate = format(this.startPicker, "dd-MM-yyyy");
+   computed: {
+    isStudent() {
+      return this.userType === "STUDENT";
     },
-    birthPicker() {
+    isAdminOrTeacherOrAll() {
+      return ["ADMIN", "ALL", "TEACHER"].includes(this.userType);
+    },
+  },
+  // ... rest of your code
+
+  watch: {
+    startPicker(newDate) {
+      this.startMenu = false;
+      this.user.startDate = format(newDate, "dd-MM-yyyy");
+    },
+    birthPicker(newDate) {
       this.dateBirth = false;
-      this.user.age = format(this.birthPicker, "dd-MM-yyyy");
+      this.user.age = format(newDate, "dd-MM-yyyy");
     },
     showForm(newVal) {
       if (!newVal) {
-        // Dialog closed → reset the form
         this.user = {};
         this.saveOrupdate = "SAVE";
       }
     },
+    userType() {
+        this.fetchUserList();
+    }
   },
   components: {},
 };
