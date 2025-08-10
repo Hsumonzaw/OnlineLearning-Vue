@@ -354,10 +354,17 @@ fetchUserList() {
     //   link.click();
     //   document.body.removeChild(link);
     // },
-    exportToExcel() {
+exportToExcel() {
   try {
+    // Determine title based on userType
+    let title = "";
+    if (this.userType === "ADMIN") title = "Admin List";
+    else if (this.userType === "STUDENT") title = "Student List";
+    else if (this.userType === "TEACHER") title = "Teacher List";
+    else title = "User List";
+
+    // Prepare data rows from userList
     const data = this.userList.map((item, index) => {
-      // safe handling for fields that might be absent
       const startDate = item.startDate ? new Date(item.startDate).toLocaleDateString() : "";
       const fullName = item.name || item.studentDto?.name || "";
       const languageName = item.languagesDto?.name || "-";
@@ -366,12 +373,11 @@ fetchUserList() {
       const email = item.email || item.studentDto?.email || "";
       const phone = item.phonenum || item.studentDto?.phonenum || "";
       const address = item.address || item.studentDto?.address || "";
-      const photoUrl = this.getUserPhotoUrl(item.photo) || "";
       const degree = item.degree || item.studentDto?.degree || "";
       const file = item.file || item.studentDto?.file || "";
       const examMark = item.examDto?.examMark ?? "";
 
-      // Build row object; include columns conditionally to match UI
+      // Row object with conditional columns
       const row = {
         "No.": index + 1,
         "Start Date": startDate,
@@ -380,8 +386,7 @@ fetchUserList() {
         "NRC": nrc,
         "Email": email,
         "Phone": phone,
-        "Address": address,
-        "Photo URL": photoUrl
+        "Address": address
       };
 
       if (this.isStudent) {
@@ -395,9 +400,54 @@ fetchUserList() {
       return row;
     });
 
-    // Create worksheet & workbook and save file
-    const worksheet = XLSX.utils.json_to_sheet(data);
-      worksheet['!cols'] = [
+    // Get header count dynamically for merges and styling
+    const sampleRow = data[0] || {
+      "No.": "",
+      "Start Date": "",
+      "Full Name": "",
+      "Gender": "",
+      "NRC": "",
+      "Email": "",
+      "Phone": "",
+      "Address": "",
+      ...(this.isStudent ? { "Language Name": "", "Exam Mark": "" } : { "Degree": "", "File": "" })
+    };
+    const headers = Object.keys(sampleRow);
+    const colCount = headers.length;
+
+    // Create worksheet starting from row 3 (A3)
+    const worksheet = XLSX.utils.json_to_sheet(data, { origin: "A3" });
+
+    // Set merged title cell at A1 spanning all columns
+    worksheet["A1"] = { t: "s", v: title };
+    worksheet["!merges"] = worksheet["!merges"] || [];
+    worksheet["!merges"].push({
+      s: { r: 0, c: 0 }, // start row 0, col 0 (A1)
+      e: { r: 0, c: colCount - 1 } // end same row, last col
+    });
+
+    // Add styles to title cell (bold, font size, center, background)
+    worksheet["A1"].s = {
+      font: { name: "Arial", sz: 16, bold: true, color: { rgb: "FFFFFFFF" } }, // white text
+      fill: { fgColor: { rgb: "4F81BD" } }, // blue background
+      alignment: { horizontal: "center", vertical: "center" }
+    };
+
+    // Style header row (row 3, zero-based index 2)
+    for (let c = 0; c < colCount; c++) {
+      const cellAddress = XLSX.utils.encode_cell({ c: c, r: 2 });
+      const cell = worksheet[cellAddress];
+      if (cell) {
+        cell.s = {
+          font: { bold: true },
+          alignment: { horizontal: "center", vertical: "center" },
+          fill: { fgColor: { rgb: "B3E5FC" } } // light blue background
+        };
+      }
+    }
+
+    // Set column widths based on columns and student/non-student
+    worksheet['!cols'] = [
       { wch: 5 },   // No.
       { wch: 12 },  // Start Date
       { wch: 20 },  // Full Name
@@ -405,8 +455,7 @@ fetchUserList() {
       { wch: 20 },  // NRC
       { wch: 20 },  // Email
       { wch: 13 },  // Phone
-      { wch: 20 },  // Address 
-      { wch: 50 },  // Photo URL 
+      { wch: 20 }   // Address
     ];
     if (this.isStudent) {
       worksheet['!cols'].push(
@@ -420,14 +469,19 @@ fetchUserList() {
       );
     }
 
+    // Create workbook and append worksheet
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "User Informations");
+
+    // Save to file
     XLSX.writeFile(workbook, "User_Informations.xlsx");
+
   } catch (error) {
     console.error("Export to Excel failed", error);
     this.$swal("Error", "Failed to export to Excel", "error");
   }
 },
+
     getUserPhotoUrl(photo) {
       if (!photo) return "path/to/default-image.png";
       return `${axios.defaults.baseURL}/userphoto/${photo}.png`;

@@ -8,6 +8,8 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
+    Barchart: typeof import('./src/components/BarChart.vue')['default']
+    BarChart: typeof import('./src/components/BarChart.vue')['default']
     CourseFile: typeof import('./src/components/CourseFile.vue')['default']
     CoursePhoto: typeof import('./src/components/CoursePhoto.vue')['default']
     HelloWorld: typeof import('./src/components/HelloWorld.vue')['default']
