@@ -5,56 +5,34 @@
         <h1 style="background-color: #b3e5fc; text-align: center" class="mt-1 mb-1">
           User Informations
         </h1>
-        <v-col cols="2" class="pl-1 pt-2">
-          <v-autocomplete
-  v-model="userType"
-  :items="userTypeListSearch"
-  label="User Type"
-  dense
-  variant="outlined"
-  @update:modelValue="fetchUserList"
-/>
-<!-- 
+      
           <v-btn color="green" class="ml-2" @click="exportToWord">
             <v-icon left>mdi-microsoft-word</v-icon>
             Export to Word
-          </v-btn> -->
+          </v-btn> 
           <v-btn color="orange" class="ml-2" @click="exportToExcel">
            <v-icon left>mdi-microsoft-excel</v-icon>
                Export to Excel
           </v-btn>
         </v-col>
-        <v-tooltip location="top">
-          <template v-slot:activator="{ props }">
-            <v-btn
-              v-bind="props"
-              icon
-              color="blue"
-              class="fab-button"
-              @click="showForm = true"
-            >
-              <v-icon size="36" color="white">mdi-plus</v-icon>
-            </v-btn>
-          </template>
-          <span>Add User</span>
-        </v-tooltip>
+        
         <v-table fixed-header height="92vh">
           <thead>
             <tr>
               <th class="text-center white--text bg-primary">No.</th>
               <th class="text-center white--text bg-primary">StartDate</th>
               <th class="text-center white--text bg-primary">Full Name</th>
-              <!-- <th v-if="isStudent" class="text-center white--text bg-primary">Language Name</th> -->
+              <th v-if="isStudent" class="text-center white--text bg-primary">Language Name</th>
               <th class="text-center white--text bg-primary">Gender</th>
               <th class="text-center white--text bg-primary">NRC</th>
               <th class="text-center white--text bg-primary">Email</th>
               <th class="text-center white--text bg-primary">Phone</th>
               <th class="text-center white--text bg-primary">Address</th>
               <th class="text-center white--text bg-primary">Photo</th>
-              <th v-if="!isStudent" class="text-center white--text bg-primary">Degree</th>
-              <th v-if="!isStudent" class="text-center white--text bg-primary">File</th>
-              <!-- <th v-if="isStudent"  class="text-center white--text bg-primary">Exam Mark</th> -->
-              <!-- <th v-if="isStudent" class="text-center white--text bg-primary">Generate Certificate</th> -->
+              <!-- <th v-if="!isStudent" class="text-center white--text bg-primary">Degree</th> -->
+              <!-- <th v-if="!isStudent" class="text-center white--text bg-primary">File</th> -->
+              <th v-if="isStudent"  class="text-center white--text bg-primary">Exam Mark</th>
+              <th v-if="isStudent" class="text-center white--text bg-primary">Generate Certificate</th>
               <!-- <th class="text-center white--text bg-primary">Action</th> -->
             </tr>
           </thead>
@@ -68,7 +46,7 @@
   <td class="text-center">{{ index + 1 }}</td>
   <td class="text-center">{{ item.startDate }}</td>
   <td class="text-center">{{ item.name || item.studentDto?.name }}</td>
-  <!-- <td v-if="isStudent" class="text-center">{{ item.languagesDto?.name || '-' }}</td> -->
+  <td v-if="isStudent" class="text-center">{{ item.languagesDto?.name || '-' }}</td>
   <td class="text-center">{{ item.gender || item.studentDto?.gender }}</td>
   <td class="text-center">{{ item.nrc || item.studentDto?.nrc }}</td>
   <td class="text-center">{{ item.email || item.studentDto?.email }}</td>
@@ -82,13 +60,13 @@
                   contain
                   loading="lazy" />
   </td>
-  <td v-if="!isStudent" class="text-center">{{ item.degree || item.studentDto?.degree}}</td>
-  <td v-if="!isStudent" class="text-center">{{ item.file || item.studentDto?.file}}</td>
-  <!-- <td v-if="isStudent" class="text-center">{{ item.examDto?.examMark ?? '-' }}</td> -->
-<!-- <td v-if="isStudent" class="text-center">
+  <!-- <td v-if="!isStudent" class="text-center">{{ item.degree || item.studentDto?.degree}}</td> -->
+  <!-- <td v-if="!isStudent" class="text-center">{{ item.file || item.studentDto?.file}}</td> -->
+  <td v-if="isStudent" class="text-center">{{ item.examDto?.examMark ?? '-' }}</td> 
+ <td v-if="isStudent" class="text-center">
   <v-icon v-if="item.examDto?.examMark > 50" color="green" title="Pass">mdi-check-circle</v-icon>
   <v-icon v-else color="red" title="Fail">mdi-close-circle</v-icon>
-</td> -->
+</td>
 </tr>
 
             <v-divider />
@@ -96,171 +74,7 @@
         </v-table>
       </v-col>
     </v-row>
-    <!-- <v-dialog v-model="showForm" max-width="600" style="height: 730px">
-      <v-card class="form pa-1" elevation="4" mb-0>
-        <v-card-title class="d-flex justify-space-between align-center">
-          <span class="text-h4">Add User</span>
-          <v-btn icon color="red" @click="showForm = false">
-            <v-icon>mdi-close</v-icon>
-          </v-btn>
-        </v-card-title>
-        <v-card-text>
-          <v-menu
-            v-model="startMenu"
-            full-width
-            max-width="200px"
-            min-width="290px"
-            v-bind:close-on-content-click="false"
-          >
-            <template v-slot:activator="{ props }">
-              <v-text-field
-                v-model="user.startDate"
-                density="compact"
-                variant="outlined"
-                label="From Date"
-                disabled
-                readonly
-                v-bind="props"
-              ></v-text-field>
-            </template>
-            <v-date-picker
-              v-model="startPicker"
-              color="primary"
-              hide-header
-            ></v-date-picker>
-          </v-menu>
-          <v-text-field
-            label="Name"
-            v-model="user.name"
-            :rules="[rules.required, rules.name]"
-          ></v-text-field>
-          <v-text-field
-            label="User Name"
-            v-model="user.userName"
-            :rules="[(v) => !!v || 'required']"
-          ></v-text-field>
-          <v-menu
-            v-model="dateBirth"
-            full-width
-            max-width="200px"
-            min-width="290px"
-            v-bind:close-on-content-click="false"
-          >
-            <template v-slot:activator="{ props }">
-              <v-text-field
-                v-model="user.age"
-                density="compact"
-                variant="outlined"
-                label="Date Of Birth"
-                readonly
-                v-bind="props"
-              ></v-text-field>
-            </template>
-            <v-date-picker
-              v-model="birthPicker"
-              color="primary"
-              hide-header
-            ></v-date-picker>
-          </v-menu>
-          <v-autocomplete
-            v-model="user.gender"
-            :items="genderList"
-            label="Gender"
-            required
-            density="compact"
-            variant="outlined"
-            filled
-          ></v-autocomplete>
-          <v-text-field
-            v-model="user.nrc"
-            label="NRC"
-            :rules="[rules.required, rules.nrc]"
-            required
-          ></v-text-field>
-          <v-text-field
-            v-model="user.email"
-            label="Email"
-            :rules="[rules.required, rules.email]"
-            required
-          ></v-text-field>
-          <v-text-field
-            v-model="user.password"
-            label="Password"
-            :type="showPassword ? 'text' : 'password'"
-            :rules="passwordRules"
-            :append-inner-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
-            @click:append-inner="showPassword = !showPassword"
-            variant="outlined"
-            density="compact"
-          />
-          <v-text-field
-            v-model="user.phonenum"
-            label="Phone Number"
-            :rules="[rules.required, rules.phone]"
-            required
-          ></v-text-field>
-          <v-textarea label="Address" v-model="user.address"></v-textarea>
-          <v-autocomplete
-            v-model="user.userType"
-            :items="userTypeList"
-            label="UserType"
-            required
-            density="compact"
-            variant="outlined"
-            filled
-          ></v-autocomplete>
-          <v-text-field label="Degree" v-model="user.degree"></v-text-field>
-        </v-card-text>
-        <v-card-actions class="justify-end pr-5">
-          <v-btn
-            class="text-black"
-            style="background-color: #2196f3"
-            @click="saveUser()"
-          >{{ saveOrupdate }}</v-btn>
-          <v-btn
-            class="text-black"
-            style="background-color: red"
-            @click="showForm = false"
-          >CANCEL</v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog> -->
-    <!-- <v-dialog v-model="dialogDelete" width="500">
-      <v-card>
-        <v-card-title class="text-h5 white--text bg-red">Delete</v-card-title>
-        <v-card-text class="text-h6">
-          Are you sure to delete({{ selectedOne.name }})?
-        </v-card-text>
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn class="black" text @click="dialogDelete = false">CANCEL</v-btn>
-          <v-btn dark class="bg-red" text @click="clickDeleteDialog()">DELETE</v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog> -->
-    <!-- <v-col>
-      <v-bottom-sheet v-model="userPhotoDialog" fullscreen scrollable>
-        <v-sheet class="information-window-v-sheet">
-          <PhotoUser
-            @closeDialog="userPhotoDialog = false"
-            :user="selectedOne"
-            @loadUserList="loadUserList"
-          />
-        </v-sheet>
-      </v-bottom-sheet>
-    </v-col>
-    <v-col>
-      <v-bottom-sheet v-model="UserFileDialog" fullscreen scrollable>
-        <v-sheet class="information-window-v-sheet">
-          <UserFile
-            @closeDialog="UserFileDialog = false"
-            :user="selectedOne"
-            @loadUserList="loadUserList"
-          />
-        </v-sheet>
-      </v-bottom-sheet>
-    </v-col> -->
-  </div>
+    </div>
 </template>
 <script>
 import { format } from "date-fns";
@@ -355,17 +169,10 @@ fetchUserList() {
     //   link.click();
     //   document.body.removeChild(link);
     // },
-exportToExcel() {
+    exportToExcel() {
   try {
-    // Determine title based on userType
-    let title = "";
-    if (this.userType === "ADMIN") title = "Admin List";
-    else if (this.userType === "STUDENT") title = "Student List";
-    else if (this.userType === "TEACHER") title = "Teacher List";
-    else title = "User List";
-
-    // Prepare data rows from userList
     const data = this.userList.map((item, index) => {
+      // safe handling for fields that might be absent
       const startDate = item.startDate ? new Date(item.startDate).toLocaleDateString() : "";
       const fullName = item.name || item.studentDto?.name || "";
       const languageName = item.languagesDto?.name || "-";
@@ -374,11 +181,12 @@ exportToExcel() {
       const email = item.email || item.studentDto?.email || "";
       const phone = item.phonenum || item.studentDto?.phonenum || "";
       const address = item.address || item.studentDto?.address || "";
+      const photoUrl = this.getUserPhotoUrl(item.photo) || "";
       const degree = item.degree || item.studentDto?.degree || "";
       const file = item.file || item.studentDto?.file || "";
       const examMark = item.examDto?.examMark ?? "";
 
-      // Row object with conditional columns
+      // Build row object; include columns conditionally to match UI
       const row = {
         "No.": index + 1,
         "Start Date": startDate,
@@ -387,7 +195,8 @@ exportToExcel() {
         "NRC": nrc,
         "Email": email,
         "Phone": phone,
-        "Address": address
+        "Address": address,
+        "Photo URL": photoUrl
       };
 
       if (this.isStudent) {
@@ -401,54 +210,9 @@ exportToExcel() {
       return row;
     });
 
-    // Get header count dynamically for merges and styling
-    const sampleRow = data[0] || {
-      "No.": "",
-      "Start Date": "",
-      "Full Name": "",
-      "Gender": "",
-      "NRC": "",
-      "Email": "",
-      "Phone": "",
-      "Address": "",
-      ...(this.isStudent ? { "Language Name": "", "Exam Mark": "" } : { "Degree": "", "File": "" })
-    };
-    const headers = Object.keys(sampleRow);
-    const colCount = headers.length;
-
-    // Create worksheet starting from row 3 (A3)
-    const worksheet = XLSX.utils.json_to_sheet(data, { origin: "A3" });
-
-    // Set merged title cell at A1 spanning all columns
-    worksheet["A1"] = { t: "s", v: title };
-    worksheet["!merges"] = worksheet["!merges"] || [];
-    worksheet["!merges"].push({
-      s: { r: 0, c: 0 }, // start row 0, col 0 (A1)
-      e: { r: 0, c: colCount - 1 } // end same row, last col
-    });
-
-    // Add styles to title cell (bold, font size, center, background)
-    worksheet["A1"].s = {
-      font: { name: "Arial", sz: 16, bold: true, color: { rgb: "FFFFFFFF" } }, // white text
-      fill: { fgColor: { rgb: "4F81BD" } }, // blue background
-      alignment: { horizontal: "center", vertical: "center" }
-    };
-
-    // Style header row (row 3, zero-based index 2)
-    for (let c = 0; c < colCount; c++) {
-      const cellAddress = XLSX.utils.encode_cell({ c: c, r: 2 });
-      const cell = worksheet[cellAddress];
-      if (cell) {
-        cell.s = {
-          font: { bold: true },
-          alignment: { horizontal: "center", vertical: "center" },
-          fill: { fgColor: { rgb: "B3E5FC" } } // light blue background
-        };
-      }
-    }
-
-    // Set column widths based on columns and student/non-student
-    worksheet['!cols'] = [
+    // Create worksheet & workbook and save file
+    const worksheet = XLSX.utils.json_to_sheet(data);
+      worksheet['!cols'] = [
       { wch: 5 },   // No.
       { wch: 12 },  // Start Date
       { wch: 20 },  // Full Name
@@ -456,7 +220,8 @@ exportToExcel() {
       { wch: 20 },  // NRC
       { wch: 20 },  // Email
       { wch: 13 },  // Phone
-      { wch: 20 }   // Address
+      { wch: 20 },  // Address 
+      { wch: 50 },  // Photo URL 
     ];
     if (this.isStudent) {
       worksheet['!cols'].push(
@@ -470,19 +235,14 @@ exportToExcel() {
       );
     }
 
-    // Create workbook and append worksheet
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "User Informations");
-
-    // Save to file
     XLSX.writeFile(workbook, "User_Informations.xlsx");
-
   } catch (error) {
     console.error("Export to Excel failed", error);
     this.$swal("Error", "Failed to export to Excel", "error");
   }
 },
-
     getUserPhotoUrl(photo) {
       if (!photo) return "path/to/default-image.png";
       return `${axios.defaults.baseURL}/userphoto/${photo}.png`;
