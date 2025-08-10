@@ -7,35 +7,34 @@
         <v-row>
         <v-col cols="2" class="pl-1 pt-5">
       <v-autocomplete
-        v-model="type"
-        item-text="typeName"
-        :items="courseList"
-        name="type"
-        label="Course Or Exam"
-        return-object
-        density="compact"
-        variant="outlined"
-        required
-        small
-        filled
-        @update:modelValue="courseListMethodByType"
-      ></v-autocomplete>
-      </v-col>
-        <v-col cols="2" class="pl-1 pt-5">
-          <v-autocomplete
-        v-model="selectedLanguage"
-        :items="languageList"
-        item-title="name"
-        item-value="languagesId"
-        label="Languages"
-        return-object
-        density="compact"
-        variant="outlined"
-        required
-        small
-        filled
-        @update:modelValue="LanguagesListMethodByType"
-      />
+  v-model="type"
+  item-text="typeName"
+  :items="courseList"
+  label="Course Or Exam"
+  return-object
+  density="compact"
+  variant="outlined"
+  required
+  small
+  filled
+/>
+</v-col>
+<v-col cols="2" class="pl-1 pt-5">
+
+<v-autocomplete
+  v-model="selectedLanguage"
+  :items="languageList"
+  item-title="name"
+  item-value="languagesId"
+  label="Languages"
+  return-object
+  density="compact"
+  variant="outlined"
+  required
+  small
+  filled
+/>
+
       </v-col>
       <!-- <v-col cols="2" class="pl-12 pt-6">
       <v-btn rounded="xl" size="large"  class="bg-blue" style="font-size: small;" @click="demand()"> 
@@ -362,6 +361,7 @@ export default {
     userData : {},
     type: "ALL",
     showdemand : true,
+    selectedLanguage : null,
   }),
   props: {},
   mounted: function () {
@@ -384,6 +384,7 @@ export default {
     this.showForm = false;
     this.courseListMethodByType();
     this.LanguagesListMethodByType();
+    this.filterCoursesList();
 
   },
   methods: {
@@ -603,7 +604,27 @@ export default {
   };
   this.showForm = false;
   this.saveOrupdate = "SAVE";
+},
+filterCoursesList() {
+  coursesService.getCourseList()
+    .then((response) => {
+      let filtered = response;
+
+      // Filter by type (if not ALL)
+      if (this.type && this.type !== 'ALL') {
+        filtered = filtered.filter(item => item.type === this.type);
+      }
+
+      // Filter by selectedLanguage (if set)
+      if (this.selectedLanguage && this.selectedLanguage.languagesId) {
+        filtered = filtered.filter(item => item.languagesDto?.languagesId === this.selectedLanguage.languagesId);
+      }
+
+      this.coursesList = filtered;
+    })
+    .catch((err) => console.error("Fetch error:", err));
 }
+
   },
   watch: {
     receivedPicker() {
@@ -619,8 +640,15 @@ export default {
       this.saveOrupdate = "SAVE";
     }
   },
+    type() {
+    this.filterCoursesList();
+  },
+  selectedLanguage() {
+    this.filterCoursesList();
+  }
   },
   computed: {
+    
     // Total amount for all items combined
     totalAmount() {
       return this.coursesList.reduce((sum, item) => sum + item.amount, 0);
