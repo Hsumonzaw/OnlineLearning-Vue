@@ -6,7 +6,7 @@
         <h1 style="background-color:#b3e5fc; text-align: center;" >Quiz</h1>
         <v-col cols="2" class="pl-1 pt-2">
       <v-autocomplete
-  v-model="type"
+  v-model="selectedLanguage"
   :items="languageList"
   item-title="displayName"
   item-value="languagesId"
@@ -14,6 +14,8 @@
   return-object
   density="compact"
   variant="outlined"
+  clearable
+
   required
   small
   filled
@@ -249,7 +251,8 @@ export default {
     showForm:false,
     showTeacher: false,
     userData : {},
-    type: "ALL",
+    selectedLanguage : null,
+    // type: "ALL",
   }),
   props: {},
   mounted: function () {
@@ -285,12 +288,19 @@ export default {
     .getQuizList()
     .then((response) => {
       // Filter out any quiz items where languages or languagesId is missing
-      const filtered = response.filter(item => item.languages && item.languages.languagesId);
+       const filtered = response.filter(item => item.languages && item.languages.languagesId);
 
-      if (this.type === 'ALL') {
+      // if (this.type === 'ALL') {
+      //   this.quizList = filtered;
+      // } else {
+      //   this.quizList = filtered.filter(item => item.languages.languagesId === this.type.languagesId);
+      // }
+       if (!this.selectedLanguage || !this.selectedLanguage.languagesId) {
         this.quizList = filtered;
       } else {
-        this.quizList = filtered.filter(item => item.languages.languagesId === this.type.languagesId);
+        this.quizList = filtered.filter(
+          item => item.languages?.languagesId === this.selectedLanguage.languagesId
+        );
       }
     })
     .catch((err) => {

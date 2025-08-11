@@ -262,17 +262,20 @@
       </v-card>
     </v-dialog>
 
-    <v-dialog v-model="paymentDialog" max-width="400">
+   <v-dialog v-model="paymentDialog" max-width="400">
   <v-card>
     <v-card-title class="text-h5">Choose Your Payment</v-card-title>
     <v-card-text class="text-center">
+      <div class="mb-4 text-h6">
+        Amount to Pay: <strong>{{ chosenAmount.toLocaleString() }} MMK</strong>
+      </div>
       <v-btn color="blue" class="mx-2" @click="choosePayment('kpay')">KPay</v-btn>
       <v-btn color="yellow darken-2" class="mx-2" @click="choosePayment('wavepay')">WavePay</v-btn>
       <v-btn color="red" class="mx-2" @click="choosePayment('ayapay')">AYA Pay</v-btn>
     </v-card-text>
     <v-card-actions>
       <v-spacer></v-spacer>
-      <v-btn text @click="dialogBuyNow = false">Cancel</v-btn>
+      <v-btn text @click="paymentDialog = false">Cancel</v-btn>
     </v-card-actions>
   </v-card>
 </v-dialog>
@@ -282,7 +285,7 @@
   <v-card class="pa-4 text-center">
     <h3 class="mb-4">{{ paymentName }} - Please Scan with your Phone</h3>
     <img :src="paymentQR" alt="Payment QR" style="max-width:250px; margin:auto; display:block;" />
-    <div class="payment-phone mt-2">092556774574</div>
+    <div class="payment-phone mt-2">09775988862</div>
     <v-btn @click="doneMethod()">DONE</v-btn>
 
     <v-btn class="mt-4" color="primary" @click="qrDialog = false">Close</v-btn>
@@ -313,6 +316,9 @@ export default {
     birthPicker: new Date(),
     dateBirth : false,
     saveOrupdate: "SAVE",
+    chosenAmount: 0,  
+    selectedPayment: "", 
+    showPaymentOptions: false,
     rules: {
       required: (v) => !!v || "This field is required",
       email: (v) =>
@@ -339,14 +345,14 @@ export default {
     startPicker: new Date(),
     startMenu: false,
     dialogBuyNow:false,
-    rgType:"courses",
+    rgType: "COURSES",
     languagesId:0,
     paymentDialog:false,
     qrDialog: false,
     images: [
-  new URL('@/assets/s1.jpg', import.meta.url).href,
-  new URL('@/assets/s2.jpg', import.meta.url).href,
-  new URL('@/assets/s3.jpg', import.meta.url).href
+  new URL('@/assets/kpay.jpg', import.meta.url).href,
+  new URL('@/assets/wave.jpg', import.meta.url).href,
+  new URL('@/assets/AYA.jpg', import.meta.url).href
 ],
   }),
   mounted() {
@@ -520,37 +526,68 @@ export default {
         });
     },
 
-    handleEnroll() {
-      if (this.userData.role == undefined) {
-        this.$swal({
-          title: "Enroll Now",
-          text: "Register as a student to access all lessons.",
-          icon: "info",
-          showCancelButton: true,
-          confirmButtonText: "Register",
-          cancelButtonText: "Cancel",
-        }).then((result) => {
-          if (result.isConfirmed) {
-            //window.location.href = "/register";
-            this.showForm = true;
-          }
-        });
-      } else {
-        this.$swal({
-        title: "Buy Now",
-        text: `Price: ${this.selectedOne?.amount ?? 'Unknown'} MMK`, 
-        icon: "info",
-          showCancelButton: true,
-          confirmButtonText: "Buy",
-          cancelButtonText: "Cancel",
-        }).then((result) => {
-          if (result.isConfirmed) {
-            //window.location.href = "/register";
-            this.dialogBuyNow = true;
-          }
-        });
+ handleEnroll() {
+  if (!this.userData.role) {
+    // Not logged in, ask to register first
+    this.$swal({
+      title: "Enroll Now",
+      text: "Register as a student to access all lessons.",
+      icon: "info",
+      showCancelButton: true,
+      confirmButtonText: "Register",
+      cancelButtonText: "Cancel",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.showForm = true;
       }
-    },
+    });
+  } else {
+    // Logged in: show the dialog to choose course or exam first
+    this.dialogBuyNow = true;  // Open dialog to select course or exam type
+  }
+},
+
+clickBuyNowType() {
+  // console.log("Selected item:", this.selectedOne);
+  if (!this.rgType) {
+    this.$swal('Please select either Courses or Exam');
+    return;
+  }
+
+  // Set chosen amount according to selection
+  if (this.rgType === 'COURSES') {
+    this.chosenAmount = this.selectedOne?.amount || 0;
+  } else if (this.rgType === 'EXAM') {
+    this.chosenAmount = this.selectedOne?.examFee  || 0;
+  }
+
+  this.dialogBuyNow = false; 
+  const messageText =
+    this.rgType === "COURSES"
+      ? `Couses + Free Exam Fees: ${this.chosenAmount.toLocaleString()} MMK`
+      : `Exam Fees: ${this.chosenAmount.toLocaleString()} MMK`;
+      const dialogTitle =
+    this.rgType === "COURSES"
+      ? `Are you sure want to buy  ${this.selectedOne.name} course?`
+      : `Are you sure want to buy  ${this.selectedOne.name} exam?`;
+
+  // Show confirmation dialog with price and Buy/Cancel buttons
+  this.$swal({
+    title: dialogTitle,
+    text: messageText,
+    icon: "info",
+    showCancelButton: true,
+    confirmButtonText: "Buy",
+    cancelButtonText: "Cancel",
+  }).then((result) => {
+    if (result.isConfirmed) {
+      this.paymentDialog = true;  // open payment methods dialog
+    }
+  });
+},
+
+
+
      
   },
   computed: {

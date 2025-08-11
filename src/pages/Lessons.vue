@@ -21,9 +21,10 @@
               dense
               outlined
               clearable
-              :rules="[(v) => !!v || 'Language is required']"
             />
           </v-col>
+                        <!-- :rules="[(v) => !!v || 'Language is required']" -->
+
 
           <!-- Lesson type filter -->
           <v-col cols="2" class="pl-1 pt-5">
@@ -36,7 +37,6 @@
               required
               small
               filled
-              clearable
             />
           </v-col>
         </v-row>
@@ -293,7 +293,9 @@ export default {
         } else {
           this.languageList = allLanguages;
         }
-        this.selectedLanguage = this.languageList[0] || null;
+        // this.selectedLanguage = this.languageList[0] || null;
+                this.selectedLanguage = null;
+
       } catch (error) {
         Swal.fire("Fail!", error.message || "Failed to load languages", "error");
       }
@@ -374,9 +376,7 @@ export default {
   if (error.response && error.response.status === 400) {
     // If backend sends a message, show that instead (optional)
     msg = error.response.data.message || msg;
-  } else if (error.message) {
-    msg = error.message;
-  }
+  } 
 
   Swal.fire("Fail!", msg, "error");
 });

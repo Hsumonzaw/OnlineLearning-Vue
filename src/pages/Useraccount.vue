@@ -5,7 +5,8 @@
         <h1 style="background-color: #b3e5fc; text-align: center" class="mt-1 mb-1">
           User Informations
         </h1>
-        <v-col cols="2" class="pl-1 pt-2">
+        <v-row>
+        <v-col cols="2" class="pl-1 pt-3">
           <v-autocomplete
   v-model="userType"
   :items="userTypeListSearch"
@@ -14,16 +15,26 @@
   variant="outlined"
   @update:modelValue="fetchUserList"
 />
+</v-col>
+<!-- <v-col cols="3" class="pl-1 pt-5">
+<v-btn color="blue" @click="clickRouter('/teachercourse')">
+            Teacher-Courses Overview
+          </v-btn>
+          </v-col> -->
+          </v-row>
+          
 <!-- 
           <v-btn color="green" class="ml-2" @click="exportToWord">
             <v-icon left>mdi-microsoft-word</v-icon>
             Export to Word
           </v-btn> -->
+          <v-col cols="2" class="pl-1 pt-2">
           <v-btn color="orange" class="ml-2" @click="exportToExcel">
            <v-icon left>mdi-microsoft-excel</v-icon>
                Export to Excel
-          </v-btn>
-        </v-col>
+          </v-btn></v-col>
+         
+        
         <v-tooltip location="top">
           <template v-slot:activator="{ props }">
             <v-btn
@@ -44,7 +55,7 @@
               <th class="text-center white--text bg-primary">No.</th>
               <th class="text-center white--text bg-primary">StartDate</th>
               <th class="text-center white--text bg-primary">Full Name</th>
-              <!-- <th v-if="isStudent" class="text-center white--text bg-primary">Language Name</th> -->
+              <th class="text-center white--text bg-primary">Language Name</th>
               <th class="text-center white--text bg-primary">Gender</th>
               <th class="text-center white--text bg-primary">NRC</th>
               <th class="text-center white--text bg-primary">Email</th>
@@ -68,7 +79,7 @@
   <td class="text-center">{{ index + 1 }}</td>
   <td class="text-center">{{ item.startDate }}</td>
   <td class="text-center">{{ item.name || item.studentDto?.name }}</td>
-  <!-- <td v-if="isStudent" class="text-center">{{ item.languagesDto?.name || '-' }}</td> -->
+  <td class="text-center">{{ item.languagesDto?.name || '-' }}</td>
   <td class="text-center">{{ item.gender || item.studentDto?.gender }}</td>
   <td class="text-center">{{ item.nrc || item.studentDto?.nrc }}</td>
   <td class="text-center">{{ item.email || item.studentDto?.email }}</td>
@@ -315,6 +326,9 @@ export default {
     this.fetchUserList();
   },
   methods: {
+    clickRouter(path) {
+      this.$router.push(path);
+    },
 
     // Renamed for clarity and to be consistent with the logic
 fetchUserList() {

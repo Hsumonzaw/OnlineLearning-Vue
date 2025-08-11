@@ -79,9 +79,9 @@
         <div v-if="score / quizList.length >= certificateScore" class="text-success font-weight-bold mt-2"> 
            🎉 Congratulations! You passed and can generate your certificate.
         </div>
-        <div v-else-if="score / quizList.length >= passingScore" class="text-warning font-weight-bold mt-2">
+        <!-- <div v-else-if="score / quizList.length >= passingScore" class="text-warning font-weight-bold mt-2">
        ✅ You passed the quiz! (But not enough for a certificate.)
-        </div>
+        </div> -->
         <div v-else class="text-error font-weight-bold mt-2">
           Sorry, you did not pass. Please try again.
         </div>
@@ -154,8 +154,8 @@ export default {
       loadError: false,
       showResult: false,
       score: 0,
-      passingScore: 0.5, 
-      certificateScore: 0.6,
+      // passingScore: 0.5, 
+      certificateScore: 0.5,
       languagesId :0,
       coursesId:0,
       minutes:"0m 0s",

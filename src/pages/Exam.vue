@@ -218,24 +218,30 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
-    <v-dialog v-model="dialogBuyNow" width="500">
-      <v-card>
-        <v-card-title class="text-h5 white--text bg-red">Buy </v-card-title>
-        <v-card-text class="text-h6">
-         <v-radio-group v-model="rgType" inline>
-  <v-radio label="Courses" value="COURSES"></v-radio>
-  <v-radio label="Exam" value="EXAM"></v-radio>
-</v-radio-group>
-        </v-card-text>
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn class="black" text @click="dialogBuyNow = false">CANCEL</v-btn>
-          <v-btn dark class="bg-red" text @click="clickBuyNowType()"
-            >BUY</v-btn
-          >
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
+    <!-- Choose Type Dialog -->
+<!-- Choose Type Dialog -->
+<v-dialog v-model="dialogChooseType" max-width="400">
+  <v-card>
+    <v-card-title>Choose Access Type</v-card-title>
+    <v-card-text>
+      <v-btn color="blue" block @click="confirmChoice('course')">Course</v-btn>
+      <v-btn color="green" block @click="confirmChoice('exam')">Exam</v-btn>
+    </v-card-text>
+  </v-card>
+</v-dialog>
+    <!-- Buy Now Dialog -->
+<v-dialog v-model="dialogBuyNow" max-width="400">
+  <v-card>
+    <v-card-title>Purchase {{ selectedType }}</v-card-title>
+    <v-card-text>
+      Amount to pay: <strong>{{ amountToPay }}</strong>
+    </v-card-text>
+    <v-card-actions>
+      <v-btn color="primary" @click="proceedToPayment">Pay Now</v-btn>
+      <v-btn text @click="dialogBuyNow = false">Cancel</v-btn>
+    </v-card-actions>
+  </v-card>
+</v-dialog>
               <!-- Payment Options Dialog -->
 <v-dialog v-model="paymentDialog" max-width="400">
   <v-card>
@@ -255,14 +261,30 @@
 <!-- QR Code Dialog -->
 <v-dialog v-model="qrDialog" max-width="300px" persistent>
   <v-card class="pa-4 text-center">
-    <h3 class="mb-4">{{ paymentName }} - Please Scan with your Phone</h3>
-    <img :src="paymentQR" alt="Payment QR" style="max-width:250px; margin:auto; display:block;" />
+    <h3 class="mb-2">{{ paymentName }}</h3>
+    <p class="mb-4">Amount: {{ formattedAmount }}</p>
+    <img :src="paymentQR" alt="Payment QR" style="max-width:250px; margin:auto;" />
     <div class="payment-phone mt-2">092556774574</div>
-    <v-btn @click="doneMethod()">DONE</v-btn>
-
-    <v-btn class="mt-4" color="primary" @click="qrDialog = false">Close</v-btn>
+    <v-btn class="mt-4" @click="doneMethod()">DONE</v-btn>
+    <v-btn class="mt-2" color="primary" @click="qrDialog = false">Close</v-btn>
   </v-card>
 </v-dialog>
+
+<v-dialog v-model="confirmFeeDialog" max-width="400">
+  <v-card>
+    <v-card-title class="text-h6">Confirm Payment</v-card-title>
+    <v-card-text>
+      You are about to pay <strong>{{ formattedAmount }}</strong> for
+      <strong>{{ rgType === 'COURSES' ? 'Course' : 'Exam' }}</strong>.
+    </v-card-text>
+    <v-card-actions>
+      <v-spacer></v-spacer>
+      <v-btn text @click="confirmFeeDialog = false">Cancel</v-btn>
+      <v-btn color="primary" text @click="confirmFee">Confirm</v-btn>
+    </v-card-actions>
+  </v-card>
+</v-dialog>
+
 
 </template>
 <script>
@@ -270,205 +292,192 @@ import languageService from "../service/LanguageService.js";
 import userService from "../service/UserAccountService.js";
 import coursesService from "../service/CoursesService.js";
 import { format } from "date-fns";
-
-
-
 import axios from "@/config";
+
 export default {
-  data: () => ({
-   languageList: [],
-    languagesId: 0,
-    languageList: [],
-    selectedOne: {},
-    userData: {},
-    lessonList: [],
-    paymentDialog:false,
-    showEnrollButton: true,
-    showForm: false,
-    user: { userType: "STUDENT" },
-    genderList: ["Male","Female"],
-    saveOrupdate: "SAVE",
-    qrDialog: false,
-    showPaymentOptions: false,
-    rules: {
-      required: (v) => !!v || "This field is required",
-      email: (v) =>
-        /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) || "Invalid email format",
-      phone: (v) =>
-        /^(?:\+?95|0)(?:9\d{7,9})$/.test(v) || "Invalid Myanmar phone number",
-      nrc: (v) =>
-        /^\d{1,12}\/[A-Z]{3}\([NPE]\)\d{6}$/.test(v) || "Invalid NRC format",
+  data() {
+    return {
+      languageList: [],
+      selectedOne: {},
+      userData: {},
+      showForm: false,
+      user: { userType: "STUDENT" },
+      genderList: ["Male", "Female"],
+      saveOrupdate: "SAVE",
+      startPicker: new Date(),
+      birthPicker: new Date(),
+      startMenu: false,
+      dateBirth: false,
+      dialogChooseType: false,
+      dialogBuyNow: false,
+      paymentDialog: false,
+      qrDialog: false,
+      confirmFeeDialog: false,
+      selectedPayment: "",
+      amountToPay: 0,
+      selectedType: "",
+      images: [
+        new URL('@/assets/kpay.jpg', import.meta.url).href,
+        new URL('@/assets/wave.jpg', import.meta.url).href,
+        new URL('@/assets/AYA.jpg', import.meta.url).href,
+      ],
+      showPassword: false,
+      rules: {
+        required: (v) => !!v || "This field is required",
+        email: (v) =>
+          /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) || "Invalid email format",
+        phone: (v) =>
+          /^(?:\+?95|0)(?:9\d{7,9})$/.test(v) || "Invalid Myanmar phone number",
+        nrc: (v) =>
+          /^\d{1,12}\/[A-Z]{3}\([NPE]\)\d{6}$/.test(v) || "Invalid NRC format",
         name: (v) =>
-        /^[A-Za-z]+(?:\s[A-Za-z]+)*$/.test(v) || "Invalid name format",
+          /^[A-Za-z]+(?:\s[A-Za-z]+)*$/.test(v) || "Invalid name format",
         age: (v) => {
-    if (!v) return "Date of Birth is required";
-    const today = new Date();
-    const birthDate = new Date(v.split("-").reverse().join("-")); // Convert dd-MM-yyyy to yyyy-MM-dd
-    let age = today.getFullYear() - birthDate.getFullYear();
-    const m = today.getMonth() - birthDate.getMonth();
-    if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
-      age--;
-    }
-    return age >= 15 || "You must be at least 15 years old";
-  }
- 
-    },
-    userTypeList: ["ALL", "STAFF", "STUDENT", "TEACHER", "ADMIN"],
-    startPicker: new Date(),
-    startMenu: false,
-    birthPicker: new Date(),
-    dateBirth : false,
-    dialogBuyNow:false,
-    rgType:"exam",
-    showPassword : false,
-images: [
-  new URL('@/assets/s1.jpg', import.meta.url).href,
-  new URL('@/assets/s2.jpg', import.meta.url).href,
-  new URL('@/assets/s3.jpg', import.meta.url).href
-],
-
-
-  }),
+          if (!v) return "Date of Birth is required";
+          const today = new Date();
+          const birthDate = new Date(v.split("-").reverse().join("-")); // dd-MM-yyyy to yyyy-MM-dd
+          let age = today.getFullYear() - birthDate.getFullYear();
+          const m = today.getMonth() - birthDate.getMonth();
+          if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+            age--;
+          }
+          return age >= 15 || "You must be at least 15 years old";
+        },
+      },
+    };
+  },
   mounted() {
-        console.log(this.images[0]);
-
-    console.log(this.images[1]);
-        console.log(this.images[2]);
-
-    
-    // const lessonsId = this.$route.query.lessonsId;
-    // if (lessonsId !== undefined) {
-    //   this.lessonsId = lessonsId;
-    // }
-
-   
     this.user.startDate = format(this.startPicker, "dd-MM-yyyy");
-        this.user.age = format(this.birthPicker, "dd-MM-yyyy");
+    this.user.age = format(this.birthPicker, "dd-MM-yyyy");
 
     this.userData = JSON.parse(localStorage.getItem("user")) || {};
-      if (this.userData.password!=undefined &&  this.userData?.password!="") {
-       this.languageListMethod();
-    }else{
+    if (this.userData.password) {
+      this.languageListMethod();
+    } else {
       this.languageListMethodFree();
     }
-
   },
   methods: {
-
-       selectPayment(method) {
-      this.selectedPayment = method;
-      this.qrDialog = true; // Show QR code dialog when payment method selected
-    },
-   
-    clickBuyNowType:function(){
-        this.dialogBuyNow = false; // Close the Buy Now dialog
-        this.paymentDialog = true;
-        this.showPaymentOptions = true;  // show payment buttons now
-  
-    },
-      choosePayment(method) {
-    this.selectedPayment = method;
-    this.paymentDialog = false;   // Close Payment options dialog
-    this.qrDialog = true;         // Open QR code dialog
-  },
-
-     doneMethod:function(){
-      //this.dialogBuyNow = true
-       this.dialogBuyNow = false;
-       this.qrDialog = false;
-      let courses = {studentDto:{}};
-      courses.type = this.rgType;
-      courses.receivedDate = this.user.startDate;
-      courses.studentDto.userAccountId = this.userData.userId;
-      courses.languagesDto = { languagesId: this.selectedOne.languagesId };
-      courses.amount = this.selectedOne.amount;
-
-       coursesService
-          .addCourse(courses)
-          .then((response) => {
-        //   const purchased = this.languageList.find(
-        //   (lang) => lang.languagesId === this.selectedOne.languagesId
-        //   );
-        //   if (purchased) {
-        //    purchased.buy = 1;
-        //  }
-if (this.userData.password!=undefined &&  this.userData?.password!="") {
-       this.languageListMethod();
-    }else{
-      this.languageListMethodFree();
-    }
-          this.$swal({
-          icon: "success",
-          title: "Your work saved successfully!",
-          showConfirmButton: false,
-          timer: 1000,
-        }).then(() => {
-          //this.showForm = false;
-        });
-          })
-    },
     handleExam(language) {
       this.selectedOne = language;
-      
-      if (this.userData.role == undefined) {
-        
+      if (!this.userData?.role) {
         this.$swal({
-          title: "Enroll Now",
-          text: "Register as a student to access all lessons.",
-          icon: "info",
+          title: "You need to register or login first",
+          icon: "warning",
           showCancelButton: true,
-          confirmButtonText: "Register",
+          confirmButtonText: "Register/Login",
           cancelButtonText: "Cancel",
-        }).then((result) => {
-          if (result.isConfirmed) {
-            //window.location.href = "/register";
+        }).then((res) => {
+          if (res.isConfirmed) {
             this.showForm = true;
           }
         });
-      } else {
-        this.$swal({
-          title: "Purchase Exam",
-          text: "Would you like to purchase access to the exam now?",
-          icon: "info",
-          showCancelButton: true,
-          confirmButtonText: "Yes",
-          cancelButtonText: "May be later",
-        }).then((result) => {
-          if (result.isConfirmed) {
-            //window.location.href = "/register";
-            this.dialogBuyNow = true;
-          }
-        });
+        return;
       }
+      this.dialogChooseType = true; // open choose type dialog (course/exam)
     },
-        async saveUser() {
+
+    clickTakeExam(language) {
+      const languagesId = language.languagesId;
+      const coursesId = language.coursesId;
+      this.$router.push({
+        name: "userquiz",
+        query: { languagesId, coursesId },
+      });
+    },
+
+    confirmChoice(choice) {
+      this.selectedType = choice; // 'course' or 'exam'
+      this.amountToPay =
+        choice === "course"
+          ? this.selectedOne.courseFee || this.selectedOne.amount || 0
+          : this.selectedOne.examFee || this.selectedOne.amount || 0;
+      this.dialogChooseType = false;
+      this.dialogBuyNow = true;
+    },
+
+    proceedToPayment() {
+      this.dialogBuyNow = false;
+      this.confirmFeeDialog = true;
+    },
+
+    confirmFee() {
+      this.confirmFeeDialog = false;
+      this.paymentDialog = true;
+    },
+
+    choosePayment(method) {
+      this.selectedPayment = method;
+      this.paymentDialog = false;
+      this.qrDialog = true;
+    },
+
+    doneMethod() {
+      this.qrDialog = false;
+
+      let courses = {
+        type: this.selectedType,
+        receivedDate: this.user.startDate,
+        studentDto: { userAccountId: this.userData.userId },
+        languagesDto: { languagesId: this.selectedOne.languagesId },
+        amount: this.amountToPay,
+      };
+
+      coursesService.addCourse(courses).then(() => {
+        if (this.userData.password) {
+          this.languageListMethod();
+        } else {
+          this.languageListMethodFree();
+        }
+        this.$swal({
+          icon: "success",
+          title: "Purchase successful!",
+          timer: 1000,
+          showConfirmButton: false,
+        });
+      });
+    },
+
+    languageListMethod() {
+      languageService
+        .getLanguageList()
+        .then((response) => {
+          this.languageList.splice(0);
+          this.languageList.push(...response);
+        })
+        .catch((error) => {
+          this.$swal("Fail!", error.response.data.message, "error");
+        });
+    },
+
+    languageListMethodFree() {
+      languageService
+        .getLanguageListFree()
+        .then((response) => {
+          this.languageList.splice(0);
+          this.languageList.push(...response);
+        })
+        .catch((error) => {
+          this.$swal("Fail!", error.response.data.message, "error");
+        });
+    },
+
+    async saveUser() {
       try {
-        // Normalize userType
         let userType = this.user.userType;
         if (typeof userType === "object") {
           userType = userType.userType || userType.value || "";
         }
-
-        // Re-assign normalized value back
         this.user.userType = userType;
-
-        // Assign teacherId
-        if (this.loggedInUser?.role === "TEACHER" && userType === "STUDENT") {
-          this.user.teacherId = this.loggedInUser.userId;
-        } else {
-          this.user.teacherId = 0;
-        }
 
         userService
           .saveFreeUserAccounts(this.user)
-          .then((response) => {
+          .then(() => {
             this.$router.push({ path: "/login" }).catch(() => {});
           })
           .catch((error) => {
             this.$swal("Fail!", error.response.data.message, "error");
           });
-
-        //await userService.addUser(this.user);
       } catch (error) {
         this.showForm = false;
         console.error("User save failed", error);
@@ -479,95 +488,54 @@ if (this.userData.password!=undefined &&  this.userData?.password!="") {
         );
       }
     },
-    clickTakeExam:function(languages){
-      let languagesId = languages.languagesId;
-      let coursesId = languages.coursesId;
-      let query = { languagesId,coursesId };
-      this.$router.push({
-        name: "userquiz",
-        query,
-      });
-    },
-    coursesListMethod() {
-      this.showTeacher = false;
-      coursesService
-        .getCourseList()
-        .then((response) => {
-          this.coursesList.splice(0);
-          this.coursesList.push(...response);
-        })
-        .catch((err) => console.error("Fetch error:", err));
-    },
-    // downloadPdf(pdf) {
-    //   if (!pdf) {
-    //     this.$swal("No PDF", "No PDF file available for this product.", "warning");
-    //     return;
-    //   }
-    //   const baseURL = axios?.defaults?.baseURL || "";
-    //   const pdfUrl = `${baseURL}/productfile/${pdf}.pdf`;
-    //   window.open(pdfUrl, "_blank");
-    // },
-    // getCoursePhotoUrl(cphoto) {
-    //   // const baseURL = axios?.defaults?.baseURL || "";
-    //   // return cphoto ? `${baseURL}/coursephoto/${cphoto}.png` : "";
-    //     return `${axios.defaults.baseURL}/coursephoto/${cphoto}.png`;
-      
-    // },
-    languageListMethod() {
-      languageService
-        .getLanguageList()
-        .then((response) => {
-          this.languageList.splice(0, this.languageList.length);
-          this.languageList.push(...response);
-        })
-        .catch((error) => {
-           this.$swal("Fail!", error.response.data.message, "error");
-        });
-    },
-     languageListMethodFree() {
-      languageService
-        .getLanguageListFree(this.languagesId)
-        .then((response) => {
-          this.languageList.splice(0, this.languageList.length);
-          this.languageList.push(...response);
-        })
-        .catch((error) => {
-           this.$swal("Fail!", error.response.data.message, "error");
-        });
-    },
   },
   computed: {
- paymentQR() {
-  switch (this.selectedPayment) {
-    case "kpay": return this.images[0];
-    case "wavepay": return this.images[1];
-    case "ayapay": return this.images[2];
-    default: return "";
-  }
-},
-
-  paymentName() {
-    switch (this.selectedPayment) {
-      case "kpay": return "KPay";
-      case "wavepay": return "WavePay";
-      case "ayapay": return "AYA Pay";
-      default: return "";
-    }
-  }
-},
-
+    paymentQR() {
+      switch (this.selectedPayment) {
+        case "kpay":
+          return this.images[0];
+        case "wavepay":
+          return this.images[1];
+        case "ayapay":
+          return this.images[2];
+        default:
+          return "";
+      }
+    },
+    paymentName() {
+      switch (this.selectedPayment) {
+        case "kpay":
+          return "KPay";
+        case "wavepay":
+          return "WavePay";
+        case "ayapay":
+          return "AYA Pay";
+        default:
+          return "";
+      }
+    },
+    formattedAmount() {
+      const amount = this.amountToPay || 0;
+      return new Intl.NumberFormat("en-US", {
+        style: "currency",
+        currency: "MMK",
+        minimumFractionDigits: 0,
+      }).format(amount);
+    },
+  },
   watch: {
     startPicker() {
       this.startMenu = false;
       this.user.startDate = format(this.startPicker, "dd-MM-yyyy");
     },
-        birthPicker(){
+    birthPicker() {
       this.dateBirth = false;
-      this.user.age = format(this.birthPicker,"dd-MM-yyyy");
+      this.user.age = format(this.birthPicker, "dd-MM-yyyy");
     },
   },
 };
 </script>
+
 <style scoped>
 .v-container {
   background: linear-gradient(135deg, #79d4eb 0%, #5c83aa 60%, #42a5f5 100%);

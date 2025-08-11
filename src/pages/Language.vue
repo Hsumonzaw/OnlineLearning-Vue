@@ -124,7 +124,6 @@
 
                 <v-text-field
                 v-if="showTeacher"
-                  type="number"
                   label="Amount"
                   v-model.number="language.amount"
                   :rules="[(v) => !!v || 'required']"
@@ -142,20 +141,19 @@
 
                 <v-text-field
                   v-if="showTeacher"
-                  type="number"
                   label="Exam Fee"
                   v-model.number="language.examFee"
                   density="compact"
                   variant="outlined"
                 ></v-text-field>
 
-                <v-text-field
+                <v-textarea
                   label="Descriptions"
                   v-model="language.description"
                   :rules="[(v) => !!v || 'required']"
                   density="compact"
                   variant="outlined"
-                ></v-text-field>
+                ></v-textarea>
 
                 </v-card-text>
                <v-card-actions class="justify-end pr-5">  
@@ -403,25 +401,49 @@ export default {
       this.selectedOne = { ...item };
       this.dialogDelete= true;
     },
-    clickDeleteDialog() {
-      this.dialogDelete = false;
-      languageService
-        .deleteLanguage(this.selectedOne)
-        .then((response) => {
-          this.saveOrupdate = "SAVE";
-          this.language = {};
-          this.languageListMethod();
-          this.$swal({
-            icon: "success",
-            title: "Your work has been deleted",
-            showConfirmButton: false,
-            timer: 1000,
-          });
-        })
-        .catch((error) => {
-          this.$swal("Fail!", error.response.data.message, "error");
-        });
-    },
+    // clickDeleteDialog() {
+    //   this.dialogDelete = false;
+    //   languageService
+    //     .deleteLanguage(this.selectedOne)
+    //     .then((response) => {
+    //       this.saveOrupdate = "SAVE";
+    //       this.language = {};
+    //       this.languageListMethod();
+    //       this.$swal({
+    //         icon: "success",
+    //         title: "Your work has been deleted",
+    //         showConfirmButton: false,
+    //         timer: 1000,
+    //       });
+    //     })
+    //     .catch((error) => {
+    //       this.$swal("Fail!", error.response.data.message, "error");
+    //     });
+    // },
+clickDeleteDialog() {
+  this.dialogDelete = false;
+  languageService
+    .deleteLanguage(this.selectedOne)
+    .then(() => {
+      // This only runs if HTTP status is 2xx (success)
+      this.saveOrupdate = "SAVE";
+      this.language = {};
+      this.languageListMethod();
+      this.$swal({
+        icon: "success",
+        title: "Language deleted successfully",
+        showConfirmButton: false,
+        timer: 1000,
+      });
+    })
+    .catch((error) => {
+      
+      const message ="You cannot delete this course as  it has active students and a teacher assigned.";
+      this.$swal("Deletion Blocked", message, "error");
+    });
+}
+
+
   },
   watch: {
       showForm(newVal) {

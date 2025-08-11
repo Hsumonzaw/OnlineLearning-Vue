@@ -12,7 +12,7 @@
       <v-col cols="12" md="12">
           <v-row class="ml-2">
             <v-col cols="12" md="12">
-            <img :src="file" height="100%" width="700vh" />
+            <img :src="file" height="60%" width="400vh" />
             </v-col>
             <v-col cols="12" md="12">
               <input type="file" id="file" ref="file" @change="changeCorImage"/>

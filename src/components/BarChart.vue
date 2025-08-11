@@ -31,10 +31,22 @@ onMounted(() => {
   });
 });
 
-watch(() => props.chartData, (newData) => {
+watch(
+  () => props.chartData,
+  (newData) => {
+    if (chartInstance) {
+      chartInstance.data = newData;
+      chartInstance.update();
+    }
+  },
+  { deep: true }
+);
+
+// Clean up chart instance when component unmounts
+onBeforeUnmount(() => {
   if (chartInstance) {
-    chartInstance.data = newData;
-    chartInstance.update();
+    chartInstance.destroy();
+    chartInstance = null;
   }
 });
 </script>

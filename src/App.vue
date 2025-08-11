@@ -37,16 +37,19 @@
             <v-list-item @click="clickRouter('/useraccount')" v-if="showTeacher">
               <v-list-item-title><v-icon>mdi-account-multiple</v-icon> User Account</v-list-item-title>
             </v-list-item>
+            <v-list-item @click="clickRouter('/studentdetail')" v-if="showTeacher">
+              <v-list-item-title><v-icon>	mdi-school</v-icon> Student Records</v-list-item-title>
+            </v-list-item>
             <v-list-item @click="clickRouter('/teacherforstudent')" v-else>
               <v-list-item-title><v-icon>mdi-account-multiple</v-icon> My Students</v-list-item-title>
             </v-list-item>
             <v-list-item @click="clickRouter('/courses')" v-if="showTeacher">
-              <v-list-item-title><v-icon>mdi-folder-open</v-icon> Student Ledger</v-list-item-title>
+              <v-list-item-title><v-icon>mdi-folder-open</v-icon> Ledger</v-list-item-title>
             </v-list-item>
             <v-list-item @click="clickRouter('/languages')" v-if="showTeacher">
               <v-list-item-title><v-icon>mdi-web</v-icon>Add Courses</v-list-item-title>
             </v-list-item>
-            
+            <!-- mdi-book-open-page-variant -->
             <!-- <v-list-item @click="clickRouter('/lessons')">
               <v-list-item-title><v-icon>mdi-lightbulb-on-outline</v-icon>Add Lessons</v-list-item-title>
             </v-list-item> -->
@@ -89,8 +92,10 @@
   </v-list-item-title>
 </v-list-item>
 <v-list-item @click="clickRouter('/admin')" v-if="showTeacher">
-              <v-list-item-title><v-icon>mdi-web</v-icon>Admin Dashboard</v-list-item-title>
+              <v-list-item-title><v-icon>mdi-web</v-icon>Dashboard</v-list-item-title>
             </v-list-item>
+
+
              <!-- <v-list-item @click="clickRouter('/ans')">
               <v-list-item-title><v-icon>mdi mdi-account-school</v-icon>Exam Marks</v-list-item-title>
             </v-list-item> -->

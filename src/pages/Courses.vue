@@ -3,7 +3,7 @@
     <!-- Table Section -->
    <v-row class="title">
       <v-col cols="12">
-        <h1 style="background-color: #b3e5fc; text-align: center;" class="mt-1 mb-1">Student Ledger</h1>
+        <h1 style="background-color: #b3e5fc; text-align: center;" class="mt-1 mb-1">Ledger</h1>
         <v-row>
         <v-col cols="2" class="pl-1 pt-5">
       <v-autocomplete
@@ -30,6 +30,7 @@
   return-object
   density="compact"
   variant="outlined"
+  clearable
   required
   small
   filled
@@ -59,7 +60,7 @@
       <v-icon size="36" color="white">mdi-plus</v-icon>
     </v-btn>
   </template>
-  <span>Add Student Ledger</span>
+  <span>Add Ledger</span>
 </v-tooltip>
 
         <!-- Table Full Width -->
@@ -77,7 +78,7 @@
               <!-- <th class="text-center white--text bg-primary" v-if="showdemand">Book Link</th> -->
               <!-- <th class="text-center white--text bg-primary" v-if="showdemand">Descriptions</th> -->
               
-              <th class="text-center white--text bg-primary" v-if="showdemand">Action</th>
+              <!-- <th class="text-center white--text bg-primary" v-if="showdemand">Action</th> -->
             </tr>
           </thead>
           <tbody>
@@ -127,14 +128,14 @@
               </td> -->
 
               
-              <td class="text-center" v-if="showdemand"> 
-                <!-- <v-btn class="ml-1" small icon color="black" density="compact">
+              <!-- <td class="text-center" v-if="showdemand"> 
+                 <v-btn class="ml-1" small icon color="black" density="compact">
                   <v-icon size="small" @click="FileMethod(item)">mdi-file</v-icon></v-btn
                 >
 
                  <v-btn class="ml-1" small icon color="black" density="compact">
                   <v-icon size="small" @click="photoMethod(item)">mdi-image</v-icon></v-btn
-                > -->
+                > 
                 <v-btn class="ml-1" small icon color="green" density="compact">
                   <v-icon size="small" @click="clickEdit(item)"
                     >mdi-pencil</v-icon
@@ -145,7 +146,7 @@
                     >mdi-delete</v-icon
                   ></v-btn
                 >
-              </td>
+              </td> -->
             </tr>
             <v-divider />
           </tbody>
@@ -155,7 +156,7 @@
         :key="index"
         :class="{ 'grand-total': total.isGrandTotal }"
       >
-        <td colspan="6" class="total-label text-center white--text bg-primary">{{ total.label }}</td>
+        <td colspan="5" class="total-label text-center white--text bg-primary">{{ total.label }}</td>
         <td class="total-amount text-center white--text bg-primary">{{ total.value }}</td>
       </tr>
     </tfoot>
