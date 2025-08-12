@@ -16,8 +16,9 @@
           <v-btn text to="/usercourses">Courses</v-btn>
           <v-btn text to="/userlessons">Lessons</v-btn>
           <v-btn text to="/userteacher">Teachers</v-btn>
-          <v-btn text to="/userexam">Exam</v-btn>
+<v-btn v-if="!userData.role || userData.role !== 'ADMIN'" text to="/userexam">Exam</v-btn>
           <v-btn text to="/aboutus">About Us</v-btn>
+          <v-btn v-if="userData.role === 'ADMIN'" text to="/admin">Dashboard</v-btn>
         </div>
 
         <!-- Settings for non-students -->
@@ -91,9 +92,9 @@
     Add Quiz
   </v-list-item-title>
 </v-list-item>
-<v-list-item @click="clickRouter('/admin')" v-if="showTeacher">
+<!-- <v-list-item @click="clickRouter('/admin')" v-if="showTeacher">
               <v-list-item-title><v-icon>mdi-web</v-icon>Dashboard</v-list-item-title>
-            </v-list-item>
+            </v-list-item> -->
 
 
              <!-- <v-list-item @click="clickRouter('/ans')">
@@ -133,9 +134,9 @@
               <v-list-item @click="showProfile = true">
              <v-list-item-title>View Profile</v-list-item-title>
              </v-list-item>
-             <v-list-item @click="showChangePassword = true">
+             <!-- <v-list-item @click="showChangePassword = true">
             <v-list-item-title>Change Password</v-list-item-title>
-            </v-list-item>
+            </v-list-item> -->
             </v-list>
           </v-card>
         </v-menu>
@@ -160,21 +161,21 @@
             </v-row>
           </v-col>
 
-          <v-col cols="6" md="2">
+          <v-col cols="6" md="3">
             <h4 class="font-weight-bold mb-2">Company</h4>
             <router-link to="/aboutus" class="footer-link">About Us</router-link>
-            <router-link to="" class="footer-link">Services</router-link>
+            <!-- <router-link to="" class="footer-link">Services</router-link>
             <router-link to="" class="footer-link">Community</router-link>
-            <router-link to="" class="footer-link">Comments</router-link>
+            <router-link to="" class="footer-link">Comments</router-link> -->
           </v-col>
 
-          <v-col cols="6" md="2">
+          <!-- <v-col cols="6" md="2">
             <h4 class="font-weight-bold mb-2">Support</h4>
             <router-link to="" class="footer-link">Help Center</router-link>
             <router-link to="" class="footer-link">Feedback</router-link>
-          </v-col>
+          </v-col> -->
 
-          <v-col cols="6" md="2">
+          <v-col cols="6" md="3">
             <h4 class="font-weight-bold mb-2">Links</h4>
             <router-link to="/usercourses" class="footer-link">Courses</router-link>
             <router-link to="/" class="footer-link">Lessons</router-link>
@@ -228,7 +229,7 @@
 </v-dialog>
 
 <!-- Change Password Dialog -->
-<v-dialog v-model="showChangePassword" max-width="500px">
+<!-- <v-dialog v-model="showChangePassword" max-width="500px">
   <v-card>
     <v-card-title>Change Password</v-card-title>
     <v-card-text>
@@ -255,7 +256,7 @@
       <v-btn @click="showChangePassword = false">Cancel</v-btn>
     </v-card-actions>
   </v-card>
-</v-dialog>
+</v-dialog> -->
 
 
 
@@ -275,18 +276,26 @@ export default {
     userData: {},
     isDark: false,
     showTeacher: false,
-    isLoggedIn: localStorage.getItem("isLoggedIn") === "true",
+    isLoggedIn:false,
     showProfile: false,
-    showNewPassword: false,
-  showConfirmPassword: false,
-    showChangePassword: false,
-    passwordForm: {
-      oldPassword: '',
-      newPassword: '',
-      confirmPassword: '',
-    },
+     currentUser: null,
+  //   showNewPassword: false,
+  // showConfirmPassword: false,
+  //   showChangePassword: false,
+  //   passwordForm: {
+  //     oldPassword: '',
+  //     newPassword: '',
+  //     confirmPassword: '',
+  //   },
     socialIcons: ["mdi-facebook", "mdi-twitter", "mdi-instagram", "mdi-youtube"]
   }),
+   created() {
+    const user = localStorage.getItem("user");
+    if (user) {
+      this.isLoggedIn = true;
+      this.currentUser = JSON.parse(user);
+    }
+  },
 
   mounted() {
     this.userData = JSON.parse(localStorage.getItem("user")) || {};
@@ -316,6 +325,15 @@ export default {
   },
 
   methods: {
+     setUser(user) {
+      this.currentUser = user;
+      this.isLoggedIn = !!user;
+    },
+    clearUser() {
+      this.currentUser = null;
+      this.isLoggedIn = false;
+    },
+  
     clickRouter(path) {
       this.$router.push(path);
     },
@@ -368,7 +386,7 @@ export default {
       this.isLoggedIn = false;
       this.showNavigation = false;
       this.photoSrc = this.defaultProfile;
-      this.$router.push({ path: "/" }).catch(() => {});
+      this.$router.push({ path: "/" });
     },
 
     hideToolbar() {
@@ -453,10 +471,10 @@ axios.put(`/useraccounts/${this.userData.userAccountId}/changepassword`, null, {
     console.error('Change password error:', err);
     alert('Failed to change password. Please try again.');
   });
+},
+
 }
-
-
-  }
+  
 };
 </script>
 

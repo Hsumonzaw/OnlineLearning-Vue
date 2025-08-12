@@ -49,12 +49,32 @@
     </v-row>
 
     <!-- Bar chart -->
-    <v-row>
-      <v-col cols="12">
-        <h2 class="mb-4">Popular Courses by Revenue</h2>
-        <BarChart :chartData="popularCoursesData" />
-      </v-col>
-    </v-row>
+   <v-row>
+  <!-- Bar Chart -->
+  <v-col cols="12" md="8">
+    <h2 class="mb-4">Popular Courses by Revenue For This Year</h2>
+    <BarChart :chartData="popularCoursesData" />
+    
+  
+    <div style="margin-top: 16px; font-weight: 700; font-size: 1.8rem; color: #555;">
+      Total Revenue: {{ formatCurrency(totalRevenue) }}
+    </div>
+  </v-col>
+
+  <!-- <v-col cols="12" md="4" class="d-flex flex-column justify-center align-center">
+    <div style="font-size: 1.5rem; font-weight: 600; color: #3f51b5; margin-bottom: 12px;">
+      Legend
+    </div>
+    <div class="d-flex align-center" style="gap: 10px; cursor: default;">
+      <div 
+        style="width: 24px; height: 24px; background-color: #3f51b5; border-radius: 4px;">
+      </div>
+      <div style="font-weight: 700; font-size: 1.25rem;">
+        Total Revenue
+      </div>
+    </div>
+  </v-col> -->
+</v-row>
   </v-container>
 </template>
 
@@ -69,8 +89,9 @@ export default {
       totalStudents: 0,
       totalTeachers: 0,
       totalCourses: 0,
-      coursesList: [],
+      languagesList: [],
       totalRevenue: 0,
+      coursesList: [],
     };
   },
 computed: {
@@ -111,12 +132,21 @@ computed: {
        const courseRes = await axios.get('courses');
 this.coursesList = courseRes.data;
 this.totalCourses = this.coursesList.length;
+const uniqueLanguages = new Set(
+  this.coursesList.map(c => c.languagesDto?.name).filter(name => !!name)
+);
+
+this.totalCourses = uniqueLanguages.size;  
 this.totalRevenue = this.coursesList.reduce((sum, c) => sum + (c.amount || 0), 0);
       } catch (err) {
         console.error('Failed to load dashboard data:', err);
       }
-    }
+    },
+     formatCurrency(amount) {
+    return new Intl.NumberFormat('en-MM', { style: 'currency', currency: 'MMK' }).format(amount);
+  }
   },
+  
 };
 </script>
 
