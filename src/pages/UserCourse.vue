@@ -104,7 +104,7 @@ export default {
     },
     languagesListMethod() {
       languageService
-        .getLanguageList(this.languagesId)
+        .getLanguageListFree(this.languagesId)
         .then((response) => {
           this.languagesList.splice(0, this.languagesList.length);
           this.languagesList.push(...response);

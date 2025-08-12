@@ -258,6 +258,8 @@ export default {
   mounted: function () {
          this.userData = JSON.parse(localStorage.getItem("user")) || {};
           console.log('User data from localStorage:', this.userData);
+              this.quiz.date = format(this.receivedPicker, "yyyy-MM-dd HH:mm:ss");
+
           if (this.userData?.role === "ADMIN") {
             this.showTeacher = false;
           } else {
@@ -327,7 +329,7 @@ export default {
     },
    languageListMethod() {
   languageService
-    .getLanguageList()
+    .getLanguageListFree()
     .then((response) => {
 
       
@@ -379,7 +381,23 @@ export default {
         this.quizListMethod();
         this.showForm = false;
       })
-      .catch(err => console.error("Save error:", err.response?.data || err));
+      .catch((error) => {
+  console.error('Save quiz error:', error);
+  this.showForm = false;
+
+  let msg = "Another teacher has already added a lesson for this language.";
+
+  if (error.response && error.response.data) {
+    console.log('Error response data:', error.response.data);
+    if (error.response.status === 400 && error.response.data.message) {
+      msg = error.response.data.message;
+    }
+  }
+
+  this.$swal("Adding Blocked", msg, "error");
+});
+
+
   } else {
     const payload = {
     quizId: this.quiz.quizId,

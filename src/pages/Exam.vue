@@ -30,7 +30,7 @@
                 </p>
               </div>
              <v-btn>
-            <a v-if="language.buy==1" @click="clickTakeExam(language)" class="font-weight-bold  learn-more-btn">Take Exam</a>
+            <a v-if="language.buy==1 || isTeacher" @click="clickTakeExam(language)" class="font-weight-bold  learn-more-btn">Take Exam</a>
             <a v-else @click="handleExam(language)" class="font-weight-bold  learn-more-btn d-flex align-center" style="cursor: pointer;">
               Subscribe Now
             <v-img src="@/assets/lock.png" alt="Logo"  style="width: 40px; height: 35px; margin-right: 8px;" />
@@ -291,6 +291,7 @@
 import languageService from "../service/LanguageService.js";
 import userService from "../service/UserAccountService.js";
 import coursesService from "../service/CoursesService.js";
+
 import { format } from "date-fns";
 import axios from "@/config";
 
@@ -522,6 +523,9 @@ export default {
         minimumFractionDigits: 0,
       }).format(amount);
     },
+    isTeacher() {
+    return this.userData?.role === "TEACHER";
+  },
   },
   watch: {
     startPicker() {

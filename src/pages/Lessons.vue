@@ -285,7 +285,7 @@ export default {
 
     async loadLanguages() {
       try {
-        const allLanguages = await languageService.getLanguageList();
+        const allLanguages = await languageService.getLanguageListFree();
         if (this.userData.role === "TEACHER" && this.userData.languagesIds?.length) {
           this.languageList = allLanguages.filter((lang) =>
             this.userData.languagesIds.includes(lang.languagesId)
@@ -371,14 +371,14 @@ export default {
   this.showForm = false;
 
   // Check if server returned a message, else use custom one
-  let msg = "Your adding other people's lesson";
+  let msg = "Another teacher has already added a lesson for this language.";
 
   if (error.response && error.response.status === 400) {
     // If backend sends a message, show that instead (optional)
     msg = error.response.data.message || msg;
   } 
 
-  Swal.fire("Fail!", msg, "error");
+  Swal.fire("Adding BLocked", msg, "error");
 });
 
       } else {

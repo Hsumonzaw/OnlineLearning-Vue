@@ -55,8 +55,7 @@
               <th class="text-center white--text bg-primary">No.</th>
               <th class="text-center white--text bg-primary">StartDate</th>
               <th class="text-center white--text bg-primary">Full Name</th>
-              <th class="text-center white--text bg-primary">Language Name</th>
-              <th class="text-center white--text bg-primary">Gender</th>
+<th v-if="userType !== 'ALL' && !isStudent" class="text-center white--text bg-primary">Language Name</th>              <th class="text-center white--text bg-primary">Gender</th>
               <th class="text-center white--text bg-primary">NRC</th>
               <th class="text-center white--text bg-primary">Email</th>
               <th class="text-center white--text bg-primary">Phone</th>
@@ -79,7 +78,7 @@
   <td class="text-center">{{ index + 1 }}</td>
   <td class="text-center">{{ item.startDate }}</td>
   <td class="text-center">{{ item.name || item.studentDto?.name }}</td>
-  <td class="text-center">{{ item.languagesDto?.name || '-' }}</td>
+<td v-if="userType !== 'ALL' && !isStudent" class="text-center">{{ item.languagesDto?.name || '-' }}</td>
   <td class="text-center">{{ item.gender || item.studentDto?.gender }}</td>
   <td class="text-center">{{ item.nrc || item.studentDto?.nrc }}</td>
   <td class="text-center">{{ item.email || item.studentDto?.email }}</td>
@@ -314,6 +313,7 @@ export default {
         /^[A-Za-z]+(?:\s[A-Za-z]+)*$/.test(v) || "Invalid name format",
     },
     showPassword: false,
+    
   }),
   props: { hideToolbar: Function },
   mounted: function () {

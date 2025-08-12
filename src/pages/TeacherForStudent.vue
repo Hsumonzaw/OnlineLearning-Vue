@@ -23,9 +23,20 @@
       <v-table fixed-header height="92vh">
           <thead>
             <tr>
-              <th class="text-center white--text bg-primary">No.</th>
+             <th class="text-center white--text bg-primary">No.</th>
+              <th class="text-center white--text bg-primary">StartDate</th>
+              <th class="text-center white--text bg-primary">Full Name</th>
               <th class="text-center white--text bg-primary">Language Name</th>
-              <th class="text-center white--text bg-primary">Student Name</th>
+              <th class="text-center white--text bg-primary">Type</th>
+
+              <th class="text-center white--text bg-primary">NRC</th>
+              <th class="text-center white--text bg-primary">Email</th>
+              <th class="text-center white--text bg-primary">Phone</th>
+              <th class="text-center white--text bg-primary">Address</th>
+              <th class="text-center white--text bg-primary">Photo</th>
+              <th class="text-center white--text bg-primary">Exam Mark</th>
+              <th class="text-center white--text bg-primary">Generate Certificate</th>
+
             </tr>
           </thead>
           <tbody>
@@ -40,12 +51,29 @@
                     : 'transparent',
               }"
             >
-              <td class="text-center">{{ index + 1 }}</td>
-              <td class="text-center">{{ item.languagesDto?.name }}</td>
+             <td class="text-center">{{ index + 1 }}</td>
+  <td class="text-center">{{ item.startDate }}</td>
+  <td class="text-center">{{ item.name || item.studentDto?.name }}</td>
+  <td class="text-center">{{ item.languagesDto?.name || '-' }}</td>
 
-              <td class="text-start">{{ item.studentDto?.name }}</td>
-
-              
+              <td class="text-center">{{ item.type || item.coursesDto?.type }}</td>
+  <td class="text-center">{{ item.nrc || item.studentDto?.nrc }}</td>
+  <td class="text-center">{{ item.email || item.studentDto?.email }}</td>
+  <td class="text-start">{{ item.phonenum || item.studentDto?.phonenum }}</td>
+  <td class="text-start">{{ item.address || item.studentDto?.address }}</td>
+  <td class="text-center">
+    <v-img :src="getUserPhotoUrl(item.photo)" 
+    alt="People Photo"
+                  max-width="80"
+                  max-height="80"
+                  contain
+                  loading="lazy" />
+  </td>
+<td class="text-center">{{ item.examDto?.examMark ?? '-' }}</td> 
+<td class="text-center">
+  <v-icon v-if="item.examDto?.examMark > 50" color="green" title="Pass">mdi-check-circle</v-icon>
+  <v-icon v-else color="red" title="Fail">mdi-close-circle</v-icon>
+</td> 
 
             </tr>
             <v-divider />
@@ -65,6 +93,8 @@
 import { format } from "date-fns";
 import userService from "../service/UserAccountService.js";
 import languageService from "../service/LanguageService.js";
+import axios from "../config";
+
 export default {
   data: () => ({
     selectedOne: {},
@@ -100,6 +130,10 @@ export default {
     this.loadLanguages();
   },
   methods: {
+     getUserPhotoUrl(photo) {
+      if (!photo) return "path/to/default-image.png";
+      return `${axios.defaults.baseURL}/userphoto/${photo}.png`;
+    },
 studentListMethod() {
   userService
     .getStudentsForTeacher()
