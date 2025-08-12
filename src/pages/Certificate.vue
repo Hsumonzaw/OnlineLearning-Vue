@@ -56,19 +56,24 @@
       </p>
 
       <v-row justify="space-between" align="center" class="mt-12 px-8">
-        <!-- <v-img
-          src="@/assets/signature.png"
+
+        <v-img
+          src="@/assets/signature.jpg"
           alt="Signature"
-          max-width="140"
+          max-width="80"
           contain
-        /> -->
-        <div
+        />
+        </v-row>
+        
+       <v-row>
+         <div
           class="text-subtitle-2"
           style="color: #424242; font-weight: 600;"
         >
           Principle of LearnHub
         </div>
-      </v-row>
+  
+       </v-row>
 
       <v-row justify="center" class="mt-8">
         <v-btn @click="pdfCertificate()" color="primary" rounded elevation="6" large style="text-transform: none;">
