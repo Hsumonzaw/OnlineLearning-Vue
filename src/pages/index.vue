@@ -231,7 +231,7 @@
       <v-card-text class="pa-6 overflow-y-auto" style="max-height: 500px;">
         <v-form ref="form" v-model="valid">
           <v-row dense>
-            <v-col cols="12" class="d-flex flex-column align-center">
+            <!-- <v-col cols="12" class="d-flex flex-column align-center">
               <v-avatar size="120" class="mb-4 elevation-6" style="border: 4px solid #fff;">
                 <v-img
                   v-if="photoPreview"
@@ -251,7 +251,7 @@
                 density="compact"
                 class="mb-4"
               />
-            </v-col>
+            </v-col> -->
                <v-col cols="12" sm="6">
               <v-select
                 v-model="user.gender"
@@ -390,14 +390,14 @@
             </v-col>
 
             <v-col cols="12" sm="6">
-              <v-text-field
+              <v-textarea
                 v-model="user.address"
                 label="Address"
                 variant="outlined"
                 density="compact"
               />
             </v-col>
-            <v-col cols="12" sm="6">
+            <!-- <v-col cols="12" sm="6">
               <v-file-input
                 v-model="file"
                 label="Please Upload Your CV"
@@ -407,7 +407,7 @@
                 density="compact"
                 :rules="[(v) => !!v || 'CV is required']"
               />
-            </v-col>
+            </v-col> -->
           </v-row>
         </v-form>
       </v-card-text>
@@ -601,7 +601,7 @@ async saveUser() {
 
 
      getLatestUserLanguages() {
-      languageService.getLanguageList() 
+      languageService.getLanguageListFree() 
         .then((response) => {
           // console.log("Course list response:", response);
           // Sort by ID (or createdAt if available), then take the latest 4
