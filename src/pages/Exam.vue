@@ -375,7 +375,7 @@ export default {
         });
         return;
       }
-      this.dialogChooseType = true; // open choose type dialog (course/exam)
+      
     },
 
     clickTakeExam(language) {
