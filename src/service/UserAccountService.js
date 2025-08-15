@@ -16,6 +16,16 @@ class UserAccountService {
       })
       .then((request) => request.data);
   }
+  getTeacher(userType) {
+    let url = `/free/teachers`;
+    return this.axios
+      .get(url, {
+        params: {
+          userType,
+        },
+      })
+      .then((request) => request.data);
+  }
   getUserListFree(userType) {
     let url = `/free/useraccounts`;
     return this.axios

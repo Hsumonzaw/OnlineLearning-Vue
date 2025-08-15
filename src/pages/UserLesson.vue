@@ -68,6 +68,19 @@
       </v-btn>
     </v-row>
 
+    <v-dialog v-model="dialogBuyNow" max-width="400">
+  <v-card>
+    <v-card-title>Purchase {{ selectedType }}</v-card-title>
+    <v-card-text>
+      Amount to pay: <strong>{{ this.selectedOne.amount }}</strong>
+    </v-card-text>
+    <v-card-actions>
+      <v-btn class="bg-blue" color="white" @click="proceedToPayment">Pay Now</v-btn>
+      <v-btn class="bg-white" color="primary" text @click="dialogBuyNow = false">Cancel</v-btn>
+    </v-card-actions>
+  </v-card>
+</v-dialog>
+
      <!-- <template v-slot:activator="{ props }">
     <v-btn
       v-bind="props"
@@ -243,7 +256,7 @@
       </v-card>
     </v-dialog>
 
-        <v-dialog v-model="dialogBuyNow" width="500">
+        <!-- <v-dialog v-model="dialogBuyNow" width="500">
       <v-card>
         <v-card-title class="text-h5 white--text bg-red">Buy </v-card-title>
         <v-card-text class="text-h6">
@@ -260,14 +273,14 @@
           >
         </v-card-actions>
       </v-card>
-    </v-dialog>
+    </v-dialog> -->
 
    <v-dialog v-model="paymentDialog" max-width="400">
   <v-card>
     <v-card-title class="text-h5">Choose Your Payment</v-card-title>
     <v-card-text class="text-center">
       <div class="mb-4 text-h6">
-        Amount to Pay: <strong>{{ chosenAmount.toLocaleString() }} MMK</strong>
+        Amount to Pay: <strong>{{ this.selectedOne?.amount.toLocaleString() }} MMK</strong>
       </div>
       <v-btn color="blue" class="mx-2" @click="choosePayment('kpay')">KPay</v-btn>
       <v-btn color="yellow darken-2" class="mx-2" @click="choosePayment('wavepay')">WavePay</v-btn>
@@ -291,6 +304,24 @@
     <v-btn class="mt-4" color="primary" @click="qrDialog = false">Close</v-btn>
   </v-card>
 </v-dialog>
+<v-dialog v-model="confirmFeeDialog" max-width="400">
+  <v-card>
+    <v-card-title class="text-h6">Confirm Payment</v-card-title>
+    <v-card-text>
+      You are about to pay <strong>{{ this.selectedOne.amount }}</strong>
+      <!-- <strong>{{ rgType === 'COURSES' ? 'Course' : 'Exam' }}</strong>. -->
+    </v-card-text>
+    <v-card-actions>
+      <v-spacer></v-spacer>
+      <v-btn class="bg-blue" color="white" text @click="confirmFee">Confirm</v-btn>
+      <v-btn class="bg-white" text color="primary" @click="confirmFeeDialog = false">Cancel</v-btn>
+
+    </v-card-actions>
+  </v-card>
+</v-dialog>
+
+
+
 
   </v-container>
 </template>
@@ -304,6 +335,7 @@ import axios from "@/config";
 import coursesService from "../service/CoursesService.js";
 export default {
   data: () => ({
+    confirmFeeDialog :false,
     languageList: [],
     selectedOne: {},
     userData: {},
@@ -344,7 +376,7 @@ export default {
     userTypeList: ["ALL", "STAFF", "STUDENT", "TEACHER", "ADMIN"],
     startPicker: new Date(),
     startMenu: false,
-    dialogBuyNow:false,
+     dialogBuyNow:false,
     rgType: "COURSES",
     languagesId:0,
     paymentDialog:false,
@@ -367,27 +399,35 @@ export default {
     this.languageListMethod();
   },
   methods: {
+    proceedToPayment() {
+      this.dialogBuyNow = false;
+      this.confirmFeeDialog = true;
+    },
+    confirmFee() {
+      this.confirmFeeDialog = false;
+      this.paymentDialog = true;
+    },
     selectPayment(method) {
       this.selectedPayment = method;
       this.qrDialog = true; // Show QR code dialog when payment method selected
     },
    
-    clickBuyNowType:function(){
-        this.dialogBuyNow = false; // Close the Buy Now dialog
-        this.paymentDialog = true;
-        this.showPaymentOptions = true;  // show payment buttons now
+    // clickBuyNowType:function(){
+    //     this.dialogBuyNow = false; // Close the Buy Now dialog
+    //     this.paymentDialog = true;
+    //     this.showPaymentOptions = true;  // show payment buttons now
   
-    },
+    // },
       choosePayment(method) {
     this.selectedPayment = method;
     this.paymentDialog = false;   // Close Payment options dialog
     this.qrDialog = true;         // Open QR code dialog
   },
     doneMethod:function(){
-      this.dialogBuyNow = false;
+      //this.dialogBuyNow = false;
        this.qrDialog = false;     
       let courses = {studentDto:{}};
-      courses.type = this.rgType;
+      courses.type = "COURSES";
       courses.receivedDate = this.user.startDate;
       courses.studentDto.userAccountId = this.userData.userId;
       courses.languagesDto = this.selectedOne;
@@ -397,6 +437,7 @@ export default {
           .addCourse(courses)
           .then((response) => {
             this.showEnrollButton = false;
+                  this.loadLessons(this.selectedOne.languagesId);
           this.$swal({
           icon: "success",
           title: "Your work saved successfully!",
@@ -446,6 +487,7 @@ export default {
     },
     clickLanguage(item) {
       this.selectedOne = item;
+        localStorage.setItem("selectedLanguage", JSON.stringify(item)); // Save
       if (this.userData?.password) {
         this.loadLessons(item.languagesId);
       } else {
@@ -502,29 +544,42 @@ export default {
     },
 
     languageListMethod() {
-      languageService
-        .getLanguageListFree()
-        .then((response) => {
-          this.languageList.splice(0);
-          this.languageList.push(...response);
-          if(this.languagesId==undefined){
-            this.selectedOne = this.languageList[0];
-          }else{
-          for(let i=0;i<this.languageList.length;i++){
-            let obj = this.languageList[i];
-              if(this.languagesId==obj.languagesId){
-                this.selectedOne = obj;
-              }
-          }
-          }
+  languageService
+    .getLanguageListFree()
+    .then((response) => {
+      this.languageList.splice(0);
+      this.languageList.push(...response);
 
-         
-          this.clickLanguage(this.selectedOne); // auto-load first
-        })
-        .catch((error) => {
-          this.$swal("Fail!", error.response.data.message, "error");
-        });
-    },
+      // Try to restore from localStorage
+      const savedLang = JSON.parse(localStorage.getItem("selectedLanguage"));
+
+      if (savedLang) {
+        // Find the matching language object from fresh list
+        const foundLang = this.languageList.find(
+          lang => lang.languagesId === savedLang.languagesId
+        );
+        if (foundLang) {
+          this.selectedOne = foundLang;
+        } else {
+          this.selectedOne = this.languageList[0];
+        }
+      } else {
+        // If nothing saved, fallback to query param or first
+        if (this.languagesId == undefined) {
+          this.selectedOne = this.languageList[0];
+        } else {
+          this.selectedOne = this.languageList.find(
+            obj => obj.languagesId == this.languagesId
+          ) || this.languageList[0];
+        }
+      }
+
+      this.clickLanguage(this.selectedOne); // auto-load
+    })
+    .catch((error) => {
+      this.$swal("Fail!", error.response.data.message, "error");
+    });
+},
 
  handleEnroll() {
   if (!this.userData.role) {
@@ -544,47 +599,48 @@ export default {
   } else {
     // Logged in: show the dialog to choose course or exam first
     this.dialogBuyNow = true;  // Open dialog to select course or exam type
+   // this.paymentDialog = true;
   }
 },
 
-clickBuyNowType() {
-  // console.log("Selected item:", this.selectedOne);
-  if (!this.rgType) {
-    this.$swal('Please select either Courses or Exam');
-    return;
-  }
+// clickBuyNowType() {
+//   // console.log("Selected item:", this.selectedOne);
+//   // if (!this.rgType) {
+//   //   this.$swal('Please select either Courses or Exam');
+//   //   return;
+//   // }
 
-  // Set chosen amount according to selection
-  if (this.rgType === 'COURSES') {
-    this.chosenAmount = this.selectedOne?.amount || 0;
-  } else if (this.rgType === 'EXAM') {
-    this.chosenAmount = this.selectedOne?.examFee  || 0;
-  }
+//   // Set chosen amount according to selection
+//   // if (this.rgType === 'COURSES') {
+//   //  this.chosenAmount = this.selectedOne?.amount || 0;
+//   // } else if (this.rgType === 'EXAM') {
+//   //   this.chosenAmount = this.selectedOne?.examFee  || 0;
+//   // }
 
-  this.dialogBuyNow = false; 
-  const messageText =
-    this.rgType === "COURSES"
-      ? `Couses + Free Exam Fees: ${this.chosenAmount.toLocaleString()} MMK`
-      : `Exam Fees: ${this.chosenAmount.toLocaleString()} MMK`;
-      const dialogTitle =
-    this.rgType === "COURSES"
-      ? `Are you sure want to buy  ${this.selectedOne.name} course?`
-      : `Are you sure want to buy  ${this.selectedOne.name} exam?`;
+//   this.dialogBuyNow = false; 
+//   const messageText =
+//     this.rgType === "COURSES"
+//       //  `Couses + Free Exam Fees: ${this.chosenAmount.toLocaleString()} MMK`;
+//       // : `Exam Fees: ${this.chosenAmount.toLocaleString()} MMK`;
+//       const dialogTitle =
+//     this.rgType === "COURSES"
+//        `Are you sure want to buy  ${this.selectedOne.name} course?`;
+//       // : `Are you sure want to buy  ${this.selectedOne.name} exam?`;
 
-  // Show confirmation dialog with price and Buy/Cancel buttons
-  this.$swal({
-    title: dialogTitle,
-    text: messageText,
-    icon: "info",
-    showCancelButton: true,
-    confirmButtonText: "Buy",
-    cancelButtonText: "Cancel",
-  }).then((result) => {
-    if (result.isConfirmed) {
-      this.paymentDialog = true;  // open payment methods dialog
-    }
-  });
-},
+//   // Show confirmation dialog with price and Buy/Cancel buttons
+//   this.$swal({
+//     title: dialogTitle,
+//     text: messageText,
+//     icon: "info",
+//     showCancelButton: true,
+//     confirmButtonText: "Buy",
+//     cancelButtonText: "Cancel",
+//   }).then((result) => {
+//     if (result.isConfirmed) {
+//       this.paymentDialog = true;  // open payment methods dialog
+//     }
+//   });
+// },
 
 
 

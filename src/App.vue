@@ -382,6 +382,7 @@ export default {
     logout() {
       localStorage.removeItem("user");
       localStorage.removeItem("isLoggedIn");
+      
       this.userData = {};
       this.isLoggedIn = false;
       this.showNavigation = false;

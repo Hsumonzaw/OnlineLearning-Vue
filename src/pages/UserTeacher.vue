@@ -83,7 +83,7 @@ export default {
   methods: {
     getTeachers() {
       userService
-        .getUserListFree("TE")
+        .getTeacher("TE")
         .then((response) => {
           // console.log(response);
 
