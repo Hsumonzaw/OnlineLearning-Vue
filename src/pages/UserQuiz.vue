@@ -2,7 +2,7 @@
   <v-container class="pa-8" max-width="700">
     <h2 class="text-h4 mb-6 text-center font-weight-bold " style="color:blue;">Quiz</h2>
     <p class="text-subtitle-1 text-center mb-4" style="color: #546e7a;">
-    Achieve a minimum of 50 to pass. A score of 60 or higher qualifies you for a certificate.
+    Achieving a minimum score of 50 qualifies you for a certificate.
    </p>
 
     <!-- <v-chip v-if="!showResult" class="ma-2" color="blue lighten-4" text-color="blue darken-2">
