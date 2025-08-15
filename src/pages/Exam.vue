@@ -30,8 +30,14 @@
                 </p>
               </div>
              <v-btn>
-            <a v-if="language.buy==1 || isTeacher" @click="clickTakeExam(language)" class="font-weight-bold  learn-more-btn">Take Exam</a>
-            <a v-else @click="handleExam(language)" class="font-weight-bold  learn-more-btn d-flex align-center" style="cursor: pointer;">
+ <a
+    v-if="language.buy === 1 || isTeacher"
+    @click="clickTakeExam(language)"
+    class="font-weight-bold learn-more-btn"
+  >Take Exam</a>
+            <!-- <a v-else @click="handleExam(language)" class="font-weight-bold  learn-more-btn d-flex align-center" style="cursor: pointer;"> -->
+            <a v-else class="font-weight-bold  learn-more-btn d-flex align-center" style="cursor: pointer;">
+ 
               Subscribe Now
             <v-img src="@/assets/lock.png" alt="Logo"  style="width: 40px; height: 35px; margin-right: 8px;" />
             </a>
@@ -220,7 +226,7 @@
     </v-dialog>
     <!-- Choose Type Dialog -->
 <!-- Choose Type Dialog -->
-<v-dialog v-model="dialogChooseType" max-width="400">
+<!-- <v-dialog v-model="dialogChooseType" max-width="400">
   <v-card>
     <v-card-title>Choose Access Type</v-card-title>
     <v-card-text>
@@ -228,17 +234,17 @@
       <v-btn color="green" block @click="confirmChoice('exam')">Exam</v-btn>
     </v-card-text>
   </v-card>
-</v-dialog>
+</v-dialog> -->
     <!-- Buy Now Dialog -->
 <v-dialog v-model="dialogBuyNow" max-width="400">
   <v-card>
     <v-card-title>Purchase {{ selectedType }}</v-card-title>
     <v-card-text>
-      Amount to pay: <strong>{{ amountToPay }}</strong>
+      Amount to pay: <strong>{{ this.selectedOne.examFee }}</strong>
     </v-card-text>
     <v-card-actions>
-      <v-btn color="primary" @click="proceedToPayment">Pay Now</v-btn>
-      <v-btn text @click="dialogBuyNow = false">Cancel</v-btn>
+      <v-btn class="bg-blue" color="white" @click="proceedToPayment">Pay Now</v-btn>
+      <v-btn class="bg-white" color="primary" text @click="dialogBuyNow = false">Cancel</v-btn>
     </v-card-actions>
   </v-card>
 </v-dialog>
@@ -253,7 +259,7 @@
     </v-card-text>
     <v-card-actions>
       <v-spacer></v-spacer>
-      <v-btn text @click="dialogBuyNow = false">Cancel</v-btn>
+      <v-btn text @click="paymentDialog = false">Cancel</v-btn>
     </v-card-actions>
   </v-card>
 </v-dialog>
@@ -262,7 +268,7 @@
 <v-dialog v-model="qrDialog" max-width="300px" persistent>
   <v-card class="pa-4 text-center">
     <h3 class="mb-2">{{ paymentName }}</h3>
-    <p class="mb-4">Amount: {{ formattedAmount }}</p>
+    <p class="mb-4">Amount: {{ this.selectedOne.examFee }}</p>
     <img :src="paymentQR" alt="Payment QR" style="max-width:250px; margin:auto;" />
     <div class="payment-phone mt-2">092556774574</div>
     <v-btn class="mt-4" @click="doneMethod()">DONE</v-btn>
@@ -274,13 +280,14 @@
   <v-card>
     <v-card-title class="text-h6">Confirm Payment</v-card-title>
     <v-card-text>
-      You are about to pay <strong>{{ formattedAmount }}</strong> for
-      <strong>{{ rgType === 'COURSES' ? 'Course' : 'Exam' }}</strong>.
+      You are about to pay <strong>{{ this.selectedOne.examFee }}</strong> for
+      <!-- <strong>{{ rgType === 'COURSES' ? 'Course' : 'Exam' }}</strong>. -->
     </v-card-text>
     <v-card-actions>
       <v-spacer></v-spacer>
-      <v-btn text @click="confirmFeeDialog = false">Cancel</v-btn>
-      <v-btn color="primary" text @click="confirmFee">Confirm</v-btn>
+      <v-btn class="bg-blue" color="white" text @click="confirmFee">Confirm</v-btn>
+      <v-btn class="bg-white" text color="primary" @click="confirmFeeDialog = false">Cancel</v-btn>
+
     </v-card-actions>
   </v-card>
 </v-dialog>
@@ -309,14 +316,14 @@ export default {
       birthPicker: new Date(),
       startMenu: false,
       dateBirth: false,
-      dialogChooseType: false,
+      //dialogChooseType: false,
       dialogBuyNow: false,
       paymentDialog: false,
       qrDialog: false,
       confirmFeeDialog: false,
       selectedPayment: "",
       amountToPay: 0,
-      selectedType: "",
+      selectedType: "EXAM",
       images: [
         new URL('@/assets/kpay.jpg', import.meta.url).href,
         new URL('@/assets/wave.jpg', import.meta.url).href,
@@ -345,6 +352,7 @@ export default {
           return age >= 15 || "You must be at least 15 years old";
         },
       },
+      rgType : "EXAM",
     };
   },
   mounted() {
@@ -361,6 +369,7 @@ export default {
   methods: {
     handleExam(language) {
       this.selectedOne = language;
+       this.selectedType = "EXAM";
       if (!this.userData?.role) {
         this.$swal({
           title: "You need to register or login first",
@@ -375,7 +384,8 @@ export default {
         });
         return;
       }
-      this.dialogChooseType = true; // open choose type dialog (course/exam)
+      //this.dialogChooseType = true; // open choose type dialog (course/exam)
+      this.dialogBuyNow = true;
     },
 
     clickTakeExam(language) {
@@ -387,15 +397,15 @@ export default {
       });
     },
 
-    confirmChoice(choice) {
-      this.selectedType = choice; // 'course' or 'exam'
-      this.amountToPay =
-        choice === "course"
-          ? this.selectedOne.courseFee || this.selectedOne.amount || 0
-          : this.selectedOne.examFee || this.selectedOne.amount || 0;
-      this.dialogChooseType = false;
-      this.dialogBuyNow = true;
-    },
+  //  confirmChoice(choice) {
+  //    this.selectedType = "EXAM"; // 'course' or 'exam'
+  //    this.amountToPay =
+  //       choice === "course"
+  //         this.selectedOne.examFee;
+  //         : this.selectedOne.examFee || this.selectedOne.amount || 0;
+  //     this.dialogChooseType = false;
+  //    this.dialogBuyNow = true;
+  //  },
 
     proceedToPayment() {
       this.dialogBuyNow = false;
@@ -417,11 +427,11 @@ export default {
       this.qrDialog = false;
 
       let courses = {
-        type: this.selectedType,
+        type: "EXAM",
         receivedDate: this.user.startDate,
         studentDto: { userAccountId: this.userData.userId },
         languagesDto: { languagesId: this.selectedOne.languagesId },
-        amount: this.amountToPay,
+        amount: this.selectedOne.examFee,
       };
 
       coursesService.addCourse(courses).then(() => {
@@ -445,6 +455,7 @@ export default {
         .then((response) => {
           this.languageList.splice(0);
           this.languageList.push(...response);
+          
         })
         .catch((error) => {
           this.$swal("Fail!", error.response.data.message, "error");

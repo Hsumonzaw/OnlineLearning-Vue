@@ -29,7 +29,7 @@
 
               <th class="text-center white--text bg-primary" v-if="showTeacher">Course Fees</th>
               <!-- <th class="text-center white--text bg-primary">Exam Link</th> -->
-              <th class="text-center white--text bg-primary" v-if="showTeacher">Exam Fee</th>
+              <!-- <th class="text-center white--text bg-primary" v-if="showTeacher">Exam Fee</th> -->
               <th class="text-center white--text bg-primary" v-if="showdemand">Book Link</th>
               <th class="text-center white--text bg-primary" v-if="showdemand">Descriptions</th>
 
@@ -62,7 +62,7 @@
               <td class="text-center" v-if="showTeacher">{{ item?.amount }}</td>
 
               <!-- <td class="text-start">{{ item?.examLink }}</td> -->
-              <td class="text-center" v-if="showTeacher">{{ item?.examFee }}</td>
+              <!-- <td class="text-center" v-if="showTeacher">{{ item?.examFee }}</td> -->
               <td class="text-center" v-if="showdemand">{{ item?.pdf }}</td>
               <td class="text-center" v-if="showdemand">
                 <div>
@@ -139,13 +139,13 @@
                   variant="outlined"
                 ></v-text-field> -->
 
-                <v-text-field
+                <!-- <v-text-field
                   v-if="showTeacher"
                   label="Exam Fee"
                   v-model.number="language.examFee"
                   density="compact"
                   variant="outlined"
-                ></v-text-field>
+                ></v-text-field> -->
 
                 <v-textarea
                   label="Descriptions"

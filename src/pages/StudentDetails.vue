@@ -37,7 +37,7 @@
               <th class="text-center white--text bg-primary">StartDate</th>
               <th class="text-center white--text bg-primary">Full Name</th>
               <th v-if="isStudent" class="text-center white--text bg-primary">Language Name</th>
-              <th class="text-center white--text bg-primary">Type</th>
+              <!-- <th class="text-center white--text bg-primary">Type</th> -->
 
               <th class="text-center white--text bg-primary">Gender</th>
               <th class="text-center white--text bg-primary">NRC</th>
@@ -65,7 +65,7 @@
               <td class="text-center">{{ item.startDate }}</td>
               <td class="text-center">{{ item.name || item.studentDto?.name }}</td>
               <td v-if="isStudent" class="text-center">{{ item.languagesDto?.name || '-' }}</td>
-              <td class="text-center">{{ item.type || item.coursesDto?.type }}</td>
+              <!-- <td class="text-center">{{ item.type || item.coursesDto?.type }}</td> -->
 
               <td class="text-center">{{ item.gender || item.studentDto?.gender }}</td>
               <td class="text-center">{{ item.nrc || item.studentDto?.nrc }}</td>
