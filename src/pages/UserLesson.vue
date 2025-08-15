@@ -119,7 +119,7 @@
                 v-model="user.startDate"
                 density="compact"
                 variant="outlined"
-                label="From Date"
+                label="Register Date"
                 disabled
                 readonly
                 v-bind="props"
