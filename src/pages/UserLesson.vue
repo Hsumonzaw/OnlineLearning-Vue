@@ -62,11 +62,16 @@
       </v-col>
     </v-row>
 
-    <v-row v-if="(userData.role == 'STUDENT' || userData.role == undefined) && showEnrollButton" class="justify-center mt-6 mb-16 handle">
-      <v-btn color="primary" large @click="handleEnroll">
-        Enroll to Access All Paid Videos
-      </v-btn>
-    </v-row>
+   <v-row
+  v-if="(userData.role === 'STUDENT' || !userData.role) && showEnrollButton"
+  class="justify-center mt-6 mb-16 handle"
+>
+  <v-btn color="primary" large @click="handleEnroll">
+    Enroll to Access All Paid Videos
+  </v-btn>
+</v-row>
+
+
 
     <v-dialog v-model="dialogBuyNow" max-width="400">
   <v-card>
@@ -386,6 +391,7 @@ export default {
   new URL('@/assets/wave.jpg', import.meta.url).href,
   new URL('@/assets/AYA.jpg', import.meta.url).href
 ],
+doneStatus: ["PENDING","DONE"],
   }),
   mounted() {
     this.user.startDate = format(this.startPicker, "dd-MM-yyyy");
@@ -395,10 +401,17 @@ export default {
   //  if (this.userData.role == undefined || this.userData?.role == "STUDENT") {
   //     this.showEnrollButton = true;
   //   }
+// const purchased = JSON.parse(localStorage.getItem("purchasedLanguages") || "[]");
+// if (purchased.includes(this.selectedOne.languagesId)) {
+//     this.showEnrollButton = false;
+// } else {
+//     this.showEnrollButton = true;
+// }
 
     this.languageListMethod();
   },
   methods: {
+   
     proceedToPayment() {
       this.dialogBuyNow = false;
       this.confirmFeeDialog = true;
@@ -423,31 +436,39 @@ export default {
     this.paymentDialog = false;   // Close Payment options dialog
     this.qrDialog = true;         // Open QR code dialog
   },
-    doneMethod:function(){
-      //this.dialogBuyNow = false;
-       this.qrDialog = false;     
-      let courses = {studentDto:{}};
-      courses.type = "COURSES";
-      courses.receivedDate = this.user.startDate;
-      courses.studentDto.userAccountId = this.userData.userId;
-      courses.languagesDto = this.selectedOne;
-      courses.amount = this.selectedOne.amount;
+doneMethod() {
+  this.qrDialog = false;
+  if (!this.selectedOne?.languagesId) return;
 
-       coursesService
-          .addCourse(courses)
-          .then((response) => {
-            this.showEnrollButton = false;
-                  this.loadLessons(this.selectedOne.languagesId);
-          this.$swal({
-          icon: "success",
-          title: "Your work saved successfully!",
-          showConfirmButton: false,
-          timer: 1000,
-        }).then(() => {
-          //this.showForm = false;
-        });
-          })
-    },
+  let course = {
+    type: "COURSES",
+    receivedDate: this.user.startDate,
+    studentDto: { userAccountId: this.userData.userId },
+    languagesDto: this.selectedOne,
+    amount: this.selectedOne?.amount || 0
+  };
+
+  let purchased = JSON.parse(localStorage.getItem("purchasedLanguages") || "[]");
+
+  if (!purchased.includes(this.selectedOne.languagesId)) {
+    coursesService.addCourse(course)
+      .then(() => {
+        purchased.push(this.selectedOne.languagesId);
+        localStorage.setItem("purchasedLanguages", JSON.stringify(purchased));
+
+        // Hide enroll button immediately
+        this.updateEnrollButton();
+
+        this.$swal("Success", "Course purchased successfully! Please Wait a few minutes and refresh the page Admin Team are checking" , "success");
+      })
+      .catch(err => {
+        console.error(err);
+        this.$swal("Error", "Failed to purchase course. Try again.", "error");
+      });
+  } else {
+    this.$swal("Info", "You have already purchased this course!", "info");
+  }
+},
     async saveUser() {
       try {
         // Normalize userType
@@ -485,15 +506,44 @@ export default {
         );
       }
     },
-    clickLanguage(item) {
-      this.selectedOne = item;
-        localStorage.setItem("selectedLanguage", JSON.stringify(item)); // Save
-      if (this.userData?.password) {
-        this.loadLessons(item.languagesId);
-      } else {
-        this.loadLessonsFree(item.languagesId);
-      }
-    },
+    updateEnrollButton() {
+  if (!this.selectedOne?.languagesId) {
+    this.showEnrollButton = true; // show button if no language selected
+    return;
+  }
+
+  const purchased = JSON.parse(localStorage.getItem("purchasedLanguages") || "[]");
+
+  if (!this.userData?.role || this.userData.role === 'STUDENT') {
+    // Only hide if already purchased
+    this.showEnrollButton = !purchased.includes(this.selectedOne.languagesId);
+  } else {
+    // Hide for other roles
+    this.showEnrollButton = false;
+  }
+},
+
+  // Load lessons depending on user login
+  loadLessonsForSelected() {
+    if (!this.selectedOne?.languagesId) return;
+    if (this.userData?.password) {
+      this.loadLessons(this.selectedOne.languagesId);
+    } else {
+      this.loadLessonsFree(this.selectedOne.languagesId);
+    }
+  },
+clickLanguage(item) {
+  this.selectedOne = item;
+  localStorage.setItem("selectedLanguage", JSON.stringify(item));
+
+  // Update enroll button visibility whenever language changes
+  this.updateEnrollButton();
+
+  // Load lessons for selected language
+  this.loadLessonsForSelected();
+},
+
+
     loadLessonsFree(languagesId) {
       lessonService.getLessonListFree("FREE", languagesId).then((res) => {
         // this.lessonList = res;
@@ -503,19 +553,13 @@ export default {
       });
     },
     loadLessons(languagesId) {
-      lessonService.getLessonList("ALL", languagesId).then((res) => {
-        //this.lessonList = res;
-        this.lessonList.splice(0);
-        this.lessonList.push(...res);
-                let tempList =  this.lessonList.filter((lesson)=> lesson.freeVideo=='PAID');
-        if(tempList.length>0){
-            this.showEnrollButton = false;
-        }else{
-          this.showEnrollButton = true;
+  lessonService.getLessonList("ALL", languagesId).then((res) => {
+    this.lessonList.splice(0);
+    this.lessonList.push(...res);
 
-        }
-      });
-    },
+   
+  });
+},
     loadLessonsFiltered(languagesId) {
       lessonService.getLessonList("ALL", languagesId).then((res) => {
         // Filter only FREE lessons
@@ -543,43 +587,38 @@ export default {
       return null;
     },
 
-    languageListMethod() {
-  languageService
-    .getLanguageListFree()
+  languageListMethod() {
+  languageService.getLanguageListFree()
     .then((response) => {
       this.languageList.splice(0);
       this.languageList.push(...response);
 
-      // Try to restore from localStorage
+      // Restore saved language from localStorage
       const savedLang = JSON.parse(localStorage.getItem("selectedLanguage"));
-
       if (savedLang) {
-        // Find the matching language object from fresh list
         const foundLang = this.languageList.find(
           lang => lang.languagesId === savedLang.languagesId
         );
-        if (foundLang) {
-          this.selectedOne = foundLang;
-        } else {
-          this.selectedOne = this.languageList[0];
-        }
+        this.selectedOne = foundLang || this.languageList[0];
+      } else if (this.languagesId) {
+        this.selectedOne = this.languageList.find(
+          lang => lang.languagesId == this.languagesId
+        ) || this.languageList[0];
       } else {
-        // If nothing saved, fallback to query param or first
-        if (this.languagesId == undefined) {
-          this.selectedOne = this.languageList[0];
-        } else {
-          this.selectedOne = this.languageList.find(
-            obj => obj.languagesId == this.languagesId
-          ) || this.languageList[0];
-        }
+        this.selectedOne = this.languageList[0];
       }
 
-      this.clickLanguage(this.selectedOne); // auto-load
+      // **Directly set enroll button visibility here**
+      this.updateEnrollButton();
+
+      // Load lessons for selected language
+      this.loadLessonsForSelected();
     })
     .catch((error) => {
-      this.$swal("Fail!", error.response.data.message, "error");
+      this.$swal("Fail!", error.response?.data?.message || error.message, "error");
     });
 },
+
 
  handleEnroll() {
   if (!this.userData.role) {
