@@ -117,9 +117,10 @@
         <v-menu offset-y>
           <template v-slot:activator="{ props }">
             <v-btn icon v-bind="props" class="d-flex align-center" style="gap: 8px;">
-              <v-avatar size="30" class="mr-2">
-                <img :src="photoSrc" alt="profile" class="profile-img" @error="onImgError">
-              </v-avatar>
+             <v-avatar size="30" class="mr-2">
+  <v-img :src="photoSrc"  @error="onImgError"/>
+</v-avatar>
+
        </v-btn>
           </template>
 
@@ -134,6 +135,13 @@
               <v-list-item @click="showProfile = true">
              <v-list-item-title>View Profile</v-list-item-title>
              </v-list-item>
+<v-list-item v-if="isLoggedIn" @click="openPhotoDialog()">
+  <v-list-item-title>Add Profile Photo</v-list-item-title>
+</v-list-item>
+
+
+
+
              <!-- <v-list-item @click="showChangePassword = true">
             <v-list-item-title>Change Password</v-list-item-title>
             </v-list-item> -->
@@ -257,7 +265,15 @@
     </v-card-actions>
   </v-card>
 </v-dialog> -->
+<v-dialog v-model="showPhotoDialog" max-width="800px" fullscreen scrollable>
+  <PhotoUser
+  v-show="selectedOne"
+  @closeDialog="showPhotoDialog = false"
+  @refreshUserPhoto="refreshUserPhoto"
+  :user="selectedOne"
+/>
 
+</v-dialog>
 
 
   </v-app>
@@ -266,9 +282,11 @@
 <script>
 import { ref, reactive } from 'vue'
 import axios from "./config";
-;
+import PhotoUser from "@/components/PhotoUser.vue";
+
 
 export default {
+   components: { PhotoUser },
   data: () => ({
     defaultProfile: new URL('@/assets/loginProfile.png', import.meta.url).href,
     photoSrc: '',
@@ -279,6 +297,9 @@ export default {
     isLoggedIn:false,
     showProfile: false,
      currentUser: null,
+         userPhotoDialog: false, // your logged-in user object
+         showPhotoDialog : false,
+          selectedOne: {},
   //   showNewPassword: false,
   // showConfirmPassword: false,
   //   showChangePassword: false,
@@ -296,9 +317,16 @@ export default {
       this.currentUser = JSON.parse(user);
     }
   },
+  
 
   mounted() {
     this.userData = JSON.parse(localStorage.getItem("user")) || {};
+    
+    if (this.userData?.profilePhoto) {
+    this.photoSrc = `${axios.defaults.baseURL}/userphoto/${this.userData.profilePhoto}.png`;
+  } else {
+    this.photoSrc = this.defaultProfile;
+  }
     console.log('User data from localStorage:', this.userData);
     if (this.userData?.role === "TEACHER") {
       this.showTeacher = false;
@@ -309,6 +337,7 @@ export default {
     this.getLoginMethod();
     this.setTheme();
     this.setUserPhoto();
+    this.loadUser();
   },
 
   watch: {
@@ -321,10 +350,49 @@ export default {
         console.log("Updated userData:", newVal);
       },
       deep: true
-    }
+    },showForm(newVal) {
+      if (!newVal) {
+        this.user = {};
+        this.saveOrupdate = "SAVE";
+      }
+    },
   },
 
   methods: {
+    loadUser() {
+    // Load from localStorage
+    const user = JSON.parse(localStorage.getItem("user")) || {};
+    this.userData = user;
+    this.isLoggedIn = !!user?.userId;
+    this.selectedOne = user;
+    this.setUserPhoto();
+  },
+    openPhotoDialog() {
+    if (!this.userData?.userId) {
+      console.warn("No userAccountId found");
+      return;
+    }
+    this.selectedOne = this.userData; // assign the current logged-in user
+    this.showPhotoDialog = true;
+  },
+
+  // This will be called from PhotoUser.vue after successful upload
+  loadUserList() {
+    // Refresh userData from localStorage
+    this.userData = JSON.parse(localStorage.getItem("user")) || {};
+
+    // Update avatar immediately
+    if (this.userData?.profilePhoto) {
+      this.photoSrc = `${axios.defaults.baseURL}/userphoto/${this.userData.profilePhoto}.png`;
+    } else {
+      this.photoSrc = this.defaultProfile;
+    }
+
+    this.showPhotoDialog = false; // close dialog
+  },
+    photoMethod: function (item) {
+      this.userPhotoDialog = true;
+    },
      setUser(user) {
       this.currentUser = user;
       this.isLoggedIn = !!user;
@@ -363,17 +431,22 @@ export default {
       }
     },
 
-    setUserPhoto() {
-      if (this.userData?.profilePhoto) {
-        this.photoSrc = `${axios.defaults.baseURL}/userphoto/${this.userData.profilePhoto}.png`;
-      } else {
-        this.photoSrc = this.defaultProfile;
-      }
-    },
+setUserPhoto() {
+    this.photoSrc = this.userData?.profilePhoto
+      ? `${axios.defaults.baseURL}/userphoto/${this.userData.profilePhoto}.png`
+      : this.defaultProfile;
+  },
+  onImgError(e) {
+    e.target.src = this.defaultProfile;
+  },
+  // called from PhotoUser after upload
+  refreshUserPhoto(newFileName) {
+    this.userData.profilePhoto = newFileName;
+    localStorage.setItem("user", JSON.stringify(this.userData));
+    this.photoSrc = `${axios.defaults.baseURL}/userphoto/${newFileName}.png`;
+    this.setUserPhoto();
 
-    onImgError(e) {
-      e.target.src = this.defaultProfile;
-    },
+  },
 
     clickRouter(path) {
       this.$router.push({ path }).catch(() => {});
@@ -450,12 +523,12 @@ submitPasswordChange() {
     return;
   }
 
-  if (!this.userData?.userAccountId) {
+  if (!this.userData?.userId) {
     alert("User ID missing. Please login again.");
     return;
   }
 
-axios.put(`/useraccounts/${this.userData.userAccountId}/changepassword`, null, {
+axios.put(`/useraccounts/${this.userData.userId}/changepassword`, null, {
   params: {
     oldPassword: this.passwordForm.oldPassword,
     newPassword: this.passwordForm.newPassword

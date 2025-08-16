@@ -1,80 +1,101 @@
 <template>
-  <v-row no-gutters>
-    <v-col cols="12" md="12">
-      <v-toolbar dark color="primary pl-2 pr-2" density="compact">
-        <v-toolbar-title>User Photo</v-toolbar-title>
-        <v-spacer></v-spacer>
-        <v-btn icon dark @click="$emit('closeDialog')">
-          <v-icon>mdi-close-circle</v-icon>
-        </v-btn>
-      </v-toolbar>
-    </v-col>
-      <v-col cols="12" md="12">
-          <v-row class="ml-2">
-            <v-col cols="12" md="12">
-            <img :src="file" height="100%" width="700vh" />
-            </v-col>
-            <v-col cols="12" md="12">
-              <input type="file" id="file" ref="file" @change="changeImage"/>
-            </v-col>
-            <v-col cols="12" md="12">
-            <!-- <v-btn color="red" outlined @click="$emit('closeDialog')">Cancel</v-btn> -->
-            <v-btn
-              color="primary"
-              outlined
-              class="ml-2"
-              @click="savePicture()"
-            >Save</v-btn>
-        </v-col>
-        </v-row>
-        </v-col>
-    </v-row>
+  <v-dialog v-model="showDialog" max-width="500px" persistent>
+    <v-card>
+      <v-card-title class="headline grey lighten-4">
+        <v-icon left color="primary">mdi-camera-plus</v-icon>
+        Upload Profile Photo
+      </v-card-title>
+
+      <v-card-text class="d-flex flex-column align-center">
+        <!-- Image Preview -->
+        <v-avatar size="150" class="mb-4">
+          <v-img :src="imagePreview || defaultImage" />
+        </v-avatar>
+
+        <!-- File Input -->
+        <v-file-input
+          v-model="selectedFile"
+          label="Choose a photo"
+          accept="image/*"
+          prepend-icon="mdi-upload"
+          outlined
+          dense
+          hide-details
+        ></v-file-input>
+      </v-card-text>
+
+      <v-card-actions class="justify-end">
+        <v-btn text color="red" @click="closeDialog">Cancel</v-btn>
+        <v-btn color="primary" @click="savePicture">Upload</v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
 </template>
+
 <script>
-import axios from "../config";
-import userService from "../service/UserAccountService.js";
+import userService from "@/service/UserAccountService.js";
+
 export default {
-  data: () => ({
-    file:"",
-    showForm : false,
-  }),
-   props: {user:Object},
-  mounted: function() {
-    this.file = `${axios.defaults.baseURL}/userphoto/${this.user?.photo}.png`;
+  props: ["user"],
+  data() {
+    return {
+      showDialog: true,
+      selectedFile: null,
+      imagePreview: null,
+      defaultImage: new URL('@/assets/loginProfile.png', import.meta.url).href,
+    };
+  },
+  watch: {
+    selectedFile(newFile) {
+      if (!newFile) {
+        this.imagePreview = null;
+        return;
+      }
+      const file = Array.isArray(newFile) ? newFile[0] : newFile;
+      const reader = new FileReader();
+      reader.onload = e => (this.imagePreview = e.target.result);
+      reader.readAsDataURL(file);
+    },
   },
   methods: {
-    savePicture:function(){
-var formData = new FormData();
-      formData.append("file", this.$refs.file.files[0]);
-      userService
-        .updatePhoto(formData,this.user.userAccountId)
-        .then(response => {
-            this.$emit('loadUserList');
-          this.$swal({
-                title: "Successful",
-                text: "Success!",
-                type: "success",
-                timer: 500,
-              });
-              //this.$emit('userMethod');
+    closeDialog() {
+      this.showDialog = false;
+      this.$emit("closeDialog");
+    },
+
+    savePicture() {
+      if (!this.selectedFile) {
+        alert("Please select a file!");
+        return;
+      }
+
+      const file = Array.isArray(this.selectedFile) ? this.selectedFile[0] : this.selectedFile;
+      const formData = new FormData();
+      formData.append("file", file);
+
+      userService.updatePhoto(formData, this.user.userId)
+        .then(() => {
+          // Update localStorage instantly
+          const storedUser = JSON.parse(localStorage.getItem("user")) || {};
+          storedUser.profilePhoto = file.name;
+          localStorage.setItem("user", JSON.stringify(storedUser));
+
+          this.$emit("refreshUserPhoto"); // parent will refresh avatar
+          this.closeDialog();
+          alert("Photo uploaded successfully!");
         })
-        .catch(error => {
-          this.$swal("Unfortunately, Error", error.response.data.message, "error");
+        .catch(err => {
+          console.error(err);
+          alert("Upload failed!");
         });
     },
-        changeImage: function(e) {
-      let image = e.target.files[0];
-      let reader = new FileReader();
-      reader.readAsDataURL(image);
-      reader.onload = e => {
-        this.file = e.target.result;
-      };
-    }
   },
-  watch: {},
-  components: {}
 };
 </script>
-<style scoped>
 
+<style scoped>
+.v-avatar {
+  border: 2px dashed #2196f3;
+  overflow: hidden;
+}
 </style>

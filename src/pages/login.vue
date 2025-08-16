@@ -104,7 +104,7 @@
                   />
                 </template>
                 <v-date-picker
-                  v-model="user.dob"
+                  v-model="user.age"
                   @update:model-value="updateDob"
                 />
               </v-menu>
@@ -213,7 +213,7 @@ userName: "",
 email: "",
 nrc: "",
 gender: "",
-dob: null,
+age: null,
  phonenum: "",
  address: "",
 photo: null,
@@ -310,7 +310,7 @@ async clickLogin() {
 //     },
     updateDob(date) {
   this.dobMenu = false;
-  this.user.dob = new Date(date); // store Date object
+  this.user.age = new Date(date); // store Date object
   this.formattedDob = format(new Date(date), "yyyy-MM-dd"); // optional, for display
 },
     updateStartDate(date) {
@@ -324,7 +324,7 @@ async clickLogin() {
     userName: this.user.userName,
     password: this.user.password,
     email: this.user.email,
-    dob: this.user.dob ? this.user.dob.toISOString().split("T")[0] : null,
+    age: this.user.age ? this.user.age.toISOString().split("T")[0] : null,
     gender: this.user.gender,
     phonenum: this.user.phonenum,
     nrc: this.user.nrc,

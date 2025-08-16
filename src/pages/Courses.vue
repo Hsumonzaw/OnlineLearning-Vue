@@ -73,6 +73,8 @@
               <th class="text-center white--text bg-primary">Language Name</th>
               <th class="text-center white--text bg-primary">Type</th>
               <th class="text-center white--text bg-primary">Amount</th>
+              <th class="text-center white--text bg-primary">Status</th>
+
               <!-- <th class="text-center white--text bg-primary" v-if="showdemand">Courses Photo</th> -->
               <!-- <th class="text-center white--text bg-primary">Exam Link</th> -->
               <!-- <th class="text-center white--text bg-primary" v-if="showdemand">Book Link</th> -->
@@ -102,6 +104,13 @@
 
               <td class="text-center">{{ item?.type }}</td>
               <td class="text-center">{{ item?.amount }}</td>
+          <td
+    class="text-center"
+    :style="{ color: item?.doneState === 'DONE' ? 'green' : 'red' }"
+    @click="toggleDoneState(item)"
+  >
+    {{ item?.doneState }}
+  </td>
               <!-- <td class="text-center" v-if="showdemand"><v-img
   :src="getCoursePhotoUrl(item.cphoto)"
   alt="Course Photo"
@@ -157,7 +166,7 @@
         :class="{ 'grand-total': total.isGrandTotal }"
       >
         <td colspan="5" class="total-label text-center white--text bg-primary">{{ total.label }}</td>
-        <td class="total-amount text-center white--text bg-primary">{{ total.value }}</td>
+        <td colspan="2" class="total-amount text-center white--text bg-primary">{{ total.value }}</td>
       </tr>
     </tfoot>
         </v-table>
@@ -389,6 +398,40 @@ export default {
 
   },
   methods: {
+    toggleDoneState(item) {
+      // Only change the status if it is currently 'PENDING'
+      if (item.doneState === 'PENDING') {
+        item.doneState = 'DONE';
+
+        // You would typically call an API here to persist the change to the backend.
+        // For example:
+         this.updateCourseInBackend(item); 
+      }
+    },
+    // toggleDoneState(item) {
+    //   // Toggle the state locally
+    //   item.doneState = item.doneState === 'DONE' ? 'PENDING' : 'DONE';
+      
+    //   // Send the updated item to the backend
+    //   this.updateCourseInBackend(item);
+    // },
+
+    updateCourseInBackend(item) {
+      coursesService.updateCourse(item)
+        .then(() => {
+          this.$swal({
+            icon: "success",
+            title: "Status updated!",
+            showConfirmButton: false,
+            timer: 1000,
+          });
+        })
+        .catch((error) => {
+          // If the backend call fails, revert the state on the frontend
+          item.doneState = item.doneState === 'DONE' ? 'PENDING' : 'DONE';
+          this.$swal("Fail!", error.response?.data?.message || "Error updating status", "error");
+        });
+    },
     LanguagesListMethodByType() {
   coursesService.getCourseList()
     .then((response) => {

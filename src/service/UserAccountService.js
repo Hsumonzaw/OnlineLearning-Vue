@@ -69,7 +69,7 @@ class UserAccountService {
   updatePhoto(formData, userAccountId) {
     let url = `/useraccounts/${userAccountId}/photo`;
     return axios
-      .put(url, formData, {
+      .post(url, formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
