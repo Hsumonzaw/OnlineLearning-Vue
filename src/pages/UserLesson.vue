@@ -5,6 +5,7 @@
     style="background-color: #f0f4f8"
   >
     <v-row no-gutters>
+     
       <!-- Sidebar -->
       <v-col md="2" class="pa-4" style=" background-color: white; box-shadow: 2px 0 8px rgba(0, 0, 0, 0.05);" >
         <h3 class="text-center font-weight-bold mb-4" style="color: #1565c0">
@@ -24,7 +25,11 @@
       </v-col>
 
       <!-- Lessons -->
+
       <v-col md="10" class="pa-4">
+        <v-alert type="info" outlined dense class="mb-6">
+    You can study the subjects on this website step by step. By purchasing a subject, you gain access to both the full course content and the corresponding exam. After completing the course, you can take the exam to test your knowledge. If you score 50 or more, you will be awarded a Certificate of Completion.
+  </v-alert>
         <v-row>
           <v-col
             v-for="(lesson, i) in lessonList"

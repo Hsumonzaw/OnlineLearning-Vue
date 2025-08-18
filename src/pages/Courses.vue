@@ -10,7 +10,7 @@
   v-model="type"
 
   :items="doneStateList"
-  label="Done Or Pending"
+  label="Approved Or Pending"
 
   density="compact"
   variant="outlined"
@@ -106,7 +106,7 @@
               <td class="text-center">{{ item?.amount }}</td>
           <td
     class="text-center"
-    :style="{ color: item?.doneState === 'DONE' ? 'green' : 'red' }"
+    :style="{ color: item?.doneState === 'APPROVED' ? 'green' : 'red' }"
     @click="toggleDoneState(item)"
   >
     {{ item?.doneState }}
@@ -362,7 +362,7 @@ export default {
     userType: "STUDENT",
     languageList: [],
     courseList: ["ALL","COURSES", "EXAM"],
-    doneStateList : ["ALL","DONE","PENDING"],
+    doneStateList : ["ALL","APPROVED","PENDING"],
     coursesList: [],
     dialogDelete: false,
     showForm:false,
@@ -403,7 +403,7 @@ export default {
     toggleDoneState(item) {
       // Only change the status if it is currently 'PENDING'
       if (item.doneState === 'PENDING') {
-        item.doneState = 'DONE';
+        item.doneState = 'APPROVED';
 
         // You would typically call an API here to persist the change to the backend.
         // For example:
@@ -430,7 +430,7 @@ export default {
         })
         .catch((error) => {
           // If the backend call fails, revert the state on the frontend
-          item.doneState = item.doneState === 'DONE' ? 'PENDING' : 'DONE';
+          item.doneState = item.doneState === 'APPROVED' ? 'PENDING' : 'APPROVED';
           this.$swal("Fail!", error.response?.data?.message || "Error updating status", "error");
         });
     },
@@ -716,7 +716,7 @@ filterCoursesList() {
     
     totalDoneAmount() {
       return this.filteredCoursesList
-        .filter(item => item.doneState === 'DONE')
+        .filter(item => item.doneState === 'APPROVED')
         .reduce((sum, item) => sum + Number(item.amount || 0), 0);
     },
 
@@ -730,8 +730,8 @@ filterCoursesList() {
     // Totals to display in footer
     dynamicTotals() {
       const totals = [];
-      if (!this.type || this.type === 'ALL' || this.type === 'DONE') {
-        totals.push({ label: 'Total Done Amount:', value: this.totalDoneAmount, isGrandTotal: true });
+      if (!this.type || this.type === 'ALL' || this.type === 'APPROVED') {
+        totals.push({ label: 'Total APPROVED Amount:', value: this.totalDoneAmount, isGrandTotal: true });
       }
       if (!this.type || this.type === 'ALL' || this.type === 'PENDING') {
         totals.push({ label: 'Total Pending Amount:', value: this.totalPendingAmount, isGrandTotal: true });

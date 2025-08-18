@@ -124,7 +124,7 @@
     </v-col>
   </v-row>
   <v-container class="d-flex justify-end" mb-0>
-   <router-link to="/userlessons" class="font-weight-bold  learn-more-btn">
+   <router-link to="/usercourses" class="font-weight-bold  learn-more-btn">
      Learn More
       <v-icon end>mdi-chevron-right</v-icon>
 </router-link>
@@ -198,10 +198,24 @@
     <h2 class="font-weight-bold" style="color: #0288d1; font-size: 4rem; margin-bottom: 12px;">
     We're  Hiring
     </h2>
-    <v-img src="@/assets/airplane.svg" max-width="200" />
-    <p style="color: #455a64; font-size: 2rem;">
-      Join our growing team! We're looking for passionate instructors and tech enthusiasts to empower learners worldwide.
+
+    <p style="color: #455a64; font-size: 1rem;">
+      Join our growing team! We're looking for passionate instructors and tech enthusiasts to empower learners worldwide.We’re more than just a learning platform; we’re a family of educators and students who grow together. If you have the passion to teach and inspire, we’d love to welcome you to our team.
     </p>
+     <div style="margin-top: 24px;">
+      
+    <h3 style="color: #0288d1; font-size: 1.5rem; margin-bottom: 12px;">
+      Requirements
+    </h3>
+    <ul style="color: #455a64; font-size: 1rem; line-height: 1.8; padding-left: 20px;" class="requirement-list">
+      <li>Minimum qualification: <strong>B.A (English), B.A (Japanese), B.C.Sc, or higher</strong>.</li>
+      <li>At least <strong>3 years of teaching experience</strong>.</li>
+      <li>Strong communication and presentation skills.</li>
+      <li>Ability to create engaging lessons and motivate students.</li>
+      <li>Knowledge of modern teaching methods and digital tools is a plus.</li>
+      <li>Commitment to professionalism and continuous learning.</li>
+    </ul>
+  </div>
     <v-btn
       color="primary"
       class="mt-4"
@@ -448,6 +462,8 @@ export default {
       "Ph.D(IT)",
       "B.A (English)",
       "M.A (English)",
+      "B.A (Japanese)",
+      "M.A (Japanese)",
       "B.C.Tech",
       "M.C.Teach",
       "Ph.D (CHT)",
@@ -808,6 +824,25 @@ formattedName: {
 .v-col {
   overflow: visible !important;
 }
+.requirement-list {
+  list-style: none;
+  padding-left: 0;
+  font-size: 1rem;
+  color: #455a64;
+}
+.requirement-list li {
+  position: relative;
+  margin-bottom: 10px;
+  padding-left: 28px;
+}
+.requirement-list li::before {
+  content: "✔";
+  position: absolute;
+  left: 0;
+  color: #0288d1;
+  font-weight: bold;
+}
+
 
 
 

@@ -45,7 +45,7 @@
               <v-list-item-title><v-icon>mdi-account-multiple</v-icon> My Students</v-list-item-title>
             </v-list-item>
             <v-list-item @click="clickRouter('/courses')" v-if="showTeacher">
-              <v-list-item-title><v-icon>mdi-folder-open</v-icon> Ledger</v-list-item-title>
+              <v-list-item-title><v-icon>mdi-folder-open</v-icon> Income Records</v-list-item-title>
             </v-list-item>
             <v-list-item @click="clickRouter('/languages')" v-if="showTeacher">
               <v-list-item-title><v-icon>mdi-web</v-icon>Add Courses</v-list-item-title>

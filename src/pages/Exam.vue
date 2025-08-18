@@ -35,12 +35,15 @@
     @click="clickTakeExam(language)"
     class="font-weight-bold learn-more-btn"
   >Take Exam</a>
-            <!-- <a v-else @click="handleExam(language)" class="font-weight-bold  learn-more-btn d-flex align-center" style="cursor: pointer;"> -->
-            <a v-else class="font-weight-bold  learn-more-btn d-flex align-center" style="cursor: pointer;">
- 
-              Subscribe Now
-            <v-img src="@/assets/lock.png" alt="Logo"  style="width: 40px; height: 35px; margin-right: 8px;" />
-            </a>
+            <a
+  v-else
+  @click="handleExam(language)"
+  class="font-weight-bold learn-more-btn d-flex align-center"
+  style="cursor: pointer;"
+>
+  Subscribe Now
+  <v-img src="@/assets/lock.png" alt="Logo" style="width: 40px; height: 35px; margin-right: 8px;" />
+</a>
 
             </v-btn>
 
@@ -370,20 +373,18 @@ export default {
     handleExam(language) {
       this.selectedOne = language;
        this.selectedType = "EXAM";
+
       if (!this.userData?.role) {
         this.$swal({
-          title: "You need to register or login first",
+          title: "Invest in your learning! Purchase this course and you’ll be eligible to take the exam and earn a certificate.",
           icon: "warning",
-          showCancelButton: true,
-          confirmButtonText: "Register/Login",
-          cancelButtonText: "Cancel",
-        }).then((res) => {
-          if (res.isConfirmed) {
-            this.showForm = true;
-          }
+          
         });
         return;
       }
+      
+      
+    
       //this.dialogChooseType = true; // open choose type dialog (course/exam)
       this.dialogBuyNow = true;
     },

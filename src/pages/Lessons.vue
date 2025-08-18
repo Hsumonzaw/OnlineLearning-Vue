@@ -2,6 +2,7 @@
   <div>
     <!-- Table Section -->
     <v-row class="title">
+ 
       <v-col cols="12">
         <h1 style="background-color:#b3e5fc;text-align: center;">Lessons</h1>
 
