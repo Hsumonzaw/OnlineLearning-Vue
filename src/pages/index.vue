@@ -372,7 +372,7 @@
                 <template v-slot:activator="{ props }">
                   <v-text-field
                     v-model="user.startDate"
-                    label="From Date"
+                    label="Apply Date"
                     readonly
                     v-bind="props"
                     variant="outlined"
@@ -583,7 +583,7 @@ async saveUser() {
     this.$swal({
       icon: "success",
       title: "Congratulations!",
-      text: "You are now a CodeLingo Teacher. Please log in.",
+      text: "You are now a Learn Hub Teacher. Please log in.",
       showConfirmButton: true,
       confirmButtonText: "OK",
       timer: 10000,

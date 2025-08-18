@@ -54,19 +54,7 @@
              <v-row dense>
               <!-- LEFT COLUMN -->
              <v-col cols="12" md="6">
-              <v-file-input
-  v-model="user.photo"
-  accept="image/*"
-  label="Upload Photo"
-  prepend-icon="mdi-camera"
-  dense
-  hide-details
-  show-size
-  @change="previewImage"
-/>
-
-
-
+            
                    <v-text-field 
                         v-model="user.name"
                         label="Full Name"
@@ -108,10 +96,13 @@
                   @update:model-value="updateDob"
                 />
               </v-menu>
-              </v-col>
-       
-           <!-- RIGHT COLUMN -->   
-            <v-col cols="12" md="6">
+                 <v-text-field
+                  v-model="user.email"
+                  label="Email"
+                  prepend-icon="mdi-email"
+                  :rules="emailRules"
+                  variant="outlined"
+                />
               <v-text-field
                         v-model="user.password"
                         label="Password"
@@ -122,13 +113,12 @@
                         @click:append-inner="showPassword = !showPassword"
                         :rules="passwordRules"
                       />
-                <v-text-field
-                  v-model="user.email"
-                  label="Email"
-                  prepend-icon="mdi-email"
-                  :rules="emailRules"
-                  variant="outlined"
-                />
+              </v-col>
+       
+           <!-- RIGHT COLUMN -->   
+            <v-col cols="12" md="6">
+              
+             
                 <v-text-field
                   v-model="user.phonenum"
                   label="Phone Number"
