@@ -8,10 +8,10 @@
         <v-col cols="2" class="pl-1 pt-5">
       <v-autocomplete
   v-model="type"
-  item-text="typeName"
-  :items="courseList"
-  label="Course Or Exam"
-  return-object
+
+  :items="doneStateList"
+  label="Done Or Pending"
+
   density="compact"
   variant="outlined"
   required
@@ -71,7 +71,7 @@
               <th class="text-center white--text bg-primary">Received Date</th>
               <th class="text-center white--text bg-primary">Student Name</th>
               <th class="text-center white--text bg-primary">Language Name</th>
-              <th class="text-center white--text bg-primary">Type</th>
+              <!-- <th class="text-center white--text bg-primary">Type</th> -->
               <th class="text-center white--text bg-primary">Amount</th>
               <th class="text-center white--text bg-primary">Status</th>
 
@@ -102,7 +102,7 @@
 
               <td class="text-center">{{ item.languagesDto?.name }}</td>
 
-              <td class="text-center">{{ item?.type }}</td>
+              <!-- <td class="text-center">{{ item?.type }}</td> -->
               <td class="text-center">{{ item?.amount }}</td>
           <td
     class="text-center"
@@ -362,6 +362,7 @@ export default {
     userType: "STUDENT",
     languageList: [],
     courseList: ["ALL","COURSES", "EXAM"],
+    doneStateList : ["ALL","DONE","PENDING"],
     coursesList: [],
     dialogDelete: false,
     showForm:false,
@@ -390,10 +391,11 @@ export default {
 
 
     this.coursesListMethod();
-    this.courses.type = this.courseList[0];
+   // this.courses.type = this.courseList[0];
+    this.courses.doneState = this.doneStateList[0];
     this.showForm = false;
-    this.courseListMethodByType();
-    this.LanguagesListMethodByType();
+    // this.courseListMethodByType();
+    // this.LanguagesListMethodByType();
     this.filterCoursesList();
 
   },
@@ -432,21 +434,21 @@ export default {
           this.$swal("Fail!", error.response?.data?.message || "Error updating status", "error");
         });
     },
-    LanguagesListMethodByType() {
-  coursesService.getCourseList()
-    .then((response) => {
-      if (!this.selectedLanguage || !this.selectedLanguage.languagesId) {
-        this.coursesList = response;
-      } else {
-        this.coursesList = response.filter(
-          item => item.languagesDto?.languagesId === this.selectedLanguage.languagesId
-        );
-      }
-    })
-    .catch((error) => {
-      this.$swal("Fail!", error.response?.data?.message || "Error loading lessons", "error");
-    });
-},
+//     LanguagesListMethodByType() {
+//   coursesService.getCourseList()
+//     .then((response) => {
+//       if (!this.selectedLanguage || !this.selectedLanguage.languagesId) {
+//         this.coursesList = response;
+//       } else {
+//         this.coursesList = response.filter(
+//           item => item.languagesDto?.languagesId === this.selectedLanguage.languagesId
+//         );
+//       }
+//     })
+//     .catch((error) => {
+//       this.$swal("Fail!", error.response?.data?.message || "Error loading lessons", "error");
+//     });
+// },
     demand(){
       this.showdemand = false;
     },
@@ -457,17 +459,18 @@ export default {
   if (!cphoto) return "path/to/default-image.png"; // fallback image path
   return `${axios.defaults.baseURL}/coursephoto/${cphoto}.png`;
 },
-    courseListMethodByType() {
-  coursesService.getCourseList()
-    .then((response) => {
-      if (this.type === 'ALL') {
-        this.coursesList = response;
-      } else {
-        this.coursesList = response.filter(item => item.type === this.type);
-      }
-    })
-    .catch((err) => console.error("Fetch error:", err));
-},
+//    courseListMethodByType() {
+//   coursesService.getCourseList()
+//     .then((response) => {
+//       if (this.type === 'ALL' || !this.type) {
+//         this.coursesList = response;
+//       } else {
+//         this.coursesList = response.filter(item => item.doneState === this.type);
+//       }
+//     })
+//     .catch((err) => console.error("Fetch error:", err));
+// },
+
 
 
        loadUserList:function(){
@@ -554,12 +557,13 @@ export default {
               receivedDate: format(this.receivedPicker, "dd-MM-yyyy"),
               studentDto: this.studentList[0],
               languagesDto: this.languageList[0],
-              type: this.courseList[0],
+              type: this.doneStateList[0],
               amount: 0,
             };
             this.showForm =false;
-             this.courseListMethodByType();
-                 this.LanguagesListMethodByType();
+            //  this.courseListMethodByType();
+            //      this.LanguagesListMethodByType();
+            this.filterCoursesList()
 
           this.$swal({
           icon: "success",
@@ -584,13 +588,14 @@ export default {
               receivedDate: format(this.receivedPicker, "dd-MM-yyyy"),
               studentDto: this.studentList[0],
               languagesDto: this.languageList[0],
-              type: this.courseList[0],
+              type: this.doneStateList[0],
               amount: 0,
             };
             this.coursesListMethod();
             this.showForm =false;
-             this.courseListMethodByType();
-                 this.LanguagesListMethodByType();
+            //  this.courseListMethodByType();
+            //      this.LanguagesListMethodByType();
+            this.filterCoursesList();
 
             this.$swal({
           icon: "success",
@@ -623,9 +628,9 @@ export default {
         .then((response) => {
 
           this.dialogDelete = false;
-          this.courseListMethodByType();
-              this.LanguagesListMethodByType();
-
+          // this.courseListMethodByType();
+          //     this.LanguagesListMethodByType();
+          this.filterCoursesList();
           this.$swal({
             icon: "success",
             title: "Your work has been deleted",
@@ -643,31 +648,31 @@ export default {
     receivedDate: format(new Date(), "dd-MM-yyyy"),
     studentDto: this.studentList[0],
     languagesDto: this.languageList[0],
-    type: this.courseList[0],
+    type: this.doneStateList[0],
     amount: 0,
   };
   this.showForm = false;
   this.saveOrupdate = "SAVE";
 },
 filterCoursesList() {
-  coursesService.getCourseList()
-    .then((response) => {
-      let filtered = response;
+      coursesService.getCourseList()
+        .then((response) => {
+          let filtered = response;
 
-      // Filter by type (if not ALL)
-      if (this.type && this.type !== 'ALL') {
-        filtered = filtered.filter(item => item.type === this.type);
-      }
+          // Filter by doneState (the type variable)
+          if (this.type && this.type !== 'ALL') {
+            filtered = filtered.filter(item => item.doneState === this.type);
+          }
 
-      // Filter by selectedLanguage (if set)
-      if (this.selectedLanguage && this.selectedLanguage.languagesId) {
-        filtered = filtered.filter(item => item.languagesDto?.languagesId === this.selectedLanguage.languagesId);
-      }
+          // Filter by selectedLanguage
+          if (this.selectedLanguage && this.selectedLanguage.languagesId) {
+            filtered = filtered.filter(item => item.languagesDto?.languagesId === this.selectedLanguage.languagesId);
+          }
 
-      this.coursesList = filtered;
-    })
-    .catch((err) => console.error("Fetch error:", err));
-}
+          this.coursesList = filtered;
+        })
+        .catch((err) => console.error("Fetch error:", err));
+   }
 
   },
   watch: {
@@ -692,64 +697,48 @@ filterCoursesList() {
   }
   },
   computed: {
+    filteredCoursesList() {
+    return this.coursesList.filter(item => {
+      // Done/Pending filter
+      if (this.type && this.type !== 'ALL' && item.doneState !== this.type) {
+        return false;
+      }
+
+      // Language filter
+      if (this.selectedLanguage?.languagesId && item.languagesDto?.languagesId !== this.selectedLanguage.languagesId) {
+        return false;
+      }
+
+      return true;
+    });
+  },
+
     
-    // Total amount for all items combined
-    totalAmount() {
-      return this.coursesList.reduce((sum, item) => sum + item.amount, 0);
+    totalDoneAmount() {
+      return this.filteredCoursesList
+        .filter(item => item.doneState === 'DONE')
+        .reduce((sum, item) => sum + Number(item.amount || 0), 0);
     },
 
-    // Total amount for all courses
-    totalCoursesAmount() {
-      return this.coursesList.reduce((sum, item) => {
-        if (item.type === 'COURSES') {
-          return sum + item.amount;
-        }
-        return sum;
-      }, 0);
+    // Total PENDING amount
+    totalPendingAmount() {
+      return this.filteredCoursesList
+        .filter(item => item.doneState === 'PENDING')
+        .reduce((sum, item) => sum + Number(item.amount || 0), 0);
     },
 
-    // Total amount for all exams
-    totalExamsAmount() {
-      return this.coursesList.reduce((sum, item) => {
-        if (item.type === 'EXAM') {
-          return sum + item.amount;
-        }
-        return sum;
-      }, 0);
-    },
-
-    // Amount for each specific course or exam
-    itemTotals() {
-      const totals = {};
-      this.coursesList.forEach(item => {
-        const key = `${item.languagesDto.name} - ${item.type}`;
-        if (!totals[key]) {
-          totals[key] = 0;
-        }
-        totals[key] += item.amount;
-      });
+    // Totals to display in footer
+    dynamicTotals() {
+      const totals = [];
+      if (!this.type || this.type === 'ALL' || this.type === 'DONE') {
+        totals.push({ label: 'Total Done Amount:', value: this.totalDoneAmount, isGrandTotal: true });
+      }
+      if (!this.type || this.type === 'ALL' || this.type === 'PENDING') {
+        totals.push({ label: 'Total Pending Amount:', value: this.totalPendingAmount, isGrandTotal: true });
+      }
       return totals;
     },
-     dynamicTotals() {
-    // If 'ALL' is selected, return all three totals.
-    if (this.type === 'ALL') {
-      return [
-       
-        { label: 'Total Amount:', value: this.totalAmount, isGrandTotal: true }
-      ];
-    } 
-    // If 'COURSES' is selected, return only the total for courses.
-    else if (this.type === 'COURSES') {
-      return [{ label: 'Total Course Amount:', value: this.totalCoursesAmount }];
-    } 
-    // If 'EXAM' is selected, return only the total for exams.
-    else if (this.type === 'EXAM') {
-      return [{ label: 'Total Exam Amount:', value: this.totalExamsAmount }];
-    }
-    
-    // Fallback if no type is selected
-    return [];
-  },
+   
     popularCoursesData() {
     // Filter only courses (not exams)
     const filtered = this.coursesList.filter(item => item.type === 'COURSES');
