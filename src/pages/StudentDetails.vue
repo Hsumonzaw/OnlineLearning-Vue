@@ -44,7 +44,7 @@
               <th class="text-center white--text bg-primary">Email</th>
               <th class="text-center white--text bg-primary">Phone</th>
               <th class="text-center white--text bg-primary">Address</th>
-              <th class="text-center white--text bg-primary">Photo</th>
+              <!-- <th class="text-center white--text bg-primary">Photo</th> -->
               <th v-if="isStudent" class="text-center white--text bg-primary">Exam Mark</th>
               <th v-if="isStudent" class="text-center white--text bg-primary">Generate Certificate</th>
             </tr>
@@ -72,7 +72,7 @@
               <td class="text-center">{{ item.email || item.studentDto?.email }}</td>
               <td class="text-start">{{ item.phonenum || item.studentDto?.phonenum }}</td>
               <td class="text-start">{{ item.address || item.studentDto?.address }}</td>
-              <td class="text-center">
+              <!-- <td class="text-center">
                 <v-img
                   :src="getUserPhotoUrl(item.photo)"
                   alt="People Photo"
@@ -81,7 +81,7 @@
                   contain
                   loading="lazy"
                 />
-              </td>
+              </td> -->
               <td v-if="isStudent" class="text-center">{{ item.examDto?.examMark ?? '-' }}</td>
               <td v-if="isStudent" class="text-center">
                 <v-icon v-if="item.examDto?.examMark >= 50" color="green" title="Pass"
@@ -261,10 +261,10 @@ export default {
         this.$swal("Error", "Failed to export to Excel", "error");
       }
     },
-    getUserPhotoUrl(photo) {
-      if (!photo) return "path/to/default-image.png";
-      return `/userphoto/${photo}.png`; // adjust to your backend baseURL
-    },
+    // getUserPhotoUrl(photo) {
+    //   if (!photo) return "path/to/default-image.png";
+    //   return `${axios.defaults.baseURL}/userphoto/${photo}.png`;
+    // },
   },
   computed: {
     isStudent() {
