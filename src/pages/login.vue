@@ -75,27 +75,32 @@
                         :rules="[rules.required]"
                         variant="outlined"
                       />
-                                <v-menu
-                v-model="dobMenu"
+              <v-menu
+                v-model="dateBirth"
                 :close-on-content-click="false"
                 transition="scale-transition"
                 offset-y
               >
                 <template v-slot:activator="{ props }">
                   <v-text-field
-                    v-bind="props"
-                    v-model="formattedDob"
+                    v-model="user.age"
                     label="Date of Birth"
                     prepend-icon="mdi-calendar"
+                    :rules="[rules.required, rules.age]"
                     readonly
-                    outlined
+                    v-bind="props"
+                    variant="outlined"
+                    density="compact"
                   />
                 </template>
                 <v-date-picker
-                  v-model="user.age"
-                  @update:model-value="updateDob"
+                  v-model="birthPicker"
+                  color="primary"
+                  hide-header
+                  @update:modelValue="dateBirth = false"
                 />
               </v-menu>
+
                  <v-text-field
                   v-model="user.email"
                   label="Email"
@@ -148,17 +153,21 @@
               >
                 <template v-slot:activator="{ props }">
                   <v-text-field
-                    v-bind="props"
-                    v-model="formattedStartDate"
-                    label="Register Date"
-                    prepend-icon="mdi-calendar"
+                    v-model="user.startDate"
+                    label="Apply Date"
                     readonly
-                    outlined
+                    v-bind="props"
+                    prepend-icon="mdi-calendar"
+                    variant="outlined"
+                    density="compact"
+                    disabled
                   />
                 </template>
                 <v-date-picker
-                  v-model="user.startDate"
-                  @update:model-value="updateStartDate"
+                  v-model="startPicker"
+                  color="primary"
+                  hide-header
+                  @update:modelValue="startMenu = false"
                 />
               </v-menu>
             </v-col>
@@ -187,11 +196,16 @@ data: () => ({
   tab: "login",
 
   showPassword: false,
-  dobMenu: false,
-  startMenu: false,
-  formattedDob: "",
-  formattedStartDate: "",
+  // dobMenu: false,
+  // dobPicker : null,
+  // startMenu: false,
+  // formattedDob: "",
+  // formattedStartDate: format(new Date(), "yyyy-MM-dd"), // today
+  startPicker: new Date(),
+    startMenu: false,
   selectedPhoto: null,
+  birthPicker: new Date(),
+    dateBirth: false,
   loginData: {
         userName: "",
         password: "",
@@ -208,7 +222,7 @@ age: null,
  address: "",
 photo: null,
 photoPreview: null,
-startDate: null, 
+        startDate: "" // send to DB
  },
 
 //  startPicker: new Date(),
@@ -238,6 +252,10 @@ rules: {
 },
  }),
  props: { hideToolbar: Function },
+ mounted(){
+      this.user.startDate = format(this.startPicker, "dd-MM-yyyy");
+
+ },
 //  mounted() {
 //     // const date = this.formatDate(new Date());
 //        this.user.startDate = format(this.startPicker, "dd-MM-yyyy");
@@ -246,6 +264,13 @@ rules: {
 //     // this.user.createdDate = date;
 //   },
 methods: {
+  formatTeacherName(user) {
+  if (user.gender === "Female") {
+    return `Ma ${user.name}`;
+  }else {
+    return `Mg ${user.name}`;
+  }
+},
     // toggleForm() {
     //   this.isLogin = !this.isLogin;
     //    this.$refs.form.reset();
@@ -295,31 +320,32 @@ async clickLogin() {
 // onPhotoSelected(files) {
 //       if (files && files.length > 0) {
 //         this.selectedPhoto = files[0];
-//         this.user.photoPreview = URL.createObjectURL(files[0]);
+//         this.user.photoPreview = URL.createObje
+// ctURL(files[0]);
 //       }
 //     },
-    updateDob(date) {
-  this.dobMenu = false;
-  this.user.age = new Date(date); // store Date object
-  this.formattedDob = format(new Date(date), "yyyy-MM-dd"); // optional, for display
-},
+  updateDob(date) {
+    this.dobMenu = false;
+    this.user.age = format(new Date(date), "yyyy-MM-dd"); // store safe string
+  },
     updateStartDate(date) {
       this.startMenu = false;
       this.formattedStartDate = format(new Date(date), "yyyy-MM-dd");
     },
   async clickRegister() {
+      const formattedName = this.formatTeacherName(this.user);
   // 1️⃣ Payload: DOB and startDate as formatted strings
   const payload = {
-    name: this.user.name,
+    name: formattedName,
     userName: this.user.userName,
     password: this.user.password,
     email: this.user.email,
-    age: this.user.age ? this.user.age.toISOString().split("T")[0] : null,
-    gender: this.user.gender,
+      age: this.user.age || null,       // already string
+      gender: this.user.gender,
     phonenum: this.user.phonenum,
     nrc: this.user.nrc,
     address: this.user.address,
-    startDate: this.user.startDate ? this.user.startDate.toISOString().split("T")[0] : null,
+    startDate: this.user.startDate || null,
     userType: "STUDENT"
   };
 
@@ -396,6 +422,14 @@ registerAccount(payload) {
   }
 
   },
+  birthPicker(){
+      this.dateBirth = false;
+      this.user.age = format(this.birthPicker,"dd-MM-yyyy");
+    },
+    startPicker() {
+      this.startMenu = false;
+      this.user.startDate = format(this.startPicker, "dd-MM-yyyy");
+    },
 }
 
 };

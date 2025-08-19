@@ -15,8 +15,8 @@
           <v-btn text to="/">Home</v-btn>
           <v-btn text to="/usercourses">Courses</v-btn>
           <v-btn text to="/userlessons">Lessons</v-btn>
-          <v-btn text to="/userteacher">Teachers</v-btn>
 <v-btn v-if="!userData.role || userData.role !== 'ADMIN'" text to="/userexam">Exam</v-btn>
+          <v-btn text to="/userteacher">Teachers</v-btn>
           <v-btn text to="/aboutus">About Us</v-btn>
           <v-btn v-if="userData.role === 'ADMIN'" text to="/admin">Dashboard</v-btn>
         </div>
@@ -109,9 +109,13 @@
           <v-icon>{{ isDark ? 'mdi-white-balance-sunny' : 'mdi-weather-night' }}</v-icon>
         </v-btn>
 
-       <span style="color: white; font-weight: bold; margin-left: 12px; margin-right: 16px; align-self: center;">
-       {{ userData.userName || "Guest" }}
-       </span> 
+       <span v-if="isLoggedIn" style="color: white; font-weight: bold; margin-left: 12px; margin-right: 16px; align-self: center;">
+  {{ userData.userName }}
+</span>
+<v-btn v-else color="white" small rounded @click="$router.push('/login')" style="margin-left: 12px; margin-right: 16px;">
+  Login
+</v-btn>
+
 
         <!-- Profile Avatar -->
         <v-menu offset-y>
@@ -124,30 +128,30 @@
        </v-btn>
           </template>
 
-          <v-card min-width="120">
+          <v-card min-width="120" v-if="isLoggedIn">
             <v-list>
-              <v-list-item v-if="!isLoggedIn" @click="clickRouter('/login')">
-                <v-list-item-title>Log In</v-list-item-title>
-              </v-list-item>
-              <v-list-item v-else @click="logout">
+              <v-list-item  @click="logout">
                 <v-list-item-title>Log Out</v-list-item-title>
               </v-list-item>
-              <v-list-item @click="showProfile = true">
+              <!-- <v-list-item  @click="showProfile = true">
              <v-list-item-title>View Profile</v-list-item-title>
-             </v-list-item>
-<v-list-item v-if="isLoggedIn" @click="openPhotoDialog()">
-  <v-list-item-title>Add Profile Photo</v-list-item-title>
+             </v-list-item> -->
+<v-list-item @click="openPhotoDialog()">
+  <v-list-item-title>View Profile</v-list-item-title>
 </v-list-item>
 
 
 
-
+              <!-- <v-list-item v-if="!isLoggedIn" @click="clickRouter('/login')">
+                <v-list-item-title>Log In</v-list-item-title>
+              </v-list-item> -->
              <!-- <v-list-item @click="showChangePassword = true">
             <v-list-item-title>Change Password</v-list-item-title>
             </v-list-item> -->
             </v-list>
           </v-card>
         </v-menu>
+
       </v-app-bar>
     </div>
 
@@ -205,7 +209,7 @@
       </v-container>
     </v-footer>
     <!-- View Profile Dialog -->
-<v-dialog v-model="showProfile" max-width="500px">
+<!-- <v-dialog v-model="showProfile" max-width="500px">
   <v-card>
     <v-card-title>
       <span class="text-h6">Your Profile</span>
@@ -228,13 +232,13 @@
         </v-col>
       </v-row>
     </v-card-text>
-    <!-- <v-list-item><b>Name:</b> {{ userData.name }}</v-list-item> -->
+   <v-list-item><b>Name:</b> {{ userData.name }}</v-list-item>
 
     <v-card-actions>
       <v-btn color="primary" @click="showProfile = false">Close</v-btn>
     </v-card-actions>
   </v-card>
-</v-dialog>
+</v-dialog> -->
 
 <!-- Change Password Dialog -->
 <!-- <v-dialog v-model="showChangePassword" max-width="500px">

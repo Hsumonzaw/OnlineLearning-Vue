@@ -205,7 +205,7 @@
      <div style="margin-top: 24px;">
       
     <h3 style="color: #0288d1; font-size: 1.5rem; margin-bottom: 12px;">
-      Requirements
+      Job Requirements
     </h3>
     <ul style="color: #455a64; font-size: 1rem; line-height: 1.8; padding-left: 20px;" class="requirement-list">
       <li>Minimum qualification: <strong>B.A (English), B.A (Japanese), B.C.Sc, or higher</strong>.</li>

@@ -48,7 +48,7 @@
       </v-btn>
     </v-col> -->
     </v-row>
-        <v-tooltip location="top">
+        <!-- <v-tooltip location="top">
   <template v-slot:activator="{ props }">
     <v-btn
       v-bind="props"
@@ -61,7 +61,7 @@
     </v-btn>
   </template>
   <span>Add Ledger</span>
-</v-tooltip>
+</v-tooltip> -->
 
         <!-- Table Full Width -->
         <v-table fixed-header height="92vh" >
@@ -165,7 +165,7 @@
         :key="index"
         :class="{ 'grand-total': total.isGrandTotal }"
       >
-        <td colspan="5" class="total-label text-center white--text bg-primary">{{ total.label }}</td>
+        <td colspan="4" class="total-label text-center white--text bg-primary">{{ total.label }}</td>
         <td colspan="2" class="total-amount text-center white--text bg-primary">{{ total.value }}</td>
       </tr>
     </tfoot>
