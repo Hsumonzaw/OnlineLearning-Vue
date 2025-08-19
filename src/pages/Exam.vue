@@ -35,7 +35,7 @@
     @click="clickTakeExam(language)"
     class="font-weight-bold learn-more-btn"
   >Take Exam</a>
-            <a
+  <a
   v-else
   @click="handleExam(language)"
   class="font-weight-bold learn-more-btn d-flex align-center"
@@ -371,23 +371,32 @@ export default {
   },
   methods: {
     handleExam(language) {
-      this.selectedOne = language;
-       this.selectedType = "EXAM";
+  this.selectedOne = language;
+  this.selectedType = "EXAM";
 
-      if (!this.userData?.role) {
-        this.$swal({
-          title: "Invest in your learning! Purchase this course and you’ll be eligible to take the exam and earn a certificate.",
-          icon: "warning",
-          
-        });
-        return;
+  if (!this.userData?.role) {
+    this.$swal({
+      title: "You need to register or login first",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Register/Login",
+      cancelButtonText: "Cancel",
+    }).then((res) => {
+      if (res.isConfirmed) {
+        this.showForm = true;
       }
-      
-      
-    
-      //this.dialogChooseType = true; // open choose type dialog (course/exam)
-      this.dialogBuyNow = true;
-    },
+    });
+    return;
+  }
+
+  // If user is logged in but not subscribed
+  this.$swal({
+    title: "To access this exam, please purchase the course first.",
+    icon: "info",
+    confirmButtonText: "OK",
+  });
+},
+
 
     clickTakeExam(language) {
       const languagesId = language.languagesId;

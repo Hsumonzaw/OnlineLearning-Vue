@@ -47,8 +47,8 @@
         class="text-subtitle-2 text-center mb-4"
         style="color: #616161; max-width: 400px; margin: 0 auto;"
       >
-        For successfully completing {{ languagesName }} quiz with a score of
-        <strong>{{ score }} / {{ total }}</strong>
+        For successfully completing {{ languagesName }} Exam
+        
       </p>
 
       <p class="text-caption text-center mb-10" style="color: #757575;">
